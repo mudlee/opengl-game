@@ -15,10 +15,10 @@ public class GameLoop {
     }
 
     public void loop() {
-        LOGGER.info("Running game loop...");
+        LOGGER.debug("Running game loop...");
         while (!glfwWindowShouldClose(windowID)) {
             glfwPollEvents();
         }
-        LOGGER.info("Game loop finished, quitting...");
+        LOGGER.debug("Game loop finished");
     }
 }
