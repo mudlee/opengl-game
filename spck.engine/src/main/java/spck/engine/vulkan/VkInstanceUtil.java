@@ -12,6 +12,10 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.lwjgl.glfw.GLFWVulkan.glfwGetRequiredInstanceExtensions;
@@ -37,7 +41,7 @@ import static org.lwjgl.vulkan.VK11.vkEnumerateInstanceLayerProperties;
 class VkInstanceUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(VkInstanceUtil.class);
 
-    static VkInstance create(boolean enableDebug) {
+    static VkInstance create() {
         int result;
 
         LOGGER.debug("Creating VkApplicationInfo...");
@@ -52,8 +56,8 @@ class VkInstanceUtil {
         checkValidationLayers();
 
         Optional<PointerBuffer> ppEnabledLayerNames = constructValidationLayers();
-        Optional<ByteBuffer[]> extensionBuffers = constructExtensionBuffers(enableDebug);
-        Optional<PointerBuffer> extensionNames = constructExtensionNames(extensionBuffers.orElse(null));
+        Map<String, ByteBuffer> extensionBuffers = constructExtensionBuffers();
+        PointerBuffer extensionNames = constructExtensionNames(extensionBuffers);
 
         LOGGER.debug("Creating VkInstanceCreateInfo...");
         VkInstanceCreateInfo vkInstanceCreateInfo = VkInstanceCreateInfo.calloc().
@@ -62,7 +66,7 @@ class VkInstanceUtil {
                 pApplicationInfo(vkAppInfo);
 
         ppEnabledLayerNames.ifPresent(vkInstanceCreateInfo::ppEnabledLayerNames);
-        extensionNames.ifPresent(vkInstanceCreateInfo::ppEnabledExtensionNames);
+        vkInstanceCreateInfo.ppEnabledExtensionNames(extensionNames);
 
         LOGGER.debug("Creating vkInstance...");
         PointerBuffer pInstance = memAllocPointer(1);
@@ -73,12 +77,8 @@ class VkInstanceUtil {
         LOGGER.debug("vkInstance created, cleaning up...");
         memFree(pInstance);
         ppEnabledLayerNames.ifPresent(MemoryUtil::memFree);
-        extensionBuffers.ifPresent(byteBuffers -> {
-            for (ByteBuffer byteBuffer : byteBuffers) {
-                memFree(byteBuffer);
-            }
-        });
-        extensionNames.ifPresent(MemoryUtil::memFree);
+        extensionBuffers.values().forEach(MemoryUtil::memFree);
+        memFree(extensionNames);
         memFree(vkAppInfo.pApplicationName());
         memFree(vkAppInfo.pEngineName());
         vkAppInfo.free();
@@ -106,12 +106,8 @@ class VkInstanceUtil {
         memFree(validationLayerCount);
     }
 
-    private static Optional<PointerBuffer> constructExtensionNames(ByteBuffer[] extensionBuffers) {
+    private static PointerBuffer constructExtensionNames(Map<String, ByteBuffer> extensionBuffers) {
         LOGGER.debug("Constructing extension names...");
-        if (extensionBuffers == null) {
-            LOGGER.debug("- extensionBuffers is null, no extension name was added");
-            return Optional.empty();
-        }
 
         PointerBuffer requiredExtensions = glfwGetRequiredInstanceExtensions();
         if (requiredExtensions == null) {
@@ -124,43 +120,48 @@ class VkInstanceUtil {
         VkResultChecker.check(result, "Unabled to query Vulkan extension count.");
 
         LOGGER.debug("There are {} available extensions:", extensionCount.get(0));
+        List<String> availableExtensionNames = new ArrayList<>(extensionCount.get(0));
         VkExtensionProperties.Buffer extensionProperties = VkExtensionProperties.calloc(extensionCount.get(0));
         result = vkEnumerateInstanceExtensionProperties((ByteBuffer) null, extensionCount, extensionProperties);
         VkResultChecker.check(result, "Unabled to query Vulkan extension properties.");
         for (int i = 0; i < extensionCount.get(0); i++) {
             VkExtensionProperties properties = extensionProperties.get(i);
+            availableExtensionNames.add(properties.extensionNameString());
             LOGGER.debug("- {}, ver: {}", properties.extensionNameString(), properties.specVersion());
         }
         memFree(extensionCount);
         extensionProperties.free();
 
-        // adding extensions
+        LOGGER.debug("Adding extensions");
         PointerBuffer ppEnabledExtensionNames = memAllocPointer(requiredExtensions.remaining() + 1);
         ppEnabledExtensionNames.put(requiredExtensions);
+        LOGGER.debug("- required extensions added");
 
-        for (ByteBuffer extensionBuffer : extensionBuffers) {
-            ppEnabledExtensionNames.put(extensionBuffer);
+        for (Map.Entry<String, ByteBuffer> entry : extensionBuffers.entrySet()) {
+            String extensionName = entry.getKey();
+            ByteBuffer extensionBuffer = entry.getValue();
+
+            if (availableExtensionNames.contains(extensionName)) {
+                ppEnabledExtensionNames.put(extensionBuffer);
+                LOGGER.debug("- added: {}", extensionName);
+            } else {
+                LOGGER.debug("- failed: {}", extensionName);
+            }
         }
 
         ppEnabledExtensionNames.flip();
-        LOGGER.debug("- DONE");
-        return Optional.of(ppEnabledExtensionNames);
+        return ppEnabledExtensionNames;
     }
 
-    private static Optional<ByteBuffer[]> constructExtensionBuffers(boolean enableDebug) {
+    private static Map<String, ByteBuffer> constructExtensionBuffers() {
         LOGGER.debug("Constructing extension buffers...");
-        if (!enableDebug) {
-            LOGGER.debug("- debug is not enabled, no extension was added");
-            return Optional.empty();
-        }
 
-        ByteBuffer[] extensionBuffers = new ByteBuffer[]{
-                memUTF8(VK_EXT_DEBUG_REPORT_EXTENSION_NAME)
-        };
+        Map<String, ByteBuffer> extensionBuffers = new HashMap<>();
+        extensionBuffers.put(VK_EXT_DEBUG_REPORT_EXTENSION_NAME, memUTF8(VK_EXT_DEBUG_REPORT_EXTENSION_NAME));
 
         LOGGER.debug("- Added extension: {}", VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
 
-        return Optional.of(extensionBuffers);
+        return extensionBuffers;
     }
 
     /**

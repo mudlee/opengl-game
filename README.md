@@ -9,6 +9,11 @@ Run with VM parameters:
 ```java
 -XstartOnFirstThread -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true -Dorg.lwjgl.opengl.Display.enableOSXFullscreenModeAPI=true
 ```
+# Limitations
+
+## OSX
+https://github.com/KhronosGroup/MoltenVK/blob/master/Docs/MoltenVK_Runtime_UserGuide.md#limitations
+
 # Running from command line
 
 ## Packaging

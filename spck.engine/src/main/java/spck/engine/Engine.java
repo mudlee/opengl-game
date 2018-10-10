@@ -36,7 +36,7 @@ public class Engine implements Runnable{
     @Override
     public void run() {
         window.init();
-        vulkanUtil.init(os);
+        vulkanUtil.init();
 
         gameLoop.init(window.getWindowID());
         gameLoop.loop();
