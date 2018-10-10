@@ -8,8 +8,12 @@ import spck.engine.core.Window;
 import spck.engine.util.OSNameParser;
 import spck.engine.vulkan.VulkanUtil;
 
+import static org.lwjgl.vulkan.EXTDebugReport.VK_DEBUG_REPORT_ERROR_BIT_EXT;
+import static org.lwjgl.vulkan.EXTDebugReport.VK_DEBUG_REPORT_WARNING_BIT_EXT;
+
 public class Engine implements Runnable{
     private static final Logger LOGGER = LoggerFactory.getLogger(Engine.class);
+    private static final int DEBUG_FLAGS = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
     private final Thread GAME_LOOP_THREAD;
     private final Window window=new Window();
     private final VulkanUtil vulkanUtil = new VulkanUtil();
@@ -36,7 +40,7 @@ public class Engine implements Runnable{
     @Override
     public void run() {
         window.init();
-        vulkanUtil.init();
+        vulkanUtil.init(DEBUG_FLAGS);
 
         gameLoop.init(window.getWindowID());
         gameLoop.loop();

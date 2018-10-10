@@ -25,6 +25,7 @@ import static org.lwjgl.system.MemoryUtil.memAllocPointer;
 import static org.lwjgl.system.MemoryUtil.memFree;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
 import static org.lwjgl.vulkan.EXTDebugReport.VK_EXT_DEBUG_REPORT_EXTENSION_NAME;
+import static org.lwjgl.vulkan.EXTDebugUtils.VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
 import static org.lwjgl.vulkan.VK11.VK_MAKE_VERSION;
 import static org.lwjgl.vulkan.VK11.VK_STRUCTURE_TYPE_APPLICATION_INFO;
 import static org.lwjgl.vulkan.VK11.VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -157,9 +158,13 @@ class VkInstanceUtil {
         LOGGER.debug("Constructing extension buffers...");
 
         Map<String, ByteBuffer> extensionBuffers = new HashMap<>();
+
+        // debug extensions
         extensionBuffers.put(VK_EXT_DEBUG_REPORT_EXTENSION_NAME, memUTF8(VK_EXT_DEBUG_REPORT_EXTENSION_NAME));
+        extensionBuffers.put(VK_EXT_DEBUG_UTILS_EXTENSION_NAME, memUTF8(VK_EXT_DEBUG_REPORT_EXTENSION_NAME));
 
         LOGGER.debug("- Added extension: {}", VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+        LOGGER.debug("- Added extension: {}", VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
         return extensionBuffers;
     }
