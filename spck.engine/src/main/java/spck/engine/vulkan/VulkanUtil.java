@@ -21,8 +21,8 @@ public class VulkanUtil {
     public void init(int debugFlags, long windowID) {
         LOGGER.debug("Initialising Vulkan...");
         vkInstance = VkInstanceUtil.create();
-        vkKHRSurface = VkSurfaceUtil.create(vkInstance, windowID);
         vkDebugger.create(vkInstance, debugFlags);
+        vkKHRSurface = VkSurfaceUtil.create(vkInstance, windowID);
         PhysicalDeviceAndQueueFamily physicalDeviceAndQueueFamily = VkPhysicalDeviceUtil.pickFirstSuitableDeviceAndQueueFamily(vkInstance, vkKHRSurface);
         vkDevice = VkLogicalDeviceUtil.createDevice(physicalDeviceAndQueueFamily.getGraphicsQueueFamilyIndex(), physicalDeviceAndQueueFamily.getPhysicalDevice());
         vkQueue = VkQueueUtil.create(vkDevice, physicalDeviceAndQueueFamily.getGraphicsQueueFamilyIndex());

@@ -26,7 +26,7 @@ class VkDebugger {
         this.instance = instance;
 
         if (!instance.getCapabilities().VK_EXT_debug_report) {
-            LOGGER.warn("{} cannot be setup, as vkInstance does not have VK_EXT_debug_report enabled", VkDebugger.class.getSimpleName());
+            LOGGER.warn("{} cannot be setup, as vkInstance does not have VK_EXT_debug_report support", VkDebugger.class.getSimpleName());
             return;
         }
 

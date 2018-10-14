@@ -26,6 +26,7 @@ import static org.lwjgl.system.MemoryUtil.memFree;
 import static org.lwjgl.system.MemoryUtil.memUTF8;
 import static org.lwjgl.vulkan.EXTDebugReport.VK_EXT_DEBUG_REPORT_EXTENSION_NAME;
 import static org.lwjgl.vulkan.EXTDebugUtils.VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+import static org.lwjgl.vulkan.VK10.VK_API_VERSION_1_0;
 import static org.lwjgl.vulkan.VK11.VK_MAKE_VERSION;
 import static org.lwjgl.vulkan.VK11.VK_STRUCTURE_TYPE_APPLICATION_INFO;
 import static org.lwjgl.vulkan.VK11.VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -48,11 +49,11 @@ class VkInstanceUtil {
         LOGGER.debug("Creating VkApplicationInfo...");
         VkApplicationInfo vkAppInfo = VkApplicationInfo.calloc().
                 sType(VK_STRUCTURE_TYPE_APPLICATION_INFO).
-                pApplicationName(memUTF8("Vulkan Application")).
-                applicationVersion(VK_MAKE_VERSION(1, 0, 2)).
-                pEngineName(memUTF8("Intermetto")).
+                pApplicationName(memUTF8("SPCK")).
+                applicationVersion(VK_MAKE_VERSION(1, 0, 0)).
+                pEngineName(memUTF8("SPCK")).
                 engineVersion(VK_MAKE_VERSION(1, 0, 0)).
-                apiVersion(VK_MAKE_VERSION(1, 0, 2));
+                apiVersion(VK_API_VERSION_1_0);
 
         checkValidationLayers();
 
@@ -179,7 +180,7 @@ class VkInstanceUtil {
         LOGGER.debug("Constructing validation layers: {}", VkConstants.VALIDATION_ENABLED);
 
         if (!VkConstants.VALIDATION_ENABLED) {
-            LOGGER.debug("- vulkan.validation is not enabled");
+            LOGGER.debug("- vulkan.validation system property is not true");
             return Optional.empty();
         }
 
