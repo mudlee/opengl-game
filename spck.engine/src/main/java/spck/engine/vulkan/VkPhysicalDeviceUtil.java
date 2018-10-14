@@ -67,7 +67,7 @@ class VkPhysicalDeviceUtil {
                 boolean extensionsAvailable = areDeviceExtensionsAvailable(device, deviceIndex);
 
                 if (!featuresAvailable) {
-                    LOGGER.warn("- No all features are available");
+                    LOGGER.warn("- Not all features are available");
                 }
 
                 if (extensionsAvailable && deviceSupportsGraphicsAndPresentation) {

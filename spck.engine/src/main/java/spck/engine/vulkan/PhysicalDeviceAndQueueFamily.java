@@ -11,11 +11,11 @@ class PhysicalDeviceAndQueueFamily {
         this.graphicsQueueFamilyIndex = graphicsQueueFamilyIndex;
     }
 
-    public VkPhysicalDevice getPhysicalDevice() {
+    VkPhysicalDevice getPhysicalDevice() {
         return physicalDevice;
     }
 
-    public int getGraphicsQueueFamilyIndex() {
+    int getGraphicsQueueFamilyIndex() {
         return graphicsQueueFamilyIndex;
     }
 }
