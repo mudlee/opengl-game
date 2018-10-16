@@ -31,11 +31,11 @@ mvn package
 ### Link
 
 ```bash
-jlink --module-path $JAVA_HOME/jmods:build/mods --add-modules com.intermetto.game --launcher APP=com.intermetto.game/com.intermetto.game.Main --output app
+jlink --module-path $JAVA_HOME/jmods:build/mods --add-modules spck.game --launcher APP=spck.game/spck.game.Main --output app
 ```
 
 ## Run
 
 ```bash
-java -XstartOnFirstThread -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true -Dorg.lwjgl.opengl.Display.enableOSXFullscreenModeAPI=true --module-path build/mods -m com.intermetto.game/com.intermetto.game.Main -XstartOnFirstThread -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true -Dorg.lwjgl.opengl.Display.enableOSXFullscreenModeAPI=true
+java -XstartOnFirstThread -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true -Dorg.lwjgl.opengl.Display.enableOSXFullscreenModeAPI=true --module-path build/mods -m spck.game/spck.game.Main
 ```
