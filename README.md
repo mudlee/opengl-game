@@ -30,12 +30,30 @@ mvn package
 
 ### Link
 
+#### MacOS
 ```bash
-jlink --module-path $JAVA_HOME/jmods:build/mods --add-modules spck.game --launcher APP=spck.game/spck.game.Main --output app
+./buildOSX.sh
+```
+
+#### Linux
+```bash
+TODO
+```
+
+#### Windows
+```bash
+TODO
+jlink --module-path "%JAVA_HOME%"\jmods;build\mods --add-modules spck.game --launcher APP=spck.game/spck.game.Main --output app
 ```
 
 ## Run
 
+#### Linux/OSX
 ```bash
-java -XstartOnFirstThread -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true -Dorg.lwjgl.opengl.Display.enableOSXFullscreenModeAPI=true --module-path build/mods -m spck.game/spck.game.Main
+build/release/bin/java -XstartOnFirstThread -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true -Dorg.lwjgl.opengl.Display.enableOSXFullscreenModeAPI=true --module-path build/mods -m spck.game/spck.game.Main
+```
+
+#### Windows
+```bash
+build\release\bin\java -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true --module-path build\mods -m spck.game/spck.game.Main
 ```
