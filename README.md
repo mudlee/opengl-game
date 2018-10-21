@@ -59,9 +59,42 @@ build\release\bin\java -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=
 ```
 
 # TODOs
+- Java 11 build
 - build for windows
-- build for linux
 - render triangle
 - fully customisable vulkan
 - default, replacable gameloop
 - somehow separate the engine code and be able to include it with maven
+
+# Using Automatic Modules
+
+## Extend Your pom.xml
+```xml
+<plugin>
+    <artifactId>maven-resources-plugin</artifactId>
+    <version>${maven.plugins.version}</version>
+    <executions>
+        <execution>
+            <id>copy-resources</id>
+            <phase>package</phase>
+            <goals>
+                <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+                <overwrite>true</overwrite>
+                <outputDirectory>../build/mods</outputDirectory>
+                <resources>
+                    <resource>
+                        <directory>../automatic-modules/THE_MODULE</directory>
+                        <include>THE_MODULE.jar</include>
+                    </resource>
+                </resources>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+
+## Patch Your not Modularised Jar
+
+TODO: https://examples.javacodegeeks.com/core-java/java-9-jdeps-example/

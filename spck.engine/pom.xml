@@ -145,29 +145,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>${maven.plugins.version}</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <overwrite>true</overwrite>
-                            <outputDirectory>../build/mods</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>../automatic-modules/artemis-odb</directory>
-                                    <include>artemis-odb-2.2.0-SNAPSHOT.jar</include>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 </project>
