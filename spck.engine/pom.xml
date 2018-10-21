@@ -36,6 +36,14 @@
             <properties>
                 <lwjgl.natives>natives-macos</lwjgl.natives>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.lwjgl</groupId>
+                    <artifactId>lwjgl-vulkan</artifactId>
+                    <version>${lwjgl.version}</version>
+                    <classifier>${lwjgl.natives}</classifier>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>lwjgl-natives-windows</id>
@@ -95,12 +103,6 @@
         <dependency>
             <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl-glfw</artifactId>
-            <version>${lwjgl.version}</version>
-            <classifier>${lwjgl.natives}</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.lwjgl</groupId>
-            <artifactId>lwjgl-vulkan</artifactId>
             <version>${lwjgl.version}</version>
             <classifier>${lwjgl.natives}</classifier>
         </dependency>
