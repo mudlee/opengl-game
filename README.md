@@ -2,72 +2,47 @@
 
 It's a lightweight Vulkan framework, using LWJGL3.
 
-# Running from IntelliJ IDEA
+## Running from IntelliJ IDEA
 
 Run with VM parameters:
 
 ```
 -XstartOnFirstThread -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true -Dorg.lwjgl.opengl.Display.enableOSXFullscreenModeAPI=true
 ```
-# Limitations
 
-## OSX
+Note: ```-XstartOnFirstThread``` is needed only on MacOS.
+
+## Limitations
+
+### MacOS
 https://github.com/KhronosGroup/MoltenVK/blob/master/Docs/MoltenVK_Runtime_UserGuide.md#limitations
 
-# Running from command line
+## Building
 
-## Packaging
+- Windows: TODO
+- Linux: ```./buildLinux.sh```
+- MacOS: ```./buildMacOS.sh```
 
-### Create Modules
+## Running
 
 ```bash
-mvn clean
-mvn compile
-mvn package
+./build/release/bin/APP
 ```
 
-### Setup automatic modules
-
-### Link
-
-#### MacOS
-```bash
-./buildOSX.sh
-```
-
-#### Linux
-```bash
-TODO
-```
-
-#### Windows
-```bash
-TODO
-jlink --module-path "%JAVA_HOME%"\jmods;build\mods --add-modules spck.game --launcher APP=spck.game/spck.game.Main --output app
-```
-
-## Run
-
-#### Linux/OSX
-```bash
-build/release/bin/java -XstartOnFirstThread -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true -Dorg.lwjgl.opengl.Display.enableOSXFullscreenModeAPI=true --module-path build/mods --add-modules org.lwjgl.vulkan.natives -m spck.game/spck.game.Main
-```
-
-#### Windows
-```bash
-build\release\bin\java -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true --module-path build\mods -m spck.game/spck.game.Main
-```
-
-# TODOs
+## TODOs
 - build for windows
 - render triangle
 - fully customisable vulkan
 - default, replacable gameloop
 - somehow separate the engine code and be able to include it with maven
 
-# Using Automatic Modules
+## Using Automatic Modules
 
-## Extend Your pom.xml
+### Step 1 - Patch Your not Modularised Jar
+
+TODO: https://examples.javacodegeeks.com/core-java/java-9-jdeps-example/
+
+### Step 2 - Extend Your pom.xml
 ```xml
 <plugin>
     <artifactId>maven-resources-plugin</artifactId>
@@ -93,7 +68,3 @@ build\release\bin\java -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=
     </executions>
 </plugin>
 ```
-
-## Patch Your not Modularised Jar
-
-TODO: https://examples.javacodegeeks.com/core-java/java-9-jdeps-example/

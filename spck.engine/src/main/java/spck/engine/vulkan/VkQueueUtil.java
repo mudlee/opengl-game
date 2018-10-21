@@ -13,7 +13,7 @@ import static org.lwjgl.vulkan.VK11.vkGetDeviceQueue;
 class VkQueueUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(VkQueueUtil.class);
 
-    static VkQueue create(VkDevice vkDevice, int graphicsQueueFamilyIndex) {
+    static VkQueue getDeviceQueue(VkDevice vkDevice, int graphicsQueueFamilyIndex) {
         LOGGER.debug("Creating queue...");
         PointerBuffer pQueue = memAllocPointer(1);
         vkGetDeviceQueue(vkDevice, graphicsQueueFamilyIndex, 0, pQueue);

@@ -7,11 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.lwjgl.vulkan.KHRSurface.vkDestroySurfaceKHR;
-import static org.lwjgl.vulkan.VK10.vkDestroyDevice;
+import static org.lwjgl.vulkan.VK11.vkDestroyDevice;
 import static org.lwjgl.vulkan.VK11.vkDestroyInstance;
 
-public class VulkanUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(VulkanUtil.class);
+public class VulkanRenderer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(VulkanRenderer.class);
     private VkInstance vkInstance;
     private VkDebugger vkDebugger = new VkDebugger();
     private long vkKHRSurface;
@@ -25,7 +25,7 @@ public class VulkanUtil {
         vkKHRSurface = VkSurfaceUtil.create(vkInstance, windowID);
         PhysicalDeviceAndQueueFamily physicalDeviceAndQueueFamily = VkPhysicalDeviceUtil.pickFirstSuitableDeviceAndQueueFamily(vkInstance, vkKHRSurface);
         vkDevice = VkLogicalDeviceUtil.createDevice(physicalDeviceAndQueueFamily.getGraphicsQueueFamilyIndex(), physicalDeviceAndQueueFamily.getPhysicalDevice());
-        vkQueue = VkQueueUtil.create(vkDevice, physicalDeviceAndQueueFamily.getGraphicsQueueFamilyIndex());
+        vkQueue = VkQueueUtil.getDeviceQueue(vkDevice, physicalDeviceAndQueueFamily.getGraphicsQueueFamilyIndex());
         LOGGER.debug("Initialisation done");
     }
 
