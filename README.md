@@ -59,7 +59,6 @@ build\release\bin\java -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=
 ```
 
 # TODOs
-- Java 11 build
 - build for windows
 - render triangle
 - fully customisable vulkan
