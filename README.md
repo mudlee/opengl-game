@@ -6,7 +6,7 @@ It's a lightweight Vulkan framework, using LWJGL3.
 
 Run with VM parameters:
 
-```java
+```
 -XstartOnFirstThread -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true -Dorg.lwjgl.opengl.Display.enableOSXFullscreenModeAPI=true
 ```
 # Limitations
@@ -50,10 +50,18 @@ jlink --module-path "%JAVA_HOME%"\jmods;build\mods --add-modules spck.game --lau
 
 #### Linux/OSX
 ```bash
-build/release/bin/java -XstartOnFirstThread -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true -Dorg.lwjgl.opengl.Display.enableOSXFullscreenModeAPI=true --module-path build/mods -m spck.game/spck.game.Main
+build/release/bin/java -XstartOnFirstThread -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true -Dorg.lwjgl.opengl.Display.enableOSXFullscreenModeAPI=true --module-path build/mods --add-modules org.lwjgl.vulkan.natives -m spck.game/spck.game.Main
 ```
 
 #### Windows
 ```bash
 build\release\bin\java -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true --module-path build\mods -m spck.game/spck.game.Main
 ```
+
+# TODOs
+- build for windows
+- build for linux
+- render triangle
+- fully customisable vulkan
+- default, replacable gameloop
+- somehow separate the engine code and be able to include it with maven
