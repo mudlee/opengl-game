@@ -1,6 +1,6 @@
-# SPCK Vulkan Framework
+# SPCK Framework
 
-It's a lightweight Vulkan framework, using LWJGL3.
+It's a lightweight OpenGL framework, using LWJGL3.
 
 ## Running from IntelliJ IDEA
 
@@ -11,11 +11,6 @@ Run with VM parameters:
 ```
 
 Note: ```-XstartOnFirstThread``` is needed only on MacOS.
-
-## Limitations
-
-### MacOS
-https://github.com/KhronosGroup/MoltenVK/blob/master/Docs/MoltenVK_Runtime_UserGuide.md#limitations
 
 ## Building
 
@@ -28,13 +23,6 @@ https://github.com/KhronosGroup/MoltenVK/blob/master/Docs/MoltenVK_Runtime_UserG
 ```bash
 ./build/release/bin/APP
 ```
-
-## TODOs
-- build for windows
-- render triangle
-- fully customisable vulkan
-- default, replacable gameloop
-- somehow separate the engine code and be able to include it with maven
 
 ## Using Automatic Modules
 
