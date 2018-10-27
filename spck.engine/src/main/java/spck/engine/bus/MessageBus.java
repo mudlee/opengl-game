@@ -24,6 +24,18 @@ public class MessageBus {
         }
     }
 
+    public static void broadcast(String key) {
+        for (Consumer consumer : consumers.getOrDefault(key, CONSUMER_EMPTY_LIST)) {
+            //noinspection unchecked
+            consumer.accept(null);
+        }
+
+        for (Runnable runnable : runnables.getOrDefault(key, RUNNABLE_EMPTY_LIST)) {
+            //noinspection unchecked
+            runnable.run();
+        }
+    }
+
     public static void register(String key, Consumer consumer) {
         consumers.putIfAbsent(key, new ArrayList<>());
         consumers.get(key).add(consumer);

@@ -1,31 +1,42 @@
 package spck.engine;
 
+import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.core.GameLoop;
 import spck.engine.core.OS;
+import spck.engine.debug.Measure;
+import spck.engine.debug.ecs.StatUIEntitiesBuilder;
+import spck.engine.debug.ecs.StatUITextSystem;
+import spck.engine.ecs.ECS;
 import spck.engine.framework.GLFWOpenGLWindow;
+import spck.engine.framework.ecs.UIRendererSystem;
 import spck.engine.graphics.Antialiasing;
 import spck.engine.util.OSNameParser;
 
+import java.util.Arrays;
+
 public class Engine implements Runnable{
-    public static final Preferences PREFERENCES = new Preferences();
+    public static final Preferences preferences = new Preferences();
+    public static GLFWOpenGLWindow window;
 
     public static class Preferences {
         public String defaultFont = "GeosansLight";
         public boolean polygonRenderMode;
         public OS os;
-    }
+        public Vector4f clearColor = new Vector4f(1f, 1f, 1f, 1f);
 
+    }
     private static final Logger LOGGER = LoggerFactory.getLogger(Engine.class);
     private final Thread GAME_LOOP_THREAD;
-    private final GameLoop gameLoop=new GameLoop();
+    private final GameLoop gameLoop;
+    private final ECS ecs;
 
     public Engine() {
         String osName = System.getProperty("os.name");
-        PREFERENCES.os = OSNameParser.parse(osName);
+        preferences.os = OSNameParser.parse(osName);
 
         LOGGER.debug("OS name: {}", osName);
         LOGGER.debug("OS version: {}", System.getProperty("os.version"));
@@ -35,14 +46,30 @@ public class Engine implements Runnable{
         //LOGGER.debug("Main camera: {}", Camera.main);
         LOGGER.debug("Creating GAME_LOOP_THREAD...");
         this.GAME_LOOP_THREAD=new Thread(this,"GAME_LOOP_THREAD");
+
+        window = new GLFWOpenGLWindow(new GLFWOpenGLWindow.Preferences(
+                true,
+                Antialiasing.ANTIALISING_2X,
+                false
+        ));
+
+
+        ecs = new ECS(Arrays.asList(
+                new StatUITextSystem(),
+                new UIRendererSystem()
+        ));
+
+        new StatUIEntitiesBuilder().build();
+
+        gameLoop = new GameLoop(window);
     }
 
     public void launch() {
         LOGGER.debug("Launching game...");
 
-        new GLFWOpenGLWindow(new GLFWOpenGLWindow.Preferences(true, Antialiasing.ANTIALISING_2X, false));
+        new Measure();
 
-        if (PREFERENCES.os == OS.MACOS) {
+        if (preferences.os == OS.MACOS) {
             GAME_LOOP_THREAD.run();
         }
         else {
@@ -52,8 +79,8 @@ public class Engine implements Runnable{
 
     @Override
     public void run() {
-        MessageBus.broadcast(LifeCycle.START.eventID(), null);
+        MessageBus.broadcast(LifeCycle.GAME_START.eventID());
         gameLoop.loop();
-        MessageBus.broadcast(LifeCycle.CLEANUP.eventID(), null);
+        MessageBus.broadcast(LifeCycle.CLEANUP.eventID());
     }
 }

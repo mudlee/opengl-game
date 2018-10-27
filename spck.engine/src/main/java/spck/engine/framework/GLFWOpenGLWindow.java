@@ -29,7 +29,6 @@ import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
 import static org.lwjgl.glfw.GLFW.GLFW_SAMPLES;
-import static org.lwjgl.glfw.GLFW.GLFW_SCALE_TO_MONITOR;
 import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
@@ -73,30 +72,77 @@ public class GLFWOpenGLWindow {
         private final boolean vSyncEnabled;
         private final Antialiasing antialiasing;
         private final boolean fullscreenEnabled;
+        private String title = "SPCK";
+        private int screenScaleFactor = 1;
+        private int width = 1280;
+        private int height = 720;
 
         public Preferences(boolean vSyncEnabled, Antialiasing antialiasing, boolean fullscreenEnabled) {
             this.vSyncEnabled = vSyncEnabled;
             this.antialiasing = antialiasing;
             this.fullscreenEnabled = fullscreenEnabled;
         }
-    }
 
-    public static Long ID;
-    public static String title = "SPCK";
-    public static int screenScaleFactor = 1;
-    public static int width = 1280;
-    public static int height = 720;
+        public void setWidth(int width) {
+            this.width = width;
+        }
+
+        public void setHeight(int height) {
+            this.height = height;
+        }
+
+        public void setScreenScaleFactor(int screenScaleFactor) {
+            this.screenScaleFactor = screenScaleFactor;
+        }
+
+        public boolean isvSyncEnabled() {
+            return vSyncEnabled;
+        }
+
+        public Antialiasing getAntialiasing() {
+            return antialiasing;
+        }
+
+        public boolean isFullscreenEnabled() {
+            return fullscreenEnabled;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public int getScreenScaleFactor() {
+            return screenScaleFactor;
+        }
+
+        public int getWidth() {
+            return width;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GLFWOpenGLWindow.class);
     private GLFWVidMode vidMode;
     private boolean resized;
     private final Preferences preferences;
+    private long ID;
 
     public GLFWOpenGLWindow(Preferences preferences) {
         this.preferences = preferences;
-        MessageBus.register(LifeCycle.START.eventID(), this::onStart);
+        MessageBus.register(LifeCycle.GAME_START.eventID(), this::onStart);
         MessageBus.register(LifeCycle.UPDATE.eventID(), this::onUpdate);
         MessageBus.register(LifeCycle.CLEANUP.eventID(), this::onCleanUp);
+    }
+
+    public long getID() {
+        return ID;
+    }
+
+    public Preferences getPreferences() {
+        return preferences;
     }
 
     private void onStart() {
@@ -118,7 +164,6 @@ public class GLFWOpenGLWindow {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        glfwWindowHint(GLFW_SCALE_TO_MONITOR, GL_TRUE);
 
         vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         if (preferences.antialiasing != Antialiasing.OFF) {
@@ -130,8 +175,8 @@ public class GLFWOpenGLWindow {
         }
 
         // creating window
-        LOGGER.debug("Creating window with width {} height {}", width, height);
-        ID = glfwCreateWindow(width, height, title, (preferences.fullscreenEnabled) ? glfwGetPrimaryMonitor() : NULL, NULL);
+        LOGGER.debug("Creating window with width {} height {}", preferences.getWidth(), preferences.getHeight());
+        ID = glfwCreateWindow(preferences.getWidth(), preferences.getHeight(), preferences.getTitle(), (preferences.fullscreenEnabled) ? glfwGetPrimaryMonitor() : NULL, NULL);
         if (ID == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
@@ -142,8 +187,8 @@ public class GLFWOpenGLWindow {
         glfwSetFramebufferSizeCallback(ID, new GLFWFramebufferSizeCallback() {
             @Override
             public void invoke(long window, int width, int height) {
-                GLFWOpenGLWindow.width = width;
-                GLFWOpenGLWindow.height = height;
+                preferences.setWidth(width);
+                preferences.setHeight(height);
                 resized = true;
 
                 WindowResizedEvent.reusable.width = width;
@@ -187,8 +232,8 @@ public class GLFWOpenGLWindow {
             // Center our window
             glfwSetWindowPos(
                     ID,
-                    (vidmode.width() - width) / 2,
-                    (vidmode.height() - height) / 2
+                    (vidmode.width() - preferences.getWidth()) / 2,
+                    (vidmode.height() - preferences.getHeight()) / 2
             );
         }
 
@@ -197,8 +242,8 @@ public class GLFWOpenGLWindow {
         GL.createCapabilities();
 
         // window resize setup
-        width = (preferences.fullscreenEnabled ? vidMode.width() : width) * screenScaleFactor;
-        height = (preferences.fullscreenEnabled ? vidMode.height() : height) * screenScaleFactor;
+        preferences.setWidth((preferences.fullscreenEnabled ? vidMode.width() : preferences.getWidth()) * preferences.getScreenScaleFactor());
+        preferences.setHeight((preferences.fullscreenEnabled ? vidMode.height() : preferences.getHeight()) * preferences.getScreenScaleFactor());
 
         // misc
         // NOTE: UI might touch the state, use UI.restoreGLState to restore state
@@ -219,9 +264,9 @@ public class GLFWOpenGLWindow {
 
     private void onUpdate() {
         if (resized) {
-            glViewport(0, 0, width, height);
+            glViewport(0, 0, preferences.getWidth(), preferences.getHeight());
             resized = false;
-            LOGGER.debug("Window resized to {}x{}, scale factor {}", width, height, screenScaleFactor);
+            LOGGER.debug("Window resized to {}x{}, scale factor {}", preferences.getWidth(), preferences.getHeight(), preferences.getScreenScaleFactor());
         }
     }
 
@@ -236,8 +281,8 @@ public class GLFWOpenGLWindow {
     private void prepareFullscreen() {
         // Set up a fixed width and height so window initialization does not fail
         LOGGER.debug("{}-{}", vidMode.width(), vidMode.height());
-        width = vidMode.width();
-        height = vidMode.height();
+        preferences.setWidth(vidMode.width());
+        preferences.setHeight(vidMode.height());
         glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
     }
 
@@ -250,8 +295,8 @@ public class GLFWOpenGLWindow {
         glfwGetWindowSize(ID, widthScreenCoordBuf, heightScreenCoordBuf);
         glfwGetFramebufferSize(ID, widthPixelsBuf, heightPixelsBuf);
 
-        screenScaleFactor = (int) Math.floor(widthPixelsBuf.get() / widthScreenCoordBuf.get());
-        LOGGER.debug("Screen scale factor has been set to: {}", screenScaleFactor);
+        preferences.setScreenScaleFactor((int) Math.floor(widthPixelsBuf.get() / widthScreenCoordBuf.get()));
+        LOGGER.debug("Screen scale factor has been set to: {}", preferences.getScreenScaleFactor());
 
         MemoryUtil.memFree(widthScreenCoordBuf);
         MemoryUtil.memFree(heightScreenCoordBuf);

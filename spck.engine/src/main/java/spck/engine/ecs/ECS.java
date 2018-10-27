@@ -5,6 +5,9 @@ import com.artemis.World;
 import com.artemis.WorldConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spck.engine.Time;
+import spck.engine.bus.LifeCycle;
+import spck.engine.bus.MessageBus;
 
 import java.util.List;
 
@@ -22,11 +25,12 @@ public class ECS {
         }
 
         world = new World(builder.build());
+        MessageBus.register(LifeCycle.UPDATE.eventID(), this::process);
         LOGGER.debug("ECS is ready");
     }
 
-    public void process() {
-        //world.setDelta(Time.deltaTime);
+    private void process() {
+        world.setDelta(Time.deltaTime);
         world.process();
     }
 }
