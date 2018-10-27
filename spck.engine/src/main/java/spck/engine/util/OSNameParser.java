@@ -5,7 +5,7 @@ import spck.engine.core.OS;
 public class OSNameParser {
     public static OS parse(String osName) {
         if (osName.startsWith("Mac")) {
-            return OS.OSX;
+            return OS.MACOS;
         } else if (osName.startsWith("Windows")) {
             return OS.WINDOWS;
         } else if (osName.startsWith("Linux")) {

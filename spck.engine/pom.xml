@@ -16,6 +16,8 @@
         <joml.version>1.9.11</joml.version>
         <logback.version>1.2.3</logback.version>
         <slf4j.version>1.8.0-beta2</slf4j.version>
+        <artemis.version>2.2.0-SNAPSHOT</artemis.version>
+        <eventbus.version>3.1.1</eventbus.version>
     </properties>
 
     <profiles>
@@ -70,6 +72,15 @@
             <version>${slf4j.version}</version>
         </dependency>
 
+        <!-- ECS -->
+        <dependency>
+            <groupId>net.onedaybeard.artemis</groupId>
+            <artifactId>artemis-odb</artifactId>
+            <version>${artemis.version}</version>
+        </dependency>
+
+        <!-- OTHER TOOLS -->
+
         <!-- LWJGL -->
         <dependency>
             <groupId>org.lwjgl</groupId>
@@ -83,6 +94,18 @@
         </dependency>
         <dependency>
             <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-opengl</artifactId>
+            <version>${lwjgl.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.joml</groupId>
+            <artifactId>joml</artifactId>
+            <version>${joml.version}</version>
+        </dependency>
+
+        <!-- NATIVES -->
+        <dependency>
+            <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl</artifactId>
             <version>${lwjgl.version}</version>
             <classifier>${lwjgl.natives}</classifier>
@@ -94,9 +117,10 @@
             <classifier>${lwjgl.natives}</classifier>
         </dependency>
         <dependency>
-            <groupId>org.joml</groupId>
-            <artifactId>joml</artifactId>
-            <version>${joml.version}</version>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-opengl</artifactId>
+            <version>${lwjgl.version}</version>
+            <classifier>${lwjgl.natives}</classifier>
         </dependency>
     </dependencies>
 
@@ -139,6 +163,29 @@
                     <source>11</source>
                     <target>11</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven.plugins.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>../build/mods</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>../automatic-modules/artemis-odb</directory>
+                                    <include>artemis-odb-2.2.0-SNAPSHOT.jar</include>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
