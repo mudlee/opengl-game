@@ -1,7 +1,7 @@
-package spck.engine.ui.ecs;
+package spck.engine.ecs.ui;
 
 import spck.engine.ecs.Entity;
-import spck.engine.graphics.UIObjectPosition;
+import spck.engine.ui.UIObjectPosition;
 
 public class UITextEntity extends Entity {
     private final UITextComponent textComponent;

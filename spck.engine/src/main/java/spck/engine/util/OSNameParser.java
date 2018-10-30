@@ -1,6 +1,6 @@
 package spck.engine.util;
 
-import spck.engine.core.OS;
+import spck.engine.OS;
 
 public class OSNameParser {
     public static OS parse(String osName) {

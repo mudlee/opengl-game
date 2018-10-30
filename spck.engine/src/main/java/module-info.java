@@ -12,9 +12,9 @@ module spck.engine {
     requires org.slf4j.simple;
     requires artemis.odb;
 
-    opens spck.engine.framework.ecs to artemis.odb;
-    opens spck.engine.debug.ecs to artemis.odb;
-    opens spck.engine.ui.ecs to artemis.odb;
+    opens spck.engine.ecs to artemis.odb;
+    opens spck.engine.ecs.debug to artemis.odb;
+    opens spck.engine.ecs.ui to artemis.odb;
 
     exports spck.engine;
 }

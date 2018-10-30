@@ -5,22 +5,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
-import spck.engine.core.GameLoop;
-import spck.engine.core.OS;
 import spck.engine.debug.Measure;
-import spck.engine.debug.ecs.StatUIEntitiesBuilder;
-import spck.engine.debug.ecs.StatUITextSystem;
 import spck.engine.ecs.ECS;
-import spck.engine.framework.GLFWOpenGLWindow;
-import spck.engine.framework.ecs.UIRendererSystem;
-import spck.engine.graphics.Antialiasing;
+import spck.engine.ecs.debug.StatUIEntitiesBuilder;
+import spck.engine.ecs.debug.StatUITextSystem;
+import spck.engine.ecs.ui.UIRendererSystem;
+import spck.engine.framework.Window;
 import spck.engine.util.OSNameParser;
 
 import java.util.Arrays;
 
 public class Engine implements Runnable{
     public static final Preferences preferences = new Preferences();
-    public static GLFWOpenGLWindow window;
+    public static Window window;
 
     public static class Preferences {
         public String defaultFont = "GeosansLight";
@@ -47,7 +44,7 @@ public class Engine implements Runnable{
         LOGGER.debug("Creating GAME_LOOP_THREAD...");
         this.GAME_LOOP_THREAD=new Thread(this,"GAME_LOOP_THREAD");
 
-        window = new GLFWOpenGLWindow(new GLFWOpenGLWindow.Preferences(
+        window = new Window(new Window.Preferences(
                 true,
                 Antialiasing.ANTIALISING_2X,
                 false

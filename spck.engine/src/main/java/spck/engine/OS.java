@@ -1,4 +1,4 @@
-package spck.engine.core;
+package spck.engine;
 
 public enum OS {
     WINDOWS,

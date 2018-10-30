@@ -1,5 +1,6 @@
 package spck.engine.framework;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
@@ -8,11 +9,11 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spck.engine.Antialiasing;
 import spck.engine.bus.KeyEvent;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.bus.WindowResizedEvent;
-import spck.engine.graphics.Antialiasing;
 
 import java.nio.IntBuffer;
 import java.util.Objects;
@@ -40,6 +41,7 @@ import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
 import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetFramebufferSizeCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
@@ -49,6 +51,7 @@ import static org.lwjgl.glfw.GLFW.glfwShowWindow;
 import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
+import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL41.GL_BACK;
 import static org.lwjgl.opengl.GL41.GL_BLEND;
 import static org.lwjgl.opengl.GL41.GL_CULL_FACE;
@@ -66,7 +69,7 @@ import static org.lwjgl.opengl.GL41.glGetString;
 import static org.lwjgl.opengl.GL41.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-public class GLFWOpenGLWindow {
+public class Window {
     public static class Preferences {
         private final boolean vSyncEnabled;
         private final Antialiasing antialiasing;
@@ -123,17 +126,29 @@ public class GLFWOpenGLWindow {
         }
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GLFWOpenGLWindow.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Window.class);
     private GLFWVidMode vidMode;
     private boolean resized;
     private final Preferences preferences;
     private long ID;
 
-    public GLFWOpenGLWindow(Preferences preferences) {
+    public Window(Preferences preferences) {
         this.preferences = preferences;
         MessageBus.register(LifeCycle.GAME_START.eventID(), this::onStart);
         MessageBus.register(LifeCycle.UPDATE.eventID(), this::onUpdate);
         MessageBus.register(LifeCycle.CLEANUP.eventID(), this::onCleanUp);
+    }
+
+    public void pollEvents() {
+        glfwPollEvents();
+    }
+
+    public boolean shouldNotClose() {
+        return !glfwWindowShouldClose(ID);
+    }
+
+    public void swapBuffers() {
+        GLFW.glfwSwapBuffers(ID);
     }
 
     public long getID() {

@@ -1,4 +1,4 @@
-package spck.engine.debug.ecs;
+package spck.engine.ecs.debug;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -6,7 +6,7 @@ import com.artemis.systems.IteratingSystem;
 import spck.engine.Engine;
 import spck.engine.debug.Measure;
 import spck.engine.debug.Stats;
-import spck.engine.ui.ecs.UITextComponent;
+import spck.engine.ecs.ui.UITextComponent;
 import spck.engine.util.NumberFormatter;
 
 public class StatUITextSystem extends IteratingSystem {
@@ -24,6 +24,7 @@ public class StatUITextSystem extends IteratingSystem {
         UITextComponent textComponent = textComponents.get(entityId);
         StatUITextComponent statComponent = statComponents.get(entityId);
 
+        // TODO
         switch (statComponent.type) {
             case FPS:
                 //textComponent.text = "FPS: " + String.valueOf(Measure.getFPS());

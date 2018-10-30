@@ -1,25 +1,19 @@
-package spck.engine.core;
+package spck.engine;
 
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL41;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spck.engine.Engine;
-import spck.engine.Time;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.Stats;
-import spck.engine.framework.GLFWOpenGLWindow;
-
-import static org.lwjgl.glfw.GLFW.glfwPollEvents;
-import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+import spck.engine.framework.Graphics;
+import spck.engine.framework.Window;
 
 public class GameLoop {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameLoop.class);
     private final static int TARGET_FPS = 100;
-    private final GLFWOpenGLWindow window;
+    private final Window window;
 
-    public GameLoop(GLFWOpenGLWindow window) {
+    public GameLoop(Window window) {
         this.window = window;
     }
 
@@ -27,10 +21,9 @@ public class GameLoop {
         LOGGER.debug("Running game loop...");
         double lastLoopTime = Time.getTimeInSec();
 
-        while (!glfwWindowShouldClose(window.getID())) {
+        while (window.shouldNotClose()) {
             Stats.reset();
-            GL41.glClearColor(Engine.preferences.clearColor.x, Engine.preferences.clearColor.y, Engine.preferences.clearColor.z, Engine.preferences.clearColor.w);
-            GL41.glClear(GL41.GL_COLOR_BUFFER_BIT | GL41.GL_DEPTH_BUFFER_BIT | GL41.GL_STENCIL_BUFFER_BIT);
+            Graphics.clearScreen(Engine.preferences.clearColor.x, Engine.preferences.clearColor.y, Engine.preferences.clearColor.z, Engine.preferences.clearColor.w);
 
             double currentTime = Time.getTimeInSec();
             Time.deltaTime = (float) (currentTime - lastLoopTime);
@@ -42,11 +35,10 @@ public class GameLoop {
             // ecs
 
             MessageBus.broadcast(LifeCycle.BEFORE_BUFFER_SWAP.eventID());
-
-            GLFW.glfwSwapBuffers(window.getID());
+            window.swapBuffers(); // TODO: remove it from the window
             MessageBus.broadcast(LifeCycle.AFTER_BUFFER_SWAP.eventID());
 
-            glfwPollEvents();
+            window.pollEvents();
 
             MessageBus.broadcast(LifeCycle.BEFORE_FRAME_SYNC.eventID());
             if (!window.getPreferences().isvSyncEnabled()) {

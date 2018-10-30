@@ -1,6 +1,6 @@
-package spck.engine.debug.ecs;
+package spck.engine.ecs.debug;
 
-import spck.engine.graphics.UIObjectPosition;
+import spck.engine.ui.UIObjectPosition;
 
 public class StatUIEntitiesBuilder {
     public void build() {

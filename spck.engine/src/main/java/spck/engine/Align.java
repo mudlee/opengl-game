@@ -1,4 +1,4 @@
-package spck.engine.graphics;
+package spck.engine;
 
 public enum Align {
     TOP_LEFT,

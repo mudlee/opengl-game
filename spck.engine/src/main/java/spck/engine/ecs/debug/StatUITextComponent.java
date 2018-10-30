@@ -1,7 +1,8 @@
-package spck.engine.debug.ecs;
+package spck.engine.ecs.debug;
 
 import com.artemis.Component;
 
+@SuppressWarnings("WeakerAccess")
 public class StatUITextComponent extends Component {
     public Type type;
 

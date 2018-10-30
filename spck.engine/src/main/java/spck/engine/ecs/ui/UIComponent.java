@@ -1,13 +1,13 @@
-package spck.engine.ui.ecs;
+package spck.engine.ecs.ui;
 
 import com.artemis.Component;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import spck.engine.Engine;
-import spck.engine.graphics.UIObjectPosition;
+import spck.engine.ui.UIObjectPosition;
 import spck.engine.util.Pixel;
 
-class AbstractUIComponent extends Component {
+public class UIComponent extends Component {
     UIObjectPosition position = UIObjectPosition.topLeft(0, 0);
     public Vector2i screenOffset = new Vector2i().zero();
     public Vector2f screenCoords = new Vector2f();

@@ -1,4 +1,6 @@
-package spck.engine.graphics;
+package spck.engine.ui;
+
+import spck.engine.Align;
 
 public class UIObjectPosition {
     private int top = 0;
