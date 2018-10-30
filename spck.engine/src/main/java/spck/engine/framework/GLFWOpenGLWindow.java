@@ -49,7 +49,6 @@ import static org.lwjgl.glfw.GLFW.glfwShowWindow;
 import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
-import static org.lwjgl.glfw.GLFWVulkan.glfwVulkanSupported;
 import static org.lwjgl.opengl.GL41.GL_BACK;
 import static org.lwjgl.opengl.GL41.GL_BLEND;
 import static org.lwjgl.opengl.GL41.GL_CULL_FACE;
@@ -151,10 +150,6 @@ public class GLFWOpenGLWindow {
 
         if (!glfwInit()) {
             throw new RuntimeException("Unable to initialize GLFW");
-        }
-
-        if (!glfwVulkanSupported()) {
-            throw new RuntimeException("GLFW failed to find the Vulkan loader");
         }
 
         glfwDefaultWindowHints();
