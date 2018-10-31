@@ -7,16 +7,17 @@ import spck.engine.Engine;
 import spck.engine.debug.Measure;
 import spck.engine.debug.Stats;
 import spck.engine.ecs.ui.UITextComponent;
+import spck.engine.render.Camera;
 import spck.engine.util.NumberFormatter;
 
 public class StatUITextSystem extends IteratingSystem {
-    //private final Camera camera;
+    private final Camera camera;
     private ComponentMapper<UITextComponent> textComponents;
     private ComponentMapper<StatUITextComponent> statComponents;
 
-    public StatUITextSystem() {
+    public StatUITextSystem(Camera camera) {
         super(Aspect.all(StatUITextComponent.class));
-        //this.camera = camera;
+        this.camera = camera;
     }
 
     @Override
@@ -24,11 +25,9 @@ public class StatUITextSystem extends IteratingSystem {
         UITextComponent textComponent = textComponents.get(entityId);
         StatUITextComponent statComponent = statComponents.get(entityId);
 
-        // TODO
         switch (statComponent.type) {
             case FPS:
-                //textComponent.text = "FPS: " + String.valueOf(Measure.getFPS());
-                textComponent.text = "FPS: ";
+                textComponent.text = "FPS: " + String.valueOf(Measure.getLastFPS());
                 break;
             case VSYNC:
                 textComponent.text = "Vsync: " + String.valueOf(Engine.window.getPreferences().isvSyncEnabled()).toUpperCase();
@@ -37,10 +36,10 @@ public class StatUITextSystem extends IteratingSystem {
                 textComponent.text = String.format("Render time: %.2fms, (GFX: %.2fms)", Measure.getLastRenderTime(), Measure.getLastGraphicsRenderTime());
                 break;
             case CAM_POS:
-                //textComponent.text = String.format("Cam pos: X:%.2f Y:%.2f Z:%.2f", camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
+                textComponent.text = String.format("Cam pos: X:%.2f Y:%.2f Z:%.2f", camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
                 break;
             case CAM_ROT:
-                //textComponent.text = String.format("Cam rot: X:%.2f Y:%.2f Z:%.2f", camera.getRotation().x, camera.getRotation().y, camera.getRotation().z);
+                textComponent.text = String.format("Cam rot: X:%.2f Y:%.2f Z:%.2f", camera.getRotation().x, camera.getRotation().y, camera.getRotation().z);
                 break;
             case VERTS:
                 textComponent.text = "Verts: " + NumberFormatter.format(Stats.numOfVerts);

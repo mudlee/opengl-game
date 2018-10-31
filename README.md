@@ -1,3 +1,9 @@
+## TODO
+
+- remove todos
+- asset handling
+- model loading
+
 # SPCK Framework
 
 It's a lightweight OpenGL framework, using LWJGL3.

@@ -12,7 +12,7 @@ import spck.engine.bus.MessageBus;
 import java.util.List;
 
 public class ECS {
-    static World world;
+    public static World world;
     private final static Logger LOGGER = LoggerFactory.getLogger(ECS.class);
 
     public ECS(List<BaseSystem> systems) {

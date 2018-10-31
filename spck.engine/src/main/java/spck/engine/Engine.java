@@ -9,8 +9,13 @@ import spck.engine.debug.Measure;
 import spck.engine.ecs.ECS;
 import spck.engine.ecs.debug.StatUIEntitiesBuilder;
 import spck.engine.ecs.debug.StatUITextSystem;
+import spck.engine.ecs.render.PreRenderSystem;
+import spck.engine.ecs.render.RenderSystem;
 import spck.engine.ecs.ui.UIRendererSystem;
+import spck.engine.framework.OpenGLStandardRenderer;
+import spck.engine.framework.OpenGLStandardShader;
 import spck.engine.framework.Window;
+import spck.engine.render.Camera;
 import spck.engine.util.OSNameParser;
 
 import java.util.Arrays;
@@ -18,29 +23,42 @@ import java.util.Arrays;
 public class Engine implements Runnable{
     public static final Preferences preferences = new Preferences();
     public static Window window;
+    public static OpenGLStandardRenderer renderer;
+    public static OpenGLStandardShader shader;
 
     public static class Preferences {
         public String defaultFont = "GeosansLight";
         public boolean polygonRenderMode;
         public OS os;
-        public Vector4f clearColor = new Vector4f(1f, 1f, 1f, 1f);
+        public Vector4f clearColor = new Vector4f(0f, 0f, 0f, 0f);
 
+        @Override
+        public String toString() {
+            return "Preferences{" +
+                    "defaultFont='" + defaultFont + '\'' +
+                    ", polygonRenderMode=" + polygonRenderMode +
+                    ", os=" + os +
+                    ", clearColor=" + clearColor +
+                    '}';
+        }
     }
     private static final Logger LOGGER = LoggerFactory.getLogger(Engine.class);
     private final Thread GAME_LOOP_THREAD;
     private final GameLoop gameLoop;
-    private final ECS ecs;
 
-    public Engine() {
+    public Engine(Camera camera) {
         String osName = System.getProperty("os.name");
         preferences.os = OSNameParser.parse(osName);
+
+        renderer = new OpenGLStandardRenderer();
+        shader = new OpenGLStandardShader(camera);
 
         LOGGER.debug("OS name: {}", osName);
         LOGGER.debug("OS version: {}", System.getProperty("os.version"));
         LOGGER.debug("Java version: {}, {}", System.getProperty("java.version"), System.getProperty("java.vendor"));
         LOGGER.debug("LWJGL version: {}", org.lwjgl.Version.getVersion());
-        //LOGGER.debug("Engine properties: {}", EngineProperties.print());
-        //LOGGER.debug("Main camera: {}", Camera.main);
+        LOGGER.debug("Engine preferences: {}", preferences);
+        LOGGER.debug("Camera: {}", camera);
         LOGGER.debug("Creating GAME_LOOP_THREAD...");
         this.GAME_LOOP_THREAD=new Thread(this,"GAME_LOOP_THREAD");
 
@@ -49,10 +67,12 @@ public class Engine implements Runnable{
                 Antialiasing.ANTIALISING_2X,
                 false
         ));
+        LOGGER.debug("Window preferences: {}", window.getPreferences());
 
-
-        ecs = new ECS(Arrays.asList(
-                new StatUITextSystem(),
+        new ECS(Arrays.asList(
+                new PreRenderSystem(),
+                new RenderSystem(camera),
+                new StatUITextSystem(camera),
                 new UIRendererSystem()
         ));
 

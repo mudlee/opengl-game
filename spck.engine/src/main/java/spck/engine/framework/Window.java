@@ -124,6 +124,19 @@ public class Window {
         public int getHeight() {
             return height;
         }
+
+        @Override
+        public String toString() {
+            return "Preferences{" +
+                    "vSyncEnabled=" + vSyncEnabled +
+                    ", antialiasing=" + antialiasing +
+                    ", fullscreenEnabled=" + fullscreenEnabled +
+                    ", title='" + title + '\'' +
+                    ", screenScaleFactor=" + screenScaleFactor +
+                    ", width=" + width +
+                    ", height=" + height +
+                    '}';
+        }
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Window.class);

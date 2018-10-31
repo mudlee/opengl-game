@@ -9,10 +9,17 @@ import java.util.Optional;
 public class Entity {
     private final static Logger LOGGER = LoggerFactory.getLogger(Entity.class);
     private Integer id;
+    private boolean destroyed;
 
     public Entity() {
-        id = ECS.world.create();
+        id = EntityStore.create(getClass());
         LOGGER.debug("Entity {} [{}] is created", id, getClass().getSimpleName());
+    }
+
+    public void destroy() {
+        checkIfExists();
+        destroyed = true;
+        EntityStore.destroy(id);
     }
 
     @SuppressWarnings("unchecked")
@@ -39,8 +46,8 @@ public class Entity {
     }
 
     private void checkIfExists() {
-        if (id == null) {
-            throw new RuntimeException(String.format("Entity %s super() was not called", this.getClass()));
+        if (id == null || destroyed) {
+            throw new RuntimeException(String.format("Entity %s is not available. Destroyed: %b", this.getClass(), destroyed));
         }
     }
 }

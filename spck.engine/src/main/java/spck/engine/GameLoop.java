@@ -8,16 +8,16 @@ import spck.engine.debug.Stats;
 import spck.engine.framework.Graphics;
 import spck.engine.framework.Window;
 
-public class GameLoop {
+class GameLoop {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameLoop.class);
     private final static int TARGET_FPS = 100;
     private final Window window;
 
-    public GameLoop(Window window) {
+    GameLoop(Window window) {
         this.window = window;
     }
 
-    public void loop() {
+    void loop() {
         LOGGER.debug("Running game loop...");
         double lastLoopTime = Time.getTimeInSec();
 
@@ -31,11 +31,8 @@ public class GameLoop {
 
             MessageBus.broadcast(LifeCycle.FRAME_START.eventID());
             MessageBus.broadcast(LifeCycle.UPDATE.eventID());
-
-            // ecs
-
             MessageBus.broadcast(LifeCycle.BEFORE_BUFFER_SWAP.eventID());
-            window.swapBuffers(); // TODO: remove it from the window
+            window.swapBuffers();
             MessageBus.broadcast(LifeCycle.AFTER_BUFFER_SWAP.eventID());
 
             window.pollEvents();
