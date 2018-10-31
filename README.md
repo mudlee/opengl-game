@@ -1,8 +1,7 @@
 ## TODO
 
 - remove todos
-- asset handling
-- model loading
+- input handling
 
 # SPCK Framework
 
