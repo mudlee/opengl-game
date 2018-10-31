@@ -1,5 +1,6 @@
 package spck.engine.ecs.ui;
 
+import spck.engine.Engine;
 import spck.engine.ecs.Entity;
 import spck.engine.ui.UIObjectPosition;
 
@@ -13,6 +14,6 @@ public class UITextEntity extends Entity {
         textComponent.text = text;
         textComponent.position = position;
         textComponent.screenOffset.set(0, (int) textComponent.size);
-        textComponent.updateScreenCoords();
+        textComponent.updateScreenCoords(Engine.window.getPreferences().getScreenScaleFactor());
     }
 }

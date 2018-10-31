@@ -14,7 +14,6 @@ public class UIRendererSystem extends BaseEntitySystem {
     private final UIRenderer uiRenderer = new UIRenderer(Engine.preferences.defaultFont);
     private ComponentMapper<UITextComponent> textComponents;
     private ComponentMapper<UIImageComponent> imageComponents;
-    private int lastUsedScreenScaleFactor = Engine.window.getPreferences().getScreenScaleFactor();
 
     public UIRendererSystem() {
         super(Aspect.one(UITextComponent.class, UIImageComponent.class));
@@ -57,9 +56,8 @@ public class UIRendererSystem extends BaseEntitySystem {
     }
 
     private void updateScreenScaleFactorIfNeeded(UIComponent component) {
-        if (lastUsedScreenScaleFactor != Engine.window.getPreferences().getScreenScaleFactor()) {
-            component.updateScreenCoords();
-            lastUsedScreenScaleFactor = Engine.window.getPreferences().getScreenScaleFactor();
+        if (component.screenScaleFactor != Engine.window.getPreferences().getScreenScaleFactor()) {
+            component.updateScreenCoords(Engine.window.getPreferences().getScreenScaleFactor());
         }
     }
 }

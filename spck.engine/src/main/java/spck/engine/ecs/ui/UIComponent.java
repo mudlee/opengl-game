@@ -11,8 +11,11 @@ public class UIComponent extends Component {
     UIObjectPosition position = UIObjectPosition.topLeft(0, 0);
     public Vector2i screenOffset = new Vector2i().zero();
     public Vector2f screenCoords = new Vector2f();
+    public int screenScaleFactor = 1;
 
-    public void updateScreenCoords() {
+    public void updateScreenCoords(int screenScaleFactor) {
+        this.screenScaleFactor = screenScaleFactor;
+
         switch (position.getAlign()) {
             case TOP_LEFT:
                 screenCoords.x = Pixel.scaled(position.getLeft());
