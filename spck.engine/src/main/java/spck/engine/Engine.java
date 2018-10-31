@@ -21,6 +21,7 @@ import spck.engine.util.OSNameParser;
 import java.util.Arrays;
 
 public class Engine implements Runnable{
+    public static final String ID = "SPCK";
     public static final Preferences preferences = new Preferences();
     public static Window window;
     public static OpenGLStandardRenderer renderer;

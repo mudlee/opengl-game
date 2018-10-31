@@ -13,6 +13,8 @@ import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.render.Camera;
 
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
+
 public class Main {
     private final Camera camera = Camera.perspective(60.0f, 01f, 1000f);
     private Cube cube;
@@ -39,7 +41,8 @@ public class Main {
         });
 
         float speed = 0.1f;
-        MessageBus.register(KeyEvent.pressed(300), (event) -> {
+
+        MessageBus.register(KeyEvent.keyHeldDown(GLFW_KEY_R), (event) -> {
             Vector3f current = new Vector3f(camera.getPosition());
             current.y -= speed;
             cube.getComponent(RenderComponent.class).ifPresent(component -> {

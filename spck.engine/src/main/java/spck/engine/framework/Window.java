@@ -16,11 +16,14 @@ import spck.engine.bus.MessageBus;
 import spck.engine.bus.WindowResizedEvent;
 
 import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LAST;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_Q;
 import static org.lwjgl.glfw.GLFW.GLFW_MAXIMIZED;
 import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_CORE_PROFILE;
@@ -140,6 +143,7 @@ public class Window {
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Window.class);
+    private static final List<Integer> keysDown = new ArrayList<>();
     private GLFWVidMode vidMode;
     private boolean resized;
     private final Preferences preferences;
@@ -225,16 +229,21 @@ public class Window {
         glfwSetKeyCallback(ID, new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
+                if (GLFW_KEY_LAST + 1 < key || key < 0) {
+                    return;
+                }
+
                 keyEvent.set(key, scancode, action, mods);
 
                 if (action == GLFW_PRESS) {
                     MessageBus.broadcast(KeyEvent.pressed(key), keyEvent);
+                    keysDown.add(key);
                 } else if (action == GLFW_RELEASE) {
                     MessageBus.broadcast(KeyEvent.released(key), keyEvent);
+                    keysDown.remove(Integer.valueOf(key));
                 }
             }
         });
-
 
         // VSYNC
         if (preferences.vSyncEnabled) {
@@ -286,6 +295,12 @@ public class Window {
     }
 
     private void onUpdate() {
+        if (!keysDown.isEmpty()) {
+            for (Integer keyCode : keysDown) {
+                MessageBus.broadcast(KeyEvent.keyHeldDown(keyCode));
+            }
+        }
+
         if (resized) {
             glViewport(0, 0, preferences.getWidth(), preferences.getHeight());
             resized = false;
