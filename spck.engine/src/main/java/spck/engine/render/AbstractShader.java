@@ -40,12 +40,10 @@ public abstract class AbstractShader {
     }
 
     protected void bind() {
-        LOGGER.trace("Binding pipeline [ID:{}]...", ID);
         GL41.glBindProgramPipeline(ID);
     }
 
     protected void unbind() {
-        LOGGER.trace("Unbinding pipeline [ID:{}]...", ID);
         GL41.glBindProgramPipeline(0);
     }
 

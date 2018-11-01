@@ -110,7 +110,6 @@ public class EntityBatchStore {
     }
 
     public void processChanges() {
-        processDestroyedEntities();
         processMaterialChanges();
         processMeshChanges();
         processTransformationChanges();
@@ -118,28 +117,24 @@ public class EntityBatchStore {
         processGPUDataChanges();
     }
 
-    private void processDestroyedEntities() {
-        EntityStore.getWaitingForDestroy().forEach(id -> {
-            LOGGER.trace("Removing entity {}", id);
-            ECS.world.delete(id);
-            entities.remove(id);
+    public void destroyEntity(int id) {
+        LOGGER.trace("Removing entity {}", id);
+        ECS.world.delete(id);
+        entities.remove(id);
 
-            int batchGroupID = getEntityBatchGroupID(id).orElseThrow(() -> new RuntimeException(String.format("Entity's %s was marked for deletion, but it's not in the batching system", id)));
-            int batchID = getEntityBatchID(id).orElseThrow(() -> new RuntimeException(String.format("Entity's %s was marked for deletion, but it's not in the batching system", id)));
+        int batchGroupID = getEntityBatchGroupID(id).orElseThrow(() -> new RuntimeException(String.format("Entity's %s was marked for deletion, but it's not in the batching system", id)));
+        int batchID = getEntityBatchID(id).orElseThrow(() -> new RuntimeException(String.format("Entity's %s was marked for deletion, but it's not in the batching system", id)));
 
-            groups.get(batchGroupID)
-                    .getBatch(batchID)
-                    .orElseThrow(() -> new RuntimeException(String.format("Batch %d was not found in BatchGroup %d", batchID, batchGroupID)))
-                    .remove(id);
+        groups.get(batchGroupID)
+                .getBatch(batchID)
+                .orElseThrow(() -> new RuntimeException(String.format("Batch %d was not found in BatchGroup %d", batchID, batchGroupID)))
+                .remove(id);
 
-            entityBatchGroupIDMap.remove(id);
-            entityBatchIDMap.remove(id);
-            materialChanges.remove(id);
-            meshChanges.remove(id);
-            transformationChanges.remove(id);
-        });
-
-        EntityStore.getWaitingForDestroy().clear();
+        entityBatchGroupIDMap.remove(id);
+        entityBatchIDMap.remove(id);
+        materialChanges.remove(id);
+        meshChanges.remove(id);
+        transformationChanges.remove(id);
     }
 
     public Map<Integer, BatchGroup> getGroups() {
@@ -171,6 +166,7 @@ public class EntityBatchStore {
             while (batchIterator.hasNext()) {
                 Map.Entry<Integer, Batch> batchEntry = batchIterator.next();
                 if (batchEntry.getValue().getNumOfEntities() == 0) {
+                    batchEntry.getValue().getMaterial().getRenderer().updateBatchDataInGPU(batchEntry.getValue());
                     LOGGER.trace("Batch {} is empty, removing...", batchEntry.getValue().getID());
                     LOGGER.trace("Batch {} removed from newBatchDataQueue: {}", batchEntry.getValue().getID(), newBatchDataQueue.remove(batchEntry.getValue()));
                     LOGGER.trace("Batch {} removed from changedBatchDataQueue: {}", batchEntry.getValue().getID(), changedBatchDataQueue.remove(batchEntry.getValue()));

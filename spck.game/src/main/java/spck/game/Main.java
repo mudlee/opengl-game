@@ -13,6 +13,8 @@ import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.render.Camera;
 
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 
 public class Main {
@@ -42,7 +44,7 @@ public class Main {
 
         float speed = 0.1f;
 
-        MessageBus.register(KeyEvent.keyHeldDown(GLFW_KEY_R), (event) -> {
+        MessageBus.register(KeyEvent.keyHeldDown(GLFW_KEY_R), () -> {
             Vector3f current = new Vector3f(camera.getPosition());
             current.y -= speed;
             cube.getComponent(RenderComponent.class).ifPresent(component -> {
@@ -50,6 +52,17 @@ public class Main {
                 rotation.y += 2;
                 component.transform.setRotation(rotation);
             });
+        });
+
+        MessageBus.register(KeyEvent.pressed(GLFW_KEY_D), () -> cube.destroy());
+        // TODO when adding multiple cubes, something strange happens and model loads(?) multiple times
+        MessageBus.register(KeyEvent.pressed(GLFW_KEY_A), this::addCube);
+    }
+
+    private void addCube() {
+        Cube cube = new Cube();
+        cube.getComponent(RenderComponent.class).ifPresent(component -> {
+            component.transform.setRotation(new Vector3f(20, 20, 0));
         });
     }
 }

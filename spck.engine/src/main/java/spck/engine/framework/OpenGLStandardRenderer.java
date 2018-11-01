@@ -53,7 +53,6 @@ public class OpenGLStandardRenderer implements Renderer {
         if (batch.getNumOfEntities() == 0) {
             LOGGER.trace("Batch {} is empty, removing its data from GPU", batch.getID());
             removeBatchDataFromGPU(batch);
-
             return;
         }
 
@@ -76,28 +75,6 @@ public class OpenGLStandardRenderer implements Renderer {
         });
 
         batch.dataUpdated();
-    }
-
-    public void removeBatchDataFromGPU(Batch batch) {
-        LOGGER.trace("Removing Batch {} data from GPU...", batch.getID());
-        // Batch is now empty, delete datas
-        GL41.glDeleteVertexArrays(batch.getVaoID());
-        GL41.glDeleteBuffers(batch.getIndicesVBOId());
-        GL41.glDeleteBuffers(batch.getNormalsVBOId());
-        GL41.glDeleteBuffers(batch.getVerticesVBOId());
-        GL41.glDeleteBuffers(batch.getInstancedVboID());
-        vbos.remove(batch.getIndicesVBOId());
-        vbos.remove(batch.getNormalsVBOId());
-        vbos.remove(batch.getVerticesVBOId());
-        vbos.remove(batch.getInstancedVboID());
-
-        if (batch.getUvVBOId() != null) {
-            GL41.glDeleteBuffers(batch.getUvVBOId());
-            vbos.remove(batch.getUvVBOId());
-        }
-
-        vaos.remove(batch.getVaoID());
-        LOGGER.trace("Batch {} data removed from GPU", batch.getID());
     }
 
     @Override
@@ -141,6 +118,28 @@ public class OpenGLStandardRenderer implements Renderer {
             GL41.glDisableVertexAttribArray(LayoutQualifier.INS_TRANSFORMATION_MATRIX_COL3.location);
             GL41.glDisableVertexAttribArray(LayoutQualifier.INS_TRANSFORMATION_MATRIX_COL4.location);
         });
+    }
+
+    private void removeBatchDataFromGPU(Batch batch) {
+        LOGGER.trace("Removing Batch {} data from GPU...", batch.getID());
+        // Batch is now empty, delete datas
+        GL41.glDeleteVertexArrays(batch.getVaoID());
+        GL41.glDeleteBuffers(batch.getIndicesVBOId());
+        GL41.glDeleteBuffers(batch.getNormalsVBOId());
+        GL41.glDeleteBuffers(batch.getVerticesVBOId());
+        GL41.glDeleteBuffers(batch.getInstancedVboID());
+        vbos.remove(batch.getIndicesVBOId());
+        vbos.remove(batch.getNormalsVBOId());
+        vbos.remove(batch.getVerticesVBOId());
+        vbos.remove(batch.getInstancedVboID());
+
+        if (batch.getUvVBOId() != null) {
+            GL41.glDeleteBuffers(batch.getUvVBOId());
+            vbos.remove(batch.getUvVBOId());
+        }
+
+        vaos.remove(batch.getVaoID());
+        LOGGER.trace("Batch {} data removed from GPU", batch.getID());
     }
 
     private void onCleanUp() {

@@ -7,6 +7,7 @@ import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.Measure;
 import spck.engine.ecs.ECS;
+import spck.engine.ecs.EntityBatchStore;
 import spck.engine.ecs.debug.StatUIEntitiesBuilder;
 import spck.engine.ecs.debug.StatUITextSystem;
 import spck.engine.ecs.render.PreRenderSystem;
@@ -70,9 +71,11 @@ public class Engine implements Runnable{
         ));
         LOGGER.debug("Window preferences: {}", window.getPreferences());
 
+        EntityBatchStore batchStore = new EntityBatchStore();
+
         new ECS(Arrays.asList(
-                new PreRenderSystem(),
-                new RenderSystem(camera),
+                new PreRenderSystem(batchStore),
+                new RenderSystem(batchStore, camera),
                 new StatUITextSystem(camera),
                 new UIRendererSystem()
         ));

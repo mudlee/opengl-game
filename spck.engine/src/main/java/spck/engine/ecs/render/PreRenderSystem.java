@@ -1,12 +1,11 @@
 package spck.engine.ecs.render;
 
-// TODO: when entity is removed, unload its data
-
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spck.engine.ecs.ComponentState;
 import spck.engine.ecs.EntityBatchStore;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.render.Shader;
@@ -18,17 +17,24 @@ public class PreRenderSystem extends IteratingSystem {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreRenderSystem.class);
     private final Runnable doNothing = () -> {
     };
-    private final EntityBatchStore batchStore = new EntityBatchStore();
+    private final EntityBatchStore batchStore;
     private final List<Shader> initialisedShaders = new ArrayList<>();
     private ComponentMapper<RenderComponent> meshRendererMapper;
 
-    public PreRenderSystem() {
+    public PreRenderSystem(EntityBatchStore batchStore) {
         super(Aspect.all(RenderComponent.class));
+        this.batchStore = batchStore;
     }
 
     @Override
     protected void process(int entityId) {
         RenderComponent component = meshRendererMapper.get(entityId);
+
+        if (component.state == ComponentState.MARKED_FOR_DESTROY) {
+            batchStore.destroyEntity(entityId);
+            component.state = ComponentState.DESTROYED;
+            return;
+        }
 
         if (batchStore.contains(entityId)) {
             component.material.ackAndComputeChanged(() -> batchStore.entityMaterialHasChanged(entityId, component));
@@ -43,10 +49,6 @@ public class PreRenderSystem extends IteratingSystem {
             component.mesh.ackAndComputeChanged(doNothing);
             component.transform.ackAndComputeChanged(doNothing);
         }
-    }
-
-    EntityBatchStore getBatchStore() {
-        return batchStore;
     }
 
     private void initShaderIfNeeded(Shader shader) {

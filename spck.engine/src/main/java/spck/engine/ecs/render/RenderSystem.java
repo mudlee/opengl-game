@@ -3,15 +3,17 @@ package spck.engine.ecs.render;
 import com.artemis.BaseSystem;
 import spck.engine.Engine;
 import spck.engine.debug.Stats;
+import spck.engine.ecs.EntityBatchStore;
 import spck.engine.render.Camera;
 import spck.engine.render.PolygonShader;
 import spck.engine.util.RunOnce;
 
 public class RenderSystem extends BaseSystem {
+    private final EntityBatchStore batchStore;
     private final PolygonShader polygonShader;
-    private PreRenderSystem preRenderSystem;
 
-    public RenderSystem(Camera camera) {
+    public RenderSystem(EntityBatchStore batchStore, Camera camera) {
+        this.batchStore = batchStore;
         polygonShader = new PolygonShader(camera);
     }
 
@@ -19,7 +21,7 @@ public class RenderSystem extends BaseSystem {
     protected void processSystem() {
         RunOnce.run("PolygonShader init", polygonShader::init);
 
-        preRenderSystem.getBatchStore().processChanges();
+        batchStore.processChanges();
 
         if (Engine.preferences.polygonRenderMode) {
             polygonRender();
@@ -30,7 +32,7 @@ public class RenderSystem extends BaseSystem {
 
     private void polygonRender() {
         polygonShader.startShader(null);
-        preRenderSystem.getBatchStore().getGroups().forEach((groupId, batchGroup) -> {
+        batchStore.getGroups().forEach((groupId, batchGroup) -> {
             Stats.numOfBatchGroups++;
             Stats.numOfBatches += batchGroup.getBatches().size();
             batchGroup.getBatches().values().forEach(batch -> batchGroup.getMaterial().getRenderer().render(batch));
@@ -39,7 +41,7 @@ public class RenderSystem extends BaseSystem {
     }
 
     private void forwardRender() {
-        preRenderSystem.getBatchStore().getGroups().forEach((groupId, batchGroup) -> {
+        batchStore.getGroups().forEach((groupId, batchGroup) -> {
             Stats.numOfBatchGroups++;
             Stats.numOfBatches += batchGroup.getBatches().size();
 

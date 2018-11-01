@@ -1,6 +1,7 @@
 package spck.engine.ecs;
 
 import com.artemis.Component;
+import com.artemis.utils.Bag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,23 +9,39 @@ import java.util.Optional;
 
 public class Entity {
     private final static Logger LOGGER = LoggerFactory.getLogger(Entity.class);
+    private final Bag<Component> componentBag = new Bag<>();
     private Integer id;
     private boolean destroyed;
 
     public Entity() {
-        id = EntityStore.create(getClass());
+        id = ECS.world.create();
         LOGGER.debug("Entity {} [{}] is created", id, getClass().getSimpleName());
     }
 
     public void destroy() {
-        checkIfExists();
+        if (id == null || destroyed) {
+            LOGGER.error("Entity {} is already destroyed", id);
+            return;
+        }
+
         destroyed = true;
-        EntityStore.destroy(id);
+
+        ECS.world.getComponentManager().getComponentsFor(id, componentBag);
+        for (Component component : componentBag) {
+            if (component instanceof StateAwareComponent) {
+                ((StateAwareComponent) component).state = ComponentState.MARKED_FOR_DESTROY;
+                LOGGER.debug("Entity {} is marked for deletion", id);
+            }
+        }
+        componentBag.clear();
     }
 
     @SuppressWarnings("unchecked")
     public <T> Optional<T> getComponent(Class<T> componentClass) {
-        checkIfExists();
+        if (id == null || destroyed) {
+            LOGGER.error("Entity {} is destroyed, cannot get component", id);
+            return Optional.empty();
+        }
 
         try {
             return Optional.of((T) ECS.world.getMapper((Class<? extends Component>) componentClass).get(id));
@@ -35,7 +52,10 @@ public class Entity {
 
     @SuppressWarnings({"unchecked", "SameParameterValue"})
     protected <T> T addComponent(Class<T> componentClass) {
-        checkIfExists();
+        if (id == null || destroyed) {
+            LOGGER.error("Entity {} is destroyed, cannot add component", id);
+            return null;
+        }
 
         if (!Component.class.isAssignableFrom(componentClass)) {
             throw new RuntimeException(String.format("%s is not extended from %s", componentClass, Component.class));
@@ -43,11 +63,5 @@ public class Entity {
 
         LOGGER.debug("Adding {} to Entity {}", componentClass.getSimpleName(), id);
         return (T) ECS.world.getMapper((Class<? extends Component>) componentClass).create(id);
-    }
-
-    private void checkIfExists() {
-        if (id == null || destroyed) {
-            throw new RuntimeException(String.format("Entity %s is not available. Destroyed: %b", this.getClass(), destroyed));
-        }
     }
 }
