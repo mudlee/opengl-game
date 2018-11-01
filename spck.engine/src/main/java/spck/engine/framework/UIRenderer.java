@@ -129,6 +129,7 @@ public class UIRenderer {
     }
 
     private void cleanUp() {
+        LOGGER.debug("Cleaning up...");
         nvgDelete(pointer);
     }
 

@@ -17,7 +17,9 @@
         <logback.version>1.2.3</logback.version>
         <slf4j.version>1.8.0-beta2</slf4j.version>
         <artemis.version>2.2.0-SNAPSHOT</artemis.version>
-        <eventbus.version>3.1.1</eventbus.version>
+        <junit.version>5.2.0</junit.version>
+        <assertj.version>3.10.0</assertj.version>
+        <mockito.version>2.21.0</mockito.version>
     </properties>
 
     <profiles>
@@ -79,7 +81,25 @@
             <version>${artemis.version}</version>
         </dependency>
 
-        <!-- OTHER TOOLS -->
+        <!-- TESTING -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- LWJGL -->
         <dependency>
