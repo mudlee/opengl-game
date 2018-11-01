@@ -55,7 +55,7 @@ public class Main {
         });
 
         MessageBus.register(KeyEvent.pressed(GLFW_KEY_D), () -> cube.destroy());
-        // TODO when adding multiple cubes, something strange happens and model loads(?) multiple times
+        // TODO when adding multiple cubes, something strange happens
         MessageBus.register(KeyEvent.pressed(GLFW_KEY_A), this::addCube);
     }
 

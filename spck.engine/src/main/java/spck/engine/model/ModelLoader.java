@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spck.engine.Engine;
 import spck.engine.OS;
+import spck.engine.bus.LifeCycle;
+import spck.engine.bus.MessageBus;
 import spck.engine.framework.assets.TextureLoader;
 import spck.engine.framework.assets.TextureStorage;
 import spck.engine.render.DefaultMaterial;
@@ -23,6 +25,7 @@ import spck.engine.render.ShaderUniform;
 import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureRegistry;
 import spck.engine.util.ResourceLoader;
+import spck.engine.util.RunOnce;
 
 import java.io.File;
 import java.io.InputStream;
@@ -31,35 +34,51 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ModelLoader {
     private final static Logger LOGGER = LoggerFactory.getLogger(ModelLoader.class);
     private final static int IMPORT_FLAGS = Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_Triangulate | Assimp.aiProcess_FixInfacingNormals | Assimp.aiProcess_OptimizeMeshes;
+    private final static Map<String, AIScene> modelCache = new HashMap<>();
 
     public static ModelInfo load(String resourcePath) {
+        RunOnce.run("ModelLoader CleanUp", () -> {
+            MessageBus.register(LifeCycle.CLEANUP.eventID(), ModelLoader::cleanUp);
+        });
+
         LOGGER.debug("# Trying to load model {}...", resourcePath);
 
+        AIScene scene;
         String extension = resourcePath.substring(resourcePath.lastIndexOf("."));
-        LOGGER.debug("    Extension: {}", extension);
 
-        URL res = ModelLoader.class.getResource(resourcePath);
-        String modelPath = getmodelPath(res.getPath());
+        if (modelCache.containsKey(resourcePath)) {
+            LOGGER.debug("    Loading from cache");
+            scene = modelCache.get(resourcePath);
+        } else {
+            LOGGER.debug("    Extension: {}", extension);
 
-        LOGGER.debug("    Loading model from PATH->'{}', RES->'{}'", modelPath, res.toString());
+            URL res = ModelLoader.class.getResource(resourcePath);
+            String modelPath = getmodelPath(res.getPath());
 
-        if (res.toString().startsWith("jar:") || res.toString().startsWith("jrt:")) {
-            modelPath = unpackModelsFromJar(resourcePath, extension);
-        }
+            LOGGER.debug("    Loading model from PATH->'{}', RES->'{}'", modelPath, res.toString());
 
-        AIScene scene = Assimp.aiImportFile(
-                modelPath,
-                IMPORT_FLAGS
-        );
+            if (res.toString().startsWith("jar:") || res.toString().startsWith("jrt:")) {
+                modelPath = unpackModelsFromJar(resourcePath, extension);
+            }
 
-        if (scene == null) {
-            String error = Assimp.aiGetErrorString();
-            throw new RuntimeException(String.format("Could not load model from %s. Error: %s", modelPath, error));
+            scene = Assimp.aiImportFile(
+                    modelPath,
+                    IMPORT_FLAGS
+            );
+
+            if (scene == null) {
+                String error = Assimp.aiGetErrorString();
+                throw new RuntimeException(String.format("Could not load model from %s. Error: %s", modelPath, error));
+            }
+
+            modelCache.put(resourcePath, scene);
         }
 
         // MESH
@@ -69,8 +88,11 @@ public class ModelLoader {
         Material material = loadMaterial(scene, mesh.getMaterialIndex(), resourcePath, extension);
 
         LOGGER.debug("    Model {} has been loaded. Mesh: {}, Material: {}", resourcePath, mesh, material);
-        Assimp.aiReleaseImport(scene);
         return new ModelInfo(mesh, material);
+    }
+
+    private static void cleanUp() {
+        modelCache.values().forEach(Assimp::aiReleaseImport);
     }
 
     private static String getmodelPath(String path) {
