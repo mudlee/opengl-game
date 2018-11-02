@@ -26,6 +26,7 @@ public class Entity {
 
         destroyed = true;
 
+        componentBag.clear();
         ECS.world.getComponentManager().getComponentsFor(id, componentBag);
         for (Component component : componentBag) {
             if (component instanceof StateAwareComponent) {

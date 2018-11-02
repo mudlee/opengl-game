@@ -15,6 +15,8 @@ public class StatUITextComponent extends Component {
         VERTS,
         VERTS_TOTAL,
         BATCH_GROUPS,
-        BATCHES
+        BATCHES,
+        NUM_OF_ENTITIES,
+        VBO_MEMORY_USED
     }
 }

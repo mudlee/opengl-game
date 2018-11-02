@@ -20,6 +20,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 public class Main {
     private final Camera camera = Camera.perspective(60.0f, 01f, 1000f);
     private Cube cube;
+    private static float x = 0f;
 
     public static void main(String[] args) {
         new Main().run();
@@ -55,7 +56,6 @@ public class Main {
         });
 
         MessageBus.register(KeyEvent.pressed(GLFW_KEY_D), () -> cube.destroy());
-        // TODO when adding multiple cubes, something strange happens
         MessageBus.register(KeyEvent.pressed(GLFW_KEY_A), this::addCube);
     }
 
@@ -63,6 +63,9 @@ public class Main {
         Cube cube = new Cube();
         cube.getComponent(RenderComponent.class).ifPresent(component -> {
             component.transform.setRotation(new Vector3f(20, 20, 0));
+            component.material.setDiffuseColor(new Vector3f(1, 0, 0));
+            component.transform.setPosition(x, 0, 0);
+            x += -.2;
         });
     }
 }

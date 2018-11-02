@@ -41,6 +41,8 @@ public class OpenGLStandardRenderer implements Renderer {
             loadBatchMeshDataIntoVAO(batch);
             setupInstancedRendering(batch);
             loadInstancedRenderingData(batch);
+
+            batch.dataUpdated();
         });
 
         // don't unbind before unbinding VAO, because it's state is not saved
@@ -52,6 +54,7 @@ public class OpenGLStandardRenderer implements Renderer {
     public void updateBatchDataInGPU(Batch batch) {
         if (batch.getNumOfEntities() == 0) {
             LOGGER.trace("Batch {} is empty, removing its data from GPU", batch.getID());
+            Stats.vboMemoryUsed -= batch.getOldSize() * batch.getEntityMemoryUsage();
             removeBatchDataFromGPU(batch);
             return;
         }
@@ -68,6 +71,7 @@ public class OpenGLStandardRenderer implements Renderer {
                 GL41.glBufferData(GL41.GL_ARRAY_BUFFER, batch.getNumOfEntities() * INSTANCED_DATA_SIZE_IN_BYTES * Float.BYTES, GL41.GL_DYNAMIC_DRAW);
             }
 
+            Stats.vboMemoryUsed -= batch.getOldSize() * batch.getEntityMemoryUsage();
             float[] instancedVBOData = getInstancedVBOData(batch);
             // updating the data in the array buffer
             GL41.glBufferSubData(GL41.GL_ARRAY_BUFFER, 0, instancedVBOData);
@@ -181,6 +185,7 @@ public class OpenGLStandardRenderer implements Renderer {
         float[] vboData = new float[batch.getNumOfEntities() * INSTANCED_DATA_SIZE_IN_BYTES];
         int offset = 0;
 
+        int index = 0;
         for (int entityId : batch.getEntities()) {
             RenderComponent component = ECS.world.getEntity(entityId).getComponent(RenderComponent.class);
             component.transform.getTransformationMatrix().get(vboData, offset);
@@ -191,8 +196,21 @@ public class OpenGLStandardRenderer implements Renderer {
                 vboData[offset++] = modifier.getScale();
                 vboData[offset++] = modifier.getOffset().x;
                 vboData[offset++] = modifier.getOffset().y;
+            } else {
+                vboData[offset++] = 0;
+                vboData[offset++] = 0;
+                vboData[offset++] = 0;
             }
+
+            if (index == 0 && offset != INSTANCED_DATA_SIZE_IN_BYTES) {
+                Stats.vboMemoryMisused = true;
+            }
+
+            index++;
         }
+
+        batch.storeEntityMemoryUsage(offset / batch.getNumOfEntities());
+        Stats.vboMemoryUsed += offset;
         return vboData;
     }
 

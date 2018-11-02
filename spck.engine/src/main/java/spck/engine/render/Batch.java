@@ -21,6 +21,7 @@ public class Batch {
     private boolean batchSizeChanged = false;
     private int currentSize;
     private int oldSize;
+    private int entityMemoryUsage = 0;
 
     public Batch(Mesh mesh, Material material) {
         this.mesh = mesh;
@@ -100,6 +101,10 @@ public class Batch {
         this.uvVBOId = textureVBOId;
     }
 
+    public void storeEntityMemoryUsage(int bytes) {
+        entityMemoryUsage = bytes;
+    }
+
     public boolean wasSizeChanged() {
         return batchSizeChanged;
     }
@@ -142,5 +147,9 @@ public class Batch {
 
     public Material getMaterial() {
         return material;
+    }
+
+    public int getEntityMemoryUsage() {
+        return entityMemoryUsage;
     }
 }

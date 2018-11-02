@@ -49,7 +49,7 @@ public class EntityBatchStore {
         LOGGER.trace("{} entity {} to BatchGroup {} Batch {}", addingEntityAsNew ? "Adding" : "Updating", entityId, batchGroupID, batchID);
 
         if (!groups.containsKey(batchGroupID)) {
-            LOGGER.trace("BatchGroup {} does not exist, creating...", batchGroupID);
+            LOGGER.trace("    BatchGroup {} does not exist, creating...", batchGroupID);
             // we clone the material for the batch group, because we can change entity's material and it should not affect
             // the batch group's material
             // Note: performance? -> use a material pool inside the batching system
@@ -57,11 +57,11 @@ public class EntityBatchStore {
         }
 
         if (!groups.get(batchGroupID).containsBatch(batchID)) {
-            LOGGER.trace("Batch {} does not exist, creating...", batchID);
+            LOGGER.trace("    Batch {} does not exist, creating...", batchID);
             Batch batch = new Batch(component.mesh, component.material);
             groups.get(batchGroupID).addBatch(batchID, batch);
             newBatchDataQueue.add(batch);
-            LOGGER.trace("Batch {} is added to the new queue", batchID);
+            LOGGER.trace("    Batch {} is added to the new queue", batchID);
         }
 
         Batch targetBatch = groups.get(batchGroupID).getBatch(batchID).orElseThrow(() -> new RuntimeException(String.format("Batch %d was not found in BatchGroup %d", batchID, batchGroupID)));
@@ -71,11 +71,11 @@ public class EntityBatchStore {
             // newBatchGroupDataQueue might contain a Batch that has already been waiting for the data upload,
             // so we don't have to change one of its batch's data as well
             changedBatchDataQueue.add(targetBatch);
-            LOGGER.trace("Batch {} is added to the changed queue", batchID);
+            LOGGER.trace("    Batch {} is added to the changed queue", batchID);
         }
 
         targetBatch.add(entityId);
-        LOGGER.trace("Entity {} added to BatchGroup {} Batch {}", entityId, batchGroupID, batchID);
+        LOGGER.trace("    Entity {} added to BatchGroup {} Batch {}", entityId, batchGroupID, batchID);
     }
 
     public boolean contains(int entityId) {
@@ -143,17 +143,17 @@ public class EntityBatchStore {
 
     private void processGPUDataChanges() {
         if (!newBatchDataQueue.isEmpty()) {
-            LOGGER.trace("Processing new Batch's data...");
+            LOGGER.trace("Processing new Batches' data...");
             newBatchDataQueue.forEach(batch -> batch.getMaterial().getRenderer().uploadBatchDataToGPU(batch));
             newBatchDataQueue.clear();
-            LOGGER.trace("New Batchs' data processed");
+            LOGGER.trace("New Batches' data processed");
         }
 
         if (!changedBatchDataQueue.isEmpty()) {
-            LOGGER.trace("Processing changed Batchs' data...");
+            LOGGER.trace("Processing changed Batches' data...");
             changedBatchDataQueue.forEach(batch -> batch.getMaterial().getRenderer().updateBatchDataInGPU(batch));
             changedBatchDataQueue.clear();
-            LOGGER.trace("Changed Batchs' data processed");
+            LOGGER.trace("Changed Batches' data processed");
         }
     }
 

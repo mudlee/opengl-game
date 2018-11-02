@@ -42,16 +42,22 @@ public class StatUITextSystem extends IteratingSystem {
                 textComponent.text = String.format("Cam rot: X:%.2f Y:%.2f Z:%.2f", camera.getRotation().x, camera.getRotation().y, camera.getRotation().z);
                 break;
             case VERTS:
-                textComponent.text = "Verts: " + NumberFormatter.format(Stats.numOfVerts);
+                textComponent.text = "Verts: " + NumberFormatter.formatSimple(Stats.numOfVerts);
                 break;
             case VERTS_TOTAL:
-                textComponent.text = "Verts total: " + NumberFormatter.format(Stats.numOfTotalVerts);
+                textComponent.text = "Verts total: " + NumberFormatter.formatSimple(Stats.numOfTotalVerts);
                 break;
             case BATCH_GROUPS:
-                textComponent.text = "Batch groups: " + NumberFormatter.format(Stats.numOfBatchGroups);
+                textComponent.text = "Batch groups: " + NumberFormatter.formatSimple(Stats.numOfBatchGroups);
                 break;
             case BATCHES:
-                textComponent.text = "Batches total: " + NumberFormatter.format(Stats.numOfBatches);
+                textComponent.text = "Batches total: " + NumberFormatter.formatSimple(Stats.numOfBatches);
+                break;
+            case NUM_OF_ENTITIES:
+                textComponent.text = "Num of entities: " + NumberFormatter.formatSimple(Stats.numOfEntities);
+                break;
+            case VBO_MEMORY_USED:
+                textComponent.text = "VBO memory used: " + NumberFormatter.formatBinaryUnit(Stats.vboMemoryUsed) + (Stats.vboMemoryMisused ? " - !!! INVALID VBO-OFFSET USAGE !!!" : "");
                 break;
         }
     }
