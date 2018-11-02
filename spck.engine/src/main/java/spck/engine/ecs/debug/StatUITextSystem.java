@@ -57,7 +57,23 @@ public class StatUITextSystem extends IteratingSystem {
                 textComponent.text = "Num of entities: " + NumberFormatter.formatSimple(Stats.numOfEntities);
                 break;
             case VBO_MEMORY_USED:
-                textComponent.text = "VBO memory used: " + NumberFormatter.formatBinaryUnit(Stats.vboMemoryUsed) + (Stats.vboMemoryMisused ? " - !!! INVALID VBO-OFFSET USAGE !!!" : "");
+                textComponent.text = "VBO mem used: " + NumberFormatter.formatBinaryUnit(Stats.vboMemoryUsed) + (Stats.vboMemoryMisused ? " - !!! INVALID VBO-OFFSET USAGE !!!" : "");
+                break;
+            case JVM_MEMORY_FREE:
+                Runtime r1 = Runtime.getRuntime();
+                textComponent.text = "JVM mem free: " + NumberFormatter.formatBinaryUnit(r1.freeMemory());
+                break;
+            case JVM_MEMORY_ALLOCATED:
+                Runtime r2 = Runtime.getRuntime();
+                textComponent.text = "JVM mem allocated: " + NumberFormatter.formatBinaryUnit(r2.totalMemory());
+                break;
+            case JVM_MEMORY_MAX:
+                Runtime r3 = Runtime.getRuntime();
+                textComponent.text = "JVM mem max: " + NumberFormatter.formatBinaryUnit(r3.maxMemory());
+                break;
+            case JVM_MEMORY_TOTAL_FREE:
+                Runtime r4 = Runtime.getRuntime();
+                textComponent.text = "JVM mem total free: " + NumberFormatter.formatBinaryUnit(r4.freeMemory() + (r4.maxMemory() - r4.totalMemory()));
                 break;
         }
     }

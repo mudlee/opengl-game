@@ -15,5 +15,9 @@ public class StatUIEntitiesBuilder {
         new StatUITextEntity(StatUITextComponent.Type.BATCHES, "?", UIObjectPosition.topLeft(130, 10));
         new StatUITextEntity(StatUITextComponent.Type.NUM_OF_ENTITIES, "?", UIObjectPosition.topLeft(145, 10));
         new StatUITextEntity(StatUITextComponent.Type.VBO_MEMORY_USED, "?", UIObjectPosition.topLeft(160, 10));
+        new StatUITextEntity(StatUITextComponent.Type.JVM_MEMORY_FREE, "?", UIObjectPosition.topLeft(175, 10));
+        new StatUITextEntity(StatUITextComponent.Type.JVM_MEMORY_ALLOCATED, "?", UIObjectPosition.topLeft(190, 10));
+        new StatUITextEntity(StatUITextComponent.Type.JVM_MEMORY_MAX, "?", UIObjectPosition.topLeft(205, 10));
+        new StatUITextEntity(StatUITextComponent.Type.JVM_MEMORY_TOTAL_FREE, "?", UIObjectPosition.topLeft(220, 10));
     }
 }
