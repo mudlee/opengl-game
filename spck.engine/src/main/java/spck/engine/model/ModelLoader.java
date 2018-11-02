@@ -48,21 +48,21 @@ public class ModelLoader {
             MessageBus.register(LifeCycle.CLEANUP.eventID(), ModelLoader::cleanUp);
         });
 
-        LOGGER.debug("# Trying to load model {}...", resourcePath);
+        LOGGER.trace("# Trying to load model {}...", resourcePath);
 
         AIScene scene;
         String extension = resourcePath.substring(resourcePath.lastIndexOf("."));
 
         if (modelCache.containsKey(resourcePath)) {
-            LOGGER.debug("    Loading from cache");
+            LOGGER.trace("    Loading from cache");
             scene = modelCache.get(resourcePath);
         } else {
-            LOGGER.debug("    Extension: {}", extension);
+            LOGGER.trace("    Extension: {}", extension);
 
             URL res = ModelLoader.class.getResource(resourcePath);
             String modelPath = getmodelPath(res.getPath());
 
-            LOGGER.debug("    Loading model from PATH->'{}', RES->'{}'", modelPath, res.toString());
+            LOGGER.trace("    Loading model from PATH->'{}', RES->'{}'", modelPath, res.toString());
 
             if (res.toString().startsWith("jar:") || res.toString().startsWith("jrt:")) {
                 modelPath = unpackModelsFromJar(resourcePath, extension);
@@ -87,7 +87,7 @@ public class ModelLoader {
         // MATERIAL
         Material material = loadMaterial(scene, mesh.getMaterialIndex(), resourcePath, extension);
 
-        LOGGER.debug("    Model {} has been loaded. Mesh: {}, Material: {}", resourcePath, mesh, material);
+        LOGGER.trace("    Model {} has been loaded. Mesh: {}, Material: {}", resourcePath, mesh, material);
         return new ModelInfo(mesh, material);
     }
 
@@ -162,7 +162,7 @@ public class ModelLoader {
 
         try {
             final String tempDir = System.getProperty("java.io.tmpdir");
-            LOGGER.debug("    Model found in a jar file, extracting files to a temp directory: {}", tempDir);
+            LOGGER.trace("    Model found in a jar file, extracting files to a temp directory: {}", tempDir);
 
             File modelFile = new File(tempDir, origName + extension);
             modelFile.deleteOnExit();
@@ -170,7 +170,7 @@ public class ModelLoader {
 
             InputStream modelInput = ModelLoader.class.getResourceAsStream(resourcePath);
             Files.write(modelFile.toPath(), modelInput.readAllBytes());
-            LOGGER.debug("    File {} extracted", tempDir + origName + extension);
+            LOGGER.trace("    File {} extracted", tempDir + origName + extension);
 
             // MTL
             File mtlFile = new File(tempDir, origName + ".mtl");
@@ -179,10 +179,10 @@ public class ModelLoader {
 
             InputStream mtlInput = ModelLoader.class.getResourceAsStream(resourcePath.replace(extension, ".mtl"));
             if (mtlInput == null) {
-                LOGGER.debug("    MTL file was not found for {}, skipping", origName);
+                LOGGER.trace("    MTL file was not found for {}, skipping", origName);
             } else {
                 Files.write(mtlFile.toPath(), mtlInput.readAllBytes());
-                LOGGER.debug("    File {} extracted", origName + ".mtl");
+                LOGGER.trace("    File {} extracted", origName + ".mtl");
             }
 
             // TEXTURE
@@ -192,10 +192,10 @@ public class ModelLoader {
 
             InputStream textureInput = ModelLoader.class.getResourceAsStream(resourcePath.replace(extension, ".png"));
             if (textureInput == null) {
-                LOGGER.debug("    Texture file was not found for {}, skipping", origName);
+                LOGGER.trace("    Texture file was not found for {}, skipping", origName);
             } else {
                 Files.write(textureFile.toPath(), textureInput.readAllBytes());
-                LOGGER.debug("    File {} extracted", origName + ".png");
+                LOGGER.trace("    File {} extracted", origName + ".png");
             }
 
             return modelFile.getPath();

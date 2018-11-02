@@ -13,13 +13,13 @@ import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.render.Camera;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
+import java.util.Random;
+
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 
 public class Main {
     private final Camera camera = Camera.perspective(60.0f, 01f, 1000f);
-    private Cube cube;
+    private Cube[] cubes = new Cube[2000];
     private static float x = 0f;
 
     public static void main(String[] args) {
@@ -33,39 +33,32 @@ public class Main {
 
     private void start() {
         new DebugInputListener(camera);
-        camera.setPosition(new Vector3f(0, 0, 10));
+        camera.setPosition(new Vector3f(50, 50, 150));
         camera.setRotation(new Vector3f(0, 0, 0));
 
         LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.4f));
 
-        cube = new Cube();
-        cube.getComponent(RenderComponent.class).ifPresent(component -> {
-            component.transform.setRotation(new Vector3f(10, 20, 0));
-        });
-
-        float speed = 0.1f;
-
+        Random random = new Random();
         MessageBus.register(KeyEvent.keyHeldDown(GLFW_KEY_R), () -> {
-            Vector3f current = new Vector3f(camera.getPosition());
-            current.y -= speed;
+            for (Cube cube : cubes) {
+                cube.getComponent(RenderComponent.class).ifPresent(component -> {
+                    Vector3f rotation = component.transform.getRotation();
+                    rotation.x += 5;
+                    rotation.y += 5;
+                    rotation.z += 5;
+                    component.transform.setRotation(rotation);
+                });
+            }
+        });
+
+        for (int i = 0; i < 2000; i++) {
+            Cube cube = new Cube();
             cube.getComponent(RenderComponent.class).ifPresent(component -> {
-                Vector3f rotation = component.transform.getRotation();
-                rotation.y += 2;
-                component.transform.setRotation(rotation);
+                component.transform.setRotation(new Vector3f(20, 20, 0));
+                component.material.setDiffuseColor(new Vector3f(random.nextFloat(), random.nextFloat(), random.nextFloat()));
+                component.transform.setPosition(random.nextInt((100) + 1), random.nextInt((100) + 1), random.nextInt((100) + 1));
             });
-        });
-
-        MessageBus.register(KeyEvent.pressed(GLFW_KEY_D), () -> cube.destroy());
-        MessageBus.register(KeyEvent.pressed(GLFW_KEY_A), this::addCube);
-    }
-
-    private void addCube() {
-        Cube cube = new Cube();
-        cube.getComponent(RenderComponent.class).ifPresent(component -> {
-            component.transform.setRotation(new Vector3f(20, 20, 0));
-            component.material.setDiffuseColor(new Vector3f(1, 0, 0));
-            component.transform.setPosition(x, 0, 0);
-            x += -.2;
-        });
+            cubes[i] = cube;
+        }
     }
 }

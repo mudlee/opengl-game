@@ -57,7 +57,7 @@ public class Batch {
         batchSizeChanged = true;
         int oldSize = currentSize;
         currentSize++;
-        LOGGER.debug("Entity {} added to batch {}, size {}->{}", entityId, ID, oldSize, currentSize);
+        LOGGER.trace("Entity {} added to batch {}, size {}->{}", entityId, ID, oldSize, currentSize);
     }
 
     public void remove(Integer entityId) {

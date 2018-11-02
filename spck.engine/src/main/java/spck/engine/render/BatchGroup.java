@@ -26,7 +26,7 @@ public class BatchGroup {
         }
 
         batches.put(batchID, batch);
-        LOGGER.debug("Batch {} added", batchID);
+        LOGGER.trace("Batch {} added", batchID);
     }
 
     public Optional<Batch> getBatch(int batchID) {

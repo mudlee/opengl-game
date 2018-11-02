@@ -15,7 +15,7 @@ public class Entity {
 
     public Entity() {
         id = ECS.world.create();
-        LOGGER.debug("Entity {} [{}] is created", id, getClass().getSimpleName());
+        LOGGER.trace("Entity {} [{}] is created", id, getClass().getSimpleName());
     }
 
     public void destroy() {
@@ -31,7 +31,7 @@ public class Entity {
         for (Component component : componentBag) {
             if (component instanceof StateAwareComponent) {
                 ((StateAwareComponent) component).state = ComponentState.MARKED_FOR_DESTROY;
-                LOGGER.debug("Entity {} is marked for deletion", id);
+                LOGGER.trace("Entity {} is marked for deletion", id);
             }
         }
         componentBag.clear();
@@ -62,7 +62,7 @@ public class Entity {
             throw new RuntimeException(String.format("%s is not extended from %s", componentClass, Component.class));
         }
 
-        LOGGER.debug("Adding {} to Entity {}", componentClass.getSimpleName(), id);
+        LOGGER.trace("Adding {} to Entity {}", componentClass.getSimpleName(), id);
         return (T) ECS.world.getMapper((Class<? extends Component>) componentClass).create(id);
     }
 }
