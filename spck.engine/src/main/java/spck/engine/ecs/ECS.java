@@ -25,7 +25,7 @@ public class ECS {
         }
 
         world = new World(builder.build());
-        MessageBus.register(LifeCycle.UPDATE.eventID(), this::process);
+        MessageBus.register(LifeCycle.AFTER_UPDATE.eventID(), this::process);
         LOGGER.debug("ECS is ready");
     }
 

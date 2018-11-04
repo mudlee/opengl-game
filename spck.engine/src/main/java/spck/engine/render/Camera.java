@@ -13,10 +13,12 @@ public class Camera {
     private final Vector3f REUSABLE_RAY_VECTOR = new Vector3f().zero();
     private final Vector3f REUSABLE_3D_VECTOR = new Vector3f().zero();
     private final Vector3f position = new Vector3f(0, 0, 0);
-    private final Vector3f rotation = new Vector3f(0, 0, 0);
+    // Yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right
+    // (due to how Eular angles work) so we initially rotate a bit to the left.
+    private final Vector3f rotation = new Vector3f(0, -90, 0);
     private final Matrix4f projectionMatrix = new Matrix4f();
     private final Matrix4f viewMatrix = new Matrix4f();
-    private final Vector3f camFrontVector = new Vector3f(1, 0, 0);
+    private final Vector3f camFrontVector = new Vector3f(0, 0, -1);
     private boolean viewMatrixChanged = true;
     private boolean projectionMatrixChanged = true;
     private boolean positionChanged = true;
@@ -184,11 +186,10 @@ public class Camera {
     }
 
     private void updateViewMatrix() {
+        viewMatrix.identity();
         REUSABLE_3D_VECTOR.set(position);
 
-        viewMatrix.identity();
-        viewMatrix.rotate((float) Math.toRadians(rotation.x), camFrontVector).rotate((float) Math.toRadians(rotation.y), REUSABLE_UP_VECTOR);
-        viewMatrix.translate(-position.x, -position.y, -position.z);
+        viewMatrix.lookAt(position, REUSABLE_3D_VECTOR.add(camFrontVector), REUSABLE_UP_VECTOR);
         viewMatrixChanged = true;
     }
 }

@@ -31,7 +31,8 @@ class GameLoop {
 
             MessageBus.broadcast(LifeCycle.FRAME_START.eventID());
             MessageBus.broadcast(LifeCycle.UPDATE.eventID());
-            MessageBus.broadcast(LifeCycle.BEFORE_BUFFER_SWAP.eventID());
+            MessageBus.broadcast(LifeCycle.AFTER_UPDATE.eventID());
+            MessageBus.broadcast(LifeCycle.BEFORE_BUFFER_SWAP.eventID()); // camera resets here
             window.swapBuffers();
             MessageBus.broadcast(LifeCycle.AFTER_BUFFER_SWAP.eventID());
 

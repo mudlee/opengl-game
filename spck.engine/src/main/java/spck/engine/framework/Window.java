@@ -1,6 +1,7 @@
 package spck.engine.framework;
 
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
@@ -13,6 +14,7 @@ import spck.engine.Antialiasing;
 import spck.engine.bus.KeyEvent;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
+import spck.engine.bus.MouseEvent;
 import spck.engine.bus.WindowResizedEvent;
 
 import java.nio.IntBuffer;
@@ -23,6 +25,9 @@ import java.util.Objects;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR;
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_DISABLED;
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LAST;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_Q;
 import static org.lwjgl.glfw.GLFW.GLFW_MAXIMIZED;
@@ -45,8 +50,10 @@ import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
+import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetFramebufferSizeCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowPos;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
@@ -211,6 +218,7 @@ public class Window {
         glfwMakeContextCurrent(ID);
 
         // watch for resize
+        final WindowResizedEvent windowResizedEvent = new WindowResizedEvent();
         glfwSetFramebufferSizeCallback(ID, new GLFWFramebufferSizeCallback() {
             @Override
             public void invoke(long window, int width, int height) {
@@ -218,14 +226,15 @@ public class Window {
                 preferences.setHeight(height);
                 resized = true;
 
-                WindowResizedEvent.reusable.width = width;
-                WindowResizedEvent.reusable.height = height;
-                MessageBus.broadcast(LifeCycle.WINDOW_RESIZED.eventID(), WindowResizedEvent.reusable);
+                windowResizedEvent.set(width, height);
+                MessageBus.broadcast(LifeCycle.WINDOW_RESIZED.eventID(), windowResizedEvent);
             }
         });
 
         // initializing inputs
         final KeyEvent keyEvent = new KeyEvent();
+        final MouseEvent mouseEvent = new MouseEvent();
+
         glfwSetKeyCallback(ID, new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
@@ -242,6 +251,14 @@ public class Window {
                     MessageBus.broadcast(KeyEvent.released(key), keyEvent);
                     keysDown.remove(Integer.valueOf(key));
                 }
+            }
+        });
+
+        glfwSetCursorPosCallback(ID, new GLFWCursorPosCallback() {
+            @Override
+            public void invoke(long window, double x, double y) {
+                mouseEvent.calculate(x, y);
+                MessageBus.broadcast(MouseEvent.moved(), mouseEvent);
             }
         });
 
@@ -292,6 +309,14 @@ public class Window {
         MessageBus.register(KeyEvent.pressed(GLFW_KEY_Q), (event) -> {
             glfwSetWindowShouldClose(ID, true);
         });
+    }
+
+    public void captureMouse() {
+        glfwSetInputMode(ID, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+
+    public void releaseMouse() {
+        glfwSetInputMode(ID, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 
     private void onUpdate() {

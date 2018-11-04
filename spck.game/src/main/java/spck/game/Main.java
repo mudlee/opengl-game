@@ -7,6 +7,7 @@ import spck.engine.bus.KeyEvent;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.DebugInputListener;
+import spck.engine.debug.FreeCameraController;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.lights.AmbientLight;
 import spck.engine.lights.LightSystem;
@@ -20,21 +21,23 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 public class Main {
     private final Camera camera = Camera.perspective(60.0f, 01f, 1000f);
     private Cube[] cubes = new Cube[2000];
-    private static float x = 0f;
 
     public static void main(String[] args) {
         new Main().run();
     }
 
     private void run() {
+        Engine engine = new Engine(camera);
         MessageBus.register(LifeCycle.GAME_START.eventID(), this::start);
-        new Engine(camera).launch();
+
+        engine.launch();
     }
 
     private void start() {
         new DebugInputListener(camera);
+        new FreeCameraController(camera);
+
         camera.setPosition(new Vector3f(50, 50, 150));
-        camera.setRotation(new Vector3f(0, 0, 0));
 
         LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.4f));
 
@@ -60,5 +63,7 @@ public class Main {
             });
             cubes[i] = cube;
         }
+
+        Engine.window.captureMouse();
     }
 }

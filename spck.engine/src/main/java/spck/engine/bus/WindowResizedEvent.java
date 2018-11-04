@@ -1,8 +1,19 @@
 package spck.engine.bus;
 
 public class WindowResizedEvent {
-    public static final WindowResizedEvent reusable = new WindowResizedEvent();
+    private int width;
+    private int height;
 
-    public int width;
-    public int height;
+    public void set(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
 }
