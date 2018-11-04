@@ -10,6 +10,7 @@ import spck.engine.debug.DebugInputListener;
 import spck.engine.debug.FreeCameraController;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.lights.AmbientLight;
+import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.render.Camera;
@@ -20,7 +21,8 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 
 public class Main {
     private final Camera camera = Camera.perspective(60.0f, 01f, 1000f);
-    private Cube[] cubes = new Cube[2000];
+    private static final int CUBES = 50000;
+    private Cube[] cubes = new Cube[CUBES];
 
     public static void main(String[] args) {
         new Main().run();
@@ -40,6 +42,11 @@ public class Main {
         camera.setPosition(new Vector3f(50, 50, 150));
 
         LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.4f));
+        LightSystem.addLight(new DirectionalLight(
+                new Vector4f(1, 1, 1, 1),
+                0.7f,
+                new Vector3f(40, 20, 10)
+        ));
 
         Random random = new Random();
         MessageBus.register(KeyEvent.keyHeldDown(GLFW_KEY_R), () -> {
@@ -54,12 +61,12 @@ public class Main {
             }
         });
 
-        for (int i = 0; i < 2000; i++) {
+        for (int i = 0; i < CUBES; i++) {
             Cube cube = new Cube();
             cube.getComponent(RenderComponent.class).ifPresent(component -> {
-                component.transform.setRotation(new Vector3f(20, 20, 0));
-                component.material.setDiffuseColor(new Vector3f(random.nextFloat(), random.nextFloat(), random.nextFloat()));
-                component.transform.setPosition(random.nextInt((100) + 1), random.nextInt((100) + 1), random.nextInt((100) + 1));
+                //component.material.setDiffuseColor(new Vector3f(random.nextFloat(), random.nextFloat(), random.nextFloat()));
+                component.material.setDiffuseColor(new Vector3f(0.5f, 0.2f, 0.7f));
+                component.transform.setPosition(random.nextInt((1000) + 1), random.nextInt((1000) + 1), random.nextInt((1000) + 1));
             });
             cubes[i] = cube;
         }
