@@ -39,8 +39,19 @@ import java.util.List;
 import java.util.Map;
 
 public class ModelLoader {
+    private static class LoadedMesh {
+        Mesh mesh;
+        int materialIndex;
+
+        LoadedMesh(Mesh mesh, int materialIndex) {
+            this.mesh = mesh;
+            this.materialIndex = materialIndex;
+        }
+    }
+
     private final static Logger LOGGER = LoggerFactory.getLogger(ModelLoader.class);
     private final static int IMPORT_FLAGS = Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_Triangulate | Assimp.aiProcess_FixInfacingNormals | Assimp.aiProcess_OptimizeMeshes;
+
     private final static Map<String, AIScene> modelCache = new HashMap<>();
 
     public static ModelInfo load(String resourcePath) {
@@ -82,13 +93,13 @@ public class ModelLoader {
         }
 
         // MESH
-        Mesh mesh = loadMesh(scene, resourcePath);
+        LoadedMesh loadedMesh = loadMesh(scene, resourcePath);
 
         // MATERIAL
-        Material material = loadMaterial(scene, mesh.getMaterialIndex(), resourcePath, extension);
+        Material material = loadMaterial(scene, loadedMesh.materialIndex, resourcePath, extension);
 
-        LOGGER.trace("    Model {} has been loaded. Mesh: {}, Material: {}", resourcePath, mesh, material);
-        return new ModelInfo(mesh, material);
+        LOGGER.trace("    Model {} has been loaded. Mesh: {}, Material: {}", resourcePath, loadedMesh.mesh, material);
+        return new ModelInfo(loadedMesh.mesh, material);
     }
 
     private static void cleanUp() {
@@ -125,7 +136,7 @@ public class ModelLoader {
         return material;
     }
 
-    private static Mesh loadMesh(AIScene scene, String resourcePath) {
+    private static LoadedMesh loadMesh(AIScene scene, String resourcePath) {
         int numMeshes = scene.mNumMeshes();
         LOGGER.trace("    Found {} meshes...", numMeshes);
         PointerBuffer aiMeshes = scene.mMeshes();
@@ -149,12 +160,11 @@ public class ModelLoader {
                 processIndices(aiMesh),
                 processNormals(aiMesh),
                 processUVCoords(aiMesh),
-                new ArrayList<>(),
-                materialIndex
+                new ArrayList<>()
         );
 
         LOGGER.trace("    Mesh has been loaded. Verts: {}, normals: {}, mat idx: {}", mesh.getIndices().length, mesh.getNormals().length / 3, materialIndex);
-        return mesh;
+        return new LoadedMesh(mesh, materialIndex);
     }
 
     private static String unpackModelsFromJar(String resourcePath, String extension) {

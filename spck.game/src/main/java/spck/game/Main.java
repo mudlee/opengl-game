@@ -3,25 +3,19 @@ package spck.game;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import spck.engine.Engine;
-import spck.engine.bus.KeyEvent;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.DebugInputListener;
 import spck.engine.debug.FreeCameraController;
-import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.lights.AmbientLight;
 import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.render.Camera;
 
-import java.util.Random;
-
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
-
 public class Main {
     private final Camera camera = Camera.perspective(60.0f, 01f, 1000f);
-    private static final int CUBES = 50000;
+    private static final int CUBES = 10000;
     private Cube[] cubes = new Cube[CUBES];
 
     public static void main(String[] args) {
@@ -48,7 +42,7 @@ public class Main {
                 new Vector3f(40, 20, 10)
         ));
 
-        Random random = new Random();
+        /*Random random = new Random();
         MessageBus.register(KeyEvent.keyHeldDown(GLFW_KEY_R), () -> {
             for (Cube cube : cubes) {
                 cube.getComponent(RenderComponent.class).ifPresent(component -> {
@@ -66,11 +60,13 @@ public class Main {
             cube.getComponent(RenderComponent.class).ifPresent(component -> {
                 //component.material.setDiffuseColor(new Vector3f(random.nextFloat(), random.nextFloat(), random.nextFloat()));
                 component.material.setDiffuseColor(new Vector3f(0.5f, 0.2f, 0.7f));
-                component.transform.setPosition(random.nextInt((1000) + 1), random.nextInt((1000) + 1), random.nextInt((1000) + 1));
+                component.transform.setPosition(random.nextInt((200) + 1), random.nextInt((200) + 1), random.nextInt((200) + 1));
             });
             cubes[i] = cube;
-        }
+        }*/
 
         Engine.window.captureMouse();
+
+        new Terrain();
     }
 }

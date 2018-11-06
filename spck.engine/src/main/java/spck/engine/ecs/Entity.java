@@ -13,7 +13,7 @@ public class Entity {
     private Integer id;
     private boolean destroyed;
 
-    public Entity() {
+    public void create() {
         id = ECS.world.create();
         LOGGER.trace("Entity {} [{}] is created", id, getClass().getSimpleName());
     }

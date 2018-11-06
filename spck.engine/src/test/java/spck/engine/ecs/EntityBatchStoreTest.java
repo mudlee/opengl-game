@@ -286,7 +286,7 @@ class EntityBatchStoreTest {
     }
 
     private Mesh createEmptyMesh() {
-        return new Mesh(new float[]{}, new int[]{}, new float[]{}, new float[]{}, new ArrayList<>(), 0);
+        return new Mesh(new float[]{}, new int[]{}, new float[]{}, new float[]{}, new ArrayList<>());
     }
 
     private RenderComponent createMeshRendererComponent(Mesh mesh, Material material) {

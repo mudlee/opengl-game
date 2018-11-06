@@ -8,7 +8,7 @@ public class UITextEntity extends Entity {
     private final UITextComponent textComponent;
 
     public UITextEntity(String text, UIObjectPosition position) {
-        super();
+        create();
 
         textComponent = addComponent(UITextComponent.class);
         textComponent.text = text;

@@ -8,7 +8,7 @@ import spck.engine.render.Transform;
 
 public class Cube extends Entity {
     public Cube() {
-        super();
+        create();
 
         ModelInfo model = ModelLoader.load("/models/primitives/cube.obj");
 

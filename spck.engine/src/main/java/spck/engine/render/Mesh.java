@@ -17,15 +17,13 @@ public class Mesh {
     private float[] uvCoords;
     private List<MeshTriangle> triangles;
     private boolean changed;
-    private int materialIndex;
 
-    public Mesh(float[] vertices, int[] indices, float[] normals, float[] uvCoords, List<MeshTriangle> triangles, int materialIndex) {
+    public Mesh(float[] vertices, int[] indices, float[] normals, float[] uvCoords, List<MeshTriangle> triangles) {
         this.vertices = vertices;
         this.indices = indices;
         this.normals = normals;
         this.uvCoords = uvCoords;
         this.triangles = triangles;
-        this.materialIndex = materialIndex;
     }
 
     @Override
@@ -124,10 +122,6 @@ public class Mesh {
         }
 
         changed = true;
-    }
-
-    public int getMaterialIndex() {
-        return materialIndex;
     }
 }
 

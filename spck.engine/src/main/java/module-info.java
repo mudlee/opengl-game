@@ -25,6 +25,7 @@ module spck.engine {
     exports spck.engine.framework;
     exports spck.engine.bus;
     exports spck.engine.debug;
+    exports spck.engine.ecs;
     exports spck.engine.ecs.render.components;
     exports spck.engine.lights;
     exports spck.engine.model.primitives;
