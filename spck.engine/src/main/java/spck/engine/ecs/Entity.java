@@ -56,17 +56,19 @@ public abstract class Entity {
     }
 
     @SuppressWarnings({"unchecked", "SameParameterValue"})
-    protected <T> T addComponent(Class<T> componentClass) {
+    public <T> T addComponent(Class<T> componentClass) {
         if (id == null || destroyed) {
             LOGGER.error("Entity {} is destroyed, cannot add component", id);
             return null;
         }
 
-        if (!Component.class.isAssignableFrom(componentClass)) {
+        if (!ECSComponent.class.isAssignableFrom(componentClass)) {
             throw new RuntimeException(String.format("%s is not extended from %s", componentClass, Component.class));
         }
 
         LOGGER.trace("Adding {} to Entity {}", componentClass.getSimpleName(), id);
-        return (T) ECS.world.getMapper((Class<? extends Component>) componentClass).create(id);
+        T ecsComponent = (T) ECS.world.getMapper((Class<? extends Component>) componentClass).create(id);
+        ((ECSComponent) ecsComponent).entityId = id;
+        return ecsComponent;
     }
 }

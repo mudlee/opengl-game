@@ -1,7 +1,5 @@
 package spck.engine.ecs;
 
-import com.artemis.Component;
-
-public abstract class StateAwareComponent extends Component {
+public abstract class StateAwareComponent extends ECSComponent {
     public ComponentState state = ComponentState.ACTIVE;
 }

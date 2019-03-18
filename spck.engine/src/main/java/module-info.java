@@ -21,6 +21,7 @@ module spck.engine {
     opens spck.engine.ecs.debug to artemis.odb;
     opens spck.engine.ecs.ui to artemis.odb;
     opens spck.engine.ecs.render to artemis.odb;
+	opens spck.engine.ecs.physics to artemis.odb;
 
     exports spck.engine;
     exports spck.engine.framework;

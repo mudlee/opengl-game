@@ -1,9 +1,9 @@
 package spck.engine.ecs.debug;
 
-import com.artemis.Component;
+import spck.engine.ecs.ECSComponent;
 
 @SuppressWarnings("WeakerAccess")
-public class StatUITextComponent extends Component {
+public class StatUITextComponent extends ECSComponent {
     public Type type;
 
     public enum Type {

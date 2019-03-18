@@ -93,6 +93,7 @@ public class Transform {
         return transformationMatrixReusable;
     }
 
+    // TODO only calculate once if all is updated
     private void dataChanged() {
         transformationMatrixReusable.set(TransformationMatrixCreator.create(position, rotation, scale));
         changed = true;
