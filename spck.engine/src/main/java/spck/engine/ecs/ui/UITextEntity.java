@@ -5,11 +5,17 @@ import spck.engine.ecs.Entity;
 import spck.engine.ui.UIObjectPosition;
 
 public class UITextEntity extends Entity {
-    private final UITextComponent textComponent;
+    private final String text;
+    private final UIObjectPosition position;
+    private UITextComponent textComponent;
 
     public UITextEntity(String text, UIObjectPosition position) {
-        create();
+        this.text = text;
+        this.position = position;
+    }
 
+    @Override
+    public void onInit() {
         textComponent = addComponent(UITextComponent.class);
         textComponent.text = text;
         textComponent.position = position;

@@ -20,6 +20,7 @@
         <junit.version>5.4.0</junit.version>
         <assertj.version>3.12.1</assertj.version>
         <mockito.version>2.25.1</mockito.version>
+        <ode4j.version>0.4.0</ode4j.version>
     </properties>
 
     <profiles>
@@ -79,6 +80,13 @@
             <groupId>net.onedaybeard.artemis</groupId>
             <artifactId>artemis-odb</artifactId>
             <version>${artemis.version}</version>
+        </dependency>
+
+        <!-- PHYSICS 3D-->
+        <dependency>
+            <groupId>org.ode4j</groupId>
+            <artifactId>core</artifactId>
+            <version>${ode4j.version}</version>
         </dependency>
 
         <!-- TESTING -->

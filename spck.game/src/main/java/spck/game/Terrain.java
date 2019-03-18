@@ -2,6 +2,7 @@ package spck.game;
 
 import org.joml.Vector3f;
 import spck.engine.ecs.Entity;
+import spck.engine.ecs.physics.Physics3DBodyComponent;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.render.DefaultMaterial;
 import spck.engine.render.Mesh;
@@ -13,13 +14,14 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Terrain extends Entity {
-    public Terrain() {
-        create();
+    @Override
+    public void onInit() {
+        RenderComponent cRender = addComponent(RenderComponent.class);
+        cRender.material = new DefaultMaterial();
+        cRender.mesh = createMesh();
+        cRender.transform = new Transform();
 
-        RenderComponent component = addComponent(RenderComponent.class);
-        component.material = new DefaultMaterial();
-        component.mesh = createMesh();
-        component.transform = new Transform();
+        Physics3DBodyComponent cPhysics3D = addComponent(Physics3DBodyComponent.class);
     }
 
     private Mesh createMesh() {

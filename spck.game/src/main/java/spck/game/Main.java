@@ -7,6 +7,7 @@ import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.DebugInputListener;
 import spck.engine.debug.FreeCameraController;
+import spck.engine.ecs.Entity;
 import spck.engine.lights.AmbientLight;
 import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
@@ -67,6 +68,6 @@ public class Main {
 
         Engine.window.captureMouse();
 
-        new Terrain();
+		Entity.create(new Terrain());
     }
 }

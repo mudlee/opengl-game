@@ -7,16 +7,20 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
-public class Entity {
+public abstract class Entity {
     private final static Logger LOGGER = LoggerFactory.getLogger(Entity.class);
     private final Bag<Component> componentBag = new Bag<>();
     private Integer id;
     private boolean destroyed;
 
-    public void create() {
-        id = ECS.world.create();
-        LOGGER.trace("Entity {} [{}] is created", id, getClass().getSimpleName());
+	public static Entity create(Entity entity) {
+		entity.id = ECS.world.create();
+		LOGGER.trace("Entity {} [{}] is created", entity.id, entity.getClass().getSimpleName());
+		entity.onInit();
+		return entity;
     }
+
+	public abstract void onInit();
 
     public void destroy() {
         if (id == null || destroyed) {
