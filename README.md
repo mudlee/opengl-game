@@ -1,6 +1,6 @@
 ## TODO
 
-- do not fix FPS at 60
+- performance improvements
 - base scene
 - easier material/shader handling
 - vulkan renderer

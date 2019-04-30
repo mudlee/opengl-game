@@ -3,6 +3,7 @@ package spck.engine.debug;
 import org.joml.Vector3f;
 import spck.engine.Axis;
 import spck.engine.MoveDirection;
+import spck.engine.Time;
 import spck.engine.bus.KeyEvent;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
@@ -24,8 +25,8 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
 // - miert mozog rossz iranyba a controller
 public class FreeCameraController {
     private static final Map<MoveDirection, Integer> moveKeyMap = new HashMap<>();
-    private static final float MAX_SPEED = 4f;
-    private static final float ACCELERATION = 0.1f;
+    private static final float MAX_SPEED = 1f;
+    private static final float ACCELERATION = 0.5f;
 
     static {
         moveKeyMap.put(MoveDirection.LEFT, GLFW_KEY_A);
@@ -77,14 +78,14 @@ public class FreeCameraController {
     private Vector3f calculatePositionChange() {
         if (movementVector.x > 0) {
             if (!movingAxes.get(Axis.X)) {
-                movementVector.x -= ACCELERATION;
+                movementVector.x -= ACCELERATION * Time.deltaTime;
                 if (movementVector.x < 0) {
                     movementVector.x = 0;
                 }
             }
         } else if (movementVector.x < 0) {
             if (!movingAxes.get(Axis.X)) {
-                movementVector.x += ACCELERATION;
+                movementVector.x += ACCELERATION * Time.deltaTime;
                 if (movementVector.x > 0) {
                     movementVector.x = 0;
                 }
@@ -93,14 +94,14 @@ public class FreeCameraController {
 
         if (movementVector.z > 0) {
             if (!movingAxes.get(Axis.Z)) {
-                movementVector.z -= ACCELERATION;
+                movementVector.z -= ACCELERATION * Time.deltaTime;
                 if (movementVector.z < 0) {
                     movementVector.z = 0;
                 }
             }
         } else if (movementVector.z < 0) {
             if (!movingAxes.get(Axis.Z)) {
-                movementVector.z += ACCELERATION;
+                movementVector.z += ACCELERATION * Time.deltaTime;
                 if (movementVector.z > 0) {
                     movementVector.z = 0;
                 }
@@ -109,14 +110,14 @@ public class FreeCameraController {
 
         if (movementVector.y > 0) {
             if (!movingAxes.get(Axis.Y)) {
-                movementVector.y -= ACCELERATION;
+                movementVector.y -= ACCELERATION * Time.deltaTime;
                 if (movementVector.y < 0) {
                     movementVector.y = 0;
                 }
             }
         } else if (movementVector.y < 0) {
             if (!movingAxes.get(Axis.Y)) {
-                movementVector.y += ACCELERATION;
+                movementVector.y += ACCELERATION * Time.deltaTime;
                 if (movementVector.y > 0) {
                     movementVector.y = 0;
                 }
@@ -135,37 +136,37 @@ public class FreeCameraController {
                     break;
                 }
 
-                movementVector.x -= ACCELERATION;
+                movementVector.x -= ACCELERATION * Time.deltaTime;
                 break;
             case RIGHT:
                 if (movementVector.x > MAX_SPEED) {
                     break;
                 }
-                movementVector.x += ACCELERATION;
+                movementVector.x += ACCELERATION * Time.deltaTime;
                 break;
             case FORWARD:
                 if (movementVector.z > MAX_SPEED) {
                     break;
                 }
-                movementVector.z += ACCELERATION;
+                movementVector.z += ACCELERATION * Time.deltaTime;
                 break;
             case BACKWARD:
                 if (movementVector.z < -MAX_SPEED) {
                     break;
                 }
-                movementVector.z -= ACCELERATION;
+                movementVector.z -= ACCELERATION * Time.deltaTime;
                 break;
             case UPWARD:
                 if (movementVector.y > MAX_SPEED) {
                     break;
                 }
-                movementVector.y += ACCELERATION;
+                movementVector.y += ACCELERATION * Time.deltaTime;
                 break;
             case DOWNWARD:
                 if (movementVector.y < -MAX_SPEED) {
                     break;
                 }
-                movementVector.y -= ACCELERATION;
+                movementVector.y -= ACCELERATION * Time.deltaTime;
                 break;
         }
     }

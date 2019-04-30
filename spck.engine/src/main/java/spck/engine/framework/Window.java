@@ -84,15 +84,17 @@ public class Window {
         private final boolean vSyncEnabled;
         private final Antialiasing antialiasing;
         private final boolean fullscreenEnabled;
+        private final boolean limitFPS;
         private String title = "SPCK";
         private int screenScaleFactor = 1;
         private int width = 1280;
         private int height = 720;
 
-        public Preferences(boolean vSyncEnabled, Antialiasing antialiasing, boolean fullscreenEnabled) {
+        public Preferences(boolean vSyncEnabled, Antialiasing antialiasing, boolean fullscreenEnabled, boolean limitFPS) {
             this.vSyncEnabled = vSyncEnabled;
             this.antialiasing = antialiasing;
             this.fullscreenEnabled = fullscreenEnabled;
+            this.limitFPS = limitFPS;
         }
 
         public void setWidth(int width) {
@@ -133,6 +135,10 @@ public class Window {
 
         public int getHeight() {
             return height;
+        }
+
+        public boolean isLimitFPS() {
+            return limitFPS;
         }
 
         @Override

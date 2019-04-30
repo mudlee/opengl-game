@@ -40,7 +40,9 @@ class GameLoop {
 
             MessageBus.broadcast(LifeCycle.BEFORE_FRAME_SYNC.eventID());
             if (!window.getPreferences().isvSyncEnabled()) {
-                sync(lastLoopTime);
+                if (window.getPreferences().isLimitFPS()) {
+                    sync(lastLoopTime);
+                }
             }
             MessageBus.broadcast(LifeCycle.AFTER_FRAME_SYNC.eventID());
 
