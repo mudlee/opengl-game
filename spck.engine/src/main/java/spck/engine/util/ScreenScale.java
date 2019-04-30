@@ -2,12 +2,12 @@ package spck.engine.util;
 
 import spck.engine.Engine;
 
-public class Pixel {
-    public static int scaled(int pixel) {
+public class ScreenScale {
+    public static int applyScaleFactor(int pixel) {
         return pixel * Engine.window.getPreferences().getScreenScaleFactor();
     }
 
-    public static float scaled(float pixel) {
+    public static float applyScaleFactor(float pixel) {
         return pixel * (float) Engine.window.getPreferences().getScreenScaleFactor();
     }
 }

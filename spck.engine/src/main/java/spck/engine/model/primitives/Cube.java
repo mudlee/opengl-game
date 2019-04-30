@@ -8,7 +8,7 @@ import spck.engine.render.Transform;
 
 public class Cube extends Entity {
     @Override
-    public void onInit() {
+    public void onEntityCreated() {
         ModelInfo model = ModelLoader.load("/models/primitives/cube.obj");
 
         RenderComponent component = addComponent(RenderComponent.class);

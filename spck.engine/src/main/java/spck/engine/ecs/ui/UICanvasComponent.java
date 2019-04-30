@@ -8,6 +8,15 @@ import java.util.List;
 public class UICanvasComponent extends ECSComponent {
     private List<UIImage> images = new ArrayList<>();
     private List<UIText> texts = new ArrayList<>();
+    private UICanvasScaler canvasScaler;
+
+    public UICanvasScaler getCanvasScaler() {
+        return canvasScaler;
+    }
+
+    public void setCanvasScaler(UICanvasScaler canvasScaler) {
+        this.canvasScaler = canvasScaler;
+    }
 
     public void addImage(UIImage image) {
         images.add(image);

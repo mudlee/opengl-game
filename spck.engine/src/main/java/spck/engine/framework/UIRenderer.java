@@ -6,10 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
+import spck.engine.ecs.ui.UICanvasScaler;
 import spck.engine.ecs.ui.UIImage;
 import spck.engine.ecs.ui.UIText;
-import spck.engine.util.Pixel;
 import spck.engine.util.ResourceLoader;
+import spck.engine.util.ScreenScale;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -91,19 +92,24 @@ public class UIRenderer {
         restoreGLState();
     }
 
-    public void renderImage(UIImage image) {
+    public void renderImage(UIImage image, UICanvasScaler canvasScaler) {
         checkIfInitialised();
 
-        int imageID = nvglCreateImageFromHandle(pointer, image.textureId, Pixel.scaled(image.width), Pixel.scaled(image.height), 0);
+        int width = (int) canvasScaler.apply(ScreenScale.applyScaleFactor(image.getWidth()));
+        int height = (int) canvasScaler.apply(ScreenScale.applyScaleFactor(image.getHeight()));
+        float x = canvasScaler.apply(image.getScreenCoords().x);
+        float y = canvasScaler.apply(image.getScreenCoords().y);
+
+        int imageID = nvglCreateImageFromHandle(pointer, image.getTextureId(), width, height, 0);
         NVGPaint paint = NVGPaint.create();
-        nvgImagePattern(pointer, image.getScreenCoords().x, image.getScreenCoords().y, Pixel.scaled(image.width), Pixel.scaled(image.height), 0, imageID, 1f, paint);
+        nvgImagePattern(pointer, x, y, width, height, 0, imageID, 1f, paint);
         nvgBeginPath(pointer);
-        nvgRect(pointer, image.getScreenCoords().x, image.getScreenCoords().y, Pixel.scaled(image.width), Pixel.scaled(image.height));
+        nvgRect(pointer, x, y, width, height);
         nvgFillPaint(pointer, paint);
         nvgFill(pointer);
     }
 
-    public void renderText(UIText text) {
+    public void renderText(UIText text, UICanvasScaler canvasScaler) {
         checkIfInitialised();
 
         // setting fontFace is a slow operation, so we suppose that all the texts are using the default font
@@ -112,10 +118,10 @@ public class UIRenderer {
             nvgFontFace(pointer, text.getFont());
         }
 
-        nvgFontSize(pointer, Pixel.scaled(text.getSize()));
+        nvgFontSize(pointer, canvasScaler.apply(ScreenScale.applyScaleFactor(text.getSize())));
         nvgTextAlign(pointer, text.getAlign());
         nvgFillColor(pointer, text.getColor().getColor());
-        nvgText(pointer, text.getScreenCoords().x, text.getScreenCoords().y, text.getText());
+        nvgText(pointer, canvasScaler.apply(text.getScreenCoords().x), canvasScaler.apply(text.getScreenCoords().y), text.getText());
 
         if (!text.getFont().equals(defaultFont)) {
             nvgFontFace(pointer, defaultFont);

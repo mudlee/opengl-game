@@ -2,6 +2,8 @@ package spck.engine.ecs.ui;
 
 import spck.engine.ecs.Entity;
 
+import java.util.Objects;
+
 public class UICanvasEntity extends Entity {
     protected final UICanvasScaler canvasScaler;
     protected UICanvasComponent canvasComponent;
@@ -11,15 +13,16 @@ public class UICanvasEntity extends Entity {
     }
 
     @Override
-    public void onInit() {
+    public void onEntityCreated() {
         canvasComponent = addComponent(UICanvasComponent.class);
+        canvasComponent.setCanvasScaler(canvasScaler);
     }
 
-    public UICanvasComponent getCanvasComponent() { // TODO nem a legszebb igy
-        if (canvasComponent == null) {
-            throw new RuntimeException("Please call Entity.create() before calling this method.");
-        }
+    public void addImage(UIImage image) {
+        Objects.requireNonNull(canvasComponent).addImage(image);
+    }
 
-        return canvasComponent;
+    public void addText(UIText text) {
+        Objects.requireNonNull(canvasComponent).addText(text);
     }
 }

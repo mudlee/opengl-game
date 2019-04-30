@@ -14,7 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Terrain extends Entity {
     @Override
-    public void onInit() {
+    public void onEntityCreated() {
         RenderComponent cRender = addComponent(RenderComponent.class);
         cRender.material = new DefaultMaterial();
         cRender.mesh = createMesh();

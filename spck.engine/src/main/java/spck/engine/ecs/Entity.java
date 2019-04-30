@@ -16,11 +16,14 @@ public abstract class Entity {
 	public static Entity create(Entity entity) {
 		entity.id = ECS.world.create();
 		LOGGER.trace("Entity {} [{}] is created", entity.id, entity.getClass().getSimpleName());
-		entity.onInit();
+        entity.onEntityCreated();
 		return entity;
     }
 
-	public abstract void onInit();
+    /**
+     * This method is called, when the entity is created, so components now can be added.
+     */
+    public abstract void onEntityCreated();
 
     public void destroy() {
         if (id == null || destroyed) {

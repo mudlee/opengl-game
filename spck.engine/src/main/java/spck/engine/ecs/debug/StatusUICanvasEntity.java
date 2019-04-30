@@ -9,7 +9,8 @@ public class StatusUICanvasEntity extends UICanvasEntity {
     }
 
     @Override
-    public void onInit() {
+    public void onEntityCreated() {
         canvasComponent = addComponent(StatusUICanvasComponent.class);
+        canvasComponent.setCanvasScaler(canvasScaler);
     }
 }

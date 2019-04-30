@@ -41,15 +41,15 @@ public abstract class UICanvasRendererSystemCore extends BaseEntitySystem {
 
         for (int i = 0, s = actives.size(); s > i; i++) {
             if (canvasComponents.has(ids[i])) {
-                UICanvasComponent component = canvasComponents.get(ids[i]);
-                for (UIText text : component.getTexts()) {
+                UICanvasComponent canvas = canvasComponents.get(ids[i]);
+                for (UIText text : canvas.getTexts()) {
                     updateScreenScaleFactorIfNeeded(text);
-                    uiRenderer.renderText(text);
+                    uiRenderer.renderText(text, canvas.getCanvasScaler());
                 }
 
-                for (UIImage image : component.getImages()) {
+                for (UIImage image : canvas.getImages()) {
                     updateScreenScaleFactorIfNeeded(image);
-                    uiRenderer.renderImage(image);
+                    uiRenderer.renderImage(image, canvas.getCanvasScaler());
                 }
             }
         }

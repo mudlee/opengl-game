@@ -37,8 +37,10 @@ public class Main {
     }
 
     private void run() {
-        WINDOW_PREFERENCES.setWidth(2560);
-        WINDOW_PREFERENCES.setHeight(1440);
+        //WINDOW_PREFERENCES.setWidth(2560);
+        //WINDOW_PREFERENCES.setHeight(1440);
+        WINDOW_PREFERENCES.setWidth(1024);
+        WINDOW_PREFERENCES.setHeight(768);
         Engine engine = new Engine(CAMERA, WINDOW_PREFERENCES);
         MessageBus.register(LifeCycle.GAME_START.eventID(), this::start);
 
@@ -82,7 +84,7 @@ public class Main {
             cubes[i] = cube;
         }*/
 
-        Engine.window.captureMouse();
+        //Engine.window.captureMouse();
 
 		Entity.create(new Terrain());
 

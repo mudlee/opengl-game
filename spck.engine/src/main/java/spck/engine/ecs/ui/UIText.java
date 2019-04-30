@@ -2,45 +2,56 @@ package spck.engine.ecs.ui;
 
 import spck.engine.Engine;
 import spck.engine.framework.RGBAColor;
+import spck.engine.framework.UIRenderer;
 import spck.engine.ui.UIObjectPosition;
 
 public class UIText extends UIElement {
     private String text;
-    private float size;
-    private RGBAColor color;
-    private String font;
-    private int align;
+    private float size = 15;
+    private RGBAColor color = RGBAColor.white();
+    private String font = Engine.preferences.defaultFont;
+    private int align = UIRenderer.Align.LEFT.getValue() | UIRenderer.Align.TOP.getValue();
 
-    public UIText(String text, float size, UIObjectPosition position, RGBAColor color, String font, int align, String customID) {
-        this.customID = customID;
-        this.text = text;
+    private UIText() {
+    }
+
+    public static UIText build(String text, UIObjectPosition position) {
+        UIText uiText = new UIText();
+        uiText.text = text;
+        uiText.position = position;
+        uiText.screenOffset.set(0, (int) uiText.size);
+        uiText.updateScreenCoords(Engine.window.getPreferences().getScreenScaleFactor());
+        return uiText;
+    }
+
+    public UIText size(float size) {
         this.size = size;
-        this.color = color;
-        this.font = font;
-        this.align = align;
-        this.position = position;
-        this.screenOffset.set(0, (int) size);
-        updateScreenCoords(Engine.window.getPreferences().getScreenScaleFactor());
+        return this;
     }
 
-    public void setText(String text) {
+    public UIText font(String font) {
+        this.font = font;
+        return this;
+    }
+
+    public UIText color(RGBAColor color) {
+        this.color = color;
+        return this;
+    }
+
+    public UIText align(int align) {
+        this.align = align;
+        return this;
+    }
+
+    public UIText id(String id) {
+        this.id = id;
+        return this;
+    }
+
+    public UIText text(String text) {
         this.text = text;
-    }
-
-    public void setSize(float size) {
-        this.size = size;
-    }
-
-    public void setColor(RGBAColor color) {
-        this.color = color;
-    }
-
-    public void setFont(String font) {
-        this.font = font;
-    }
-
-    public void setAlign(int align) {
-        this.align = align;
+        return this;
     }
 
     public String getText() {
