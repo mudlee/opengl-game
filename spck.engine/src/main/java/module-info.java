@@ -14,14 +14,12 @@ module spck.engine {
     requires org.slf4j;
     requires org.slf4j.simple;
     requires artemis.odb;
-    requires core; // ode4j
     requires transitive org.joml;
 
     opens spck.engine.ecs to artemis.odb;
     opens spck.engine.ecs.debug to artemis.odb;
     opens spck.engine.ecs.ui to artemis.odb;
     opens spck.engine.ecs.render to artemis.odb;
-	opens spck.engine.ecs.physics to artemis.odb;
 
     exports spck.engine;
     exports spck.engine.framework;
@@ -29,7 +27,6 @@ module spck.engine {
     exports spck.engine.debug;
     exports spck.engine.ecs;
     exports spck.engine.ecs.render.components;
-    exports spck.engine.ecs.physics;
     exports spck.engine.lights;
     exports spck.engine.model.primitives;
     exports spck.engine.render;

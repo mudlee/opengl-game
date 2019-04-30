@@ -9,7 +9,6 @@ import spck.engine.bus.MessageBus;
 import spck.engine.debug.DebugInputListener;
 import spck.engine.debug.FreeCameraController;
 import spck.engine.ecs.Entity;
-import spck.engine.ecs.physics.Physics3DBodyComponent;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.lights.AmbientLight;
 import spck.engine.lights.DirectionalLight;
@@ -91,7 +90,5 @@ public class Main {
             component.transform.setScale(new Vector3f(10, 10, 10));
             component.transform.setPosition(new Vector3f(50, 20, 50));
         });
-
-        Physics3DBodyComponent ph3d = cube.addComponent(Physics3DBodyComponent.class);
     }
 }

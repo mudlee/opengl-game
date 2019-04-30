@@ -2,7 +2,6 @@ package spck.game;
 
 import org.joml.Vector3f;
 import spck.engine.ecs.Entity;
-import spck.engine.ecs.physics.Physics3DBodyComponent;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.render.DefaultMaterial;
 import spck.engine.render.Mesh;
@@ -20,8 +19,6 @@ public class Terrain extends Entity {
         cRender.material = new DefaultMaterial();
         cRender.mesh = createMesh();
         cRender.transform = new Transform();
-
-        Physics3DBodyComponent cPhysics3D = addComponent(Physics3DBodyComponent.class);
     }
 
     private Mesh createMesh() {

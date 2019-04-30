@@ -10,7 +10,6 @@ import spck.engine.ecs.ECS;
 import spck.engine.ecs.EntityBatchStore;
 import spck.engine.ecs.debug.StatUIEntitiesBuilder;
 import spck.engine.ecs.debug.StatUITextSystem;
-import spck.engine.ecs.physics.Physics3DSystem;
 import spck.engine.ecs.render.PreRenderSystem;
 import spck.engine.ecs.render.RenderSystem;
 import spck.engine.ecs.ui.UIRendererSystem;
@@ -78,8 +77,7 @@ public class Engine implements Runnable{
                 new PreRenderSystem(batchStore),
                 new RenderSystem(batchStore, camera),
                 new StatUITextSystem(camera),
-				new UIRendererSystem(),
-				new Physics3DSystem()
+                new UIRendererSystem()
         ));
 
         new StatUIEntitiesBuilder().build();
