@@ -37,6 +37,8 @@ public class Main {
     }
 
     private void run() {
+        WINDOW_PREFERENCES.setWidth(2560);
+        WINDOW_PREFERENCES.setHeight(1440);
         Engine engine = new Engine(CAMERA, WINDOW_PREFERENCES);
         MessageBus.register(LifeCycle.GAME_START.eventID(), this::start);
 

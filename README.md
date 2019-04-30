@@ -1,6 +1,6 @@
 ## TODO
 
-- fix screen scale factor on 4K monitor
+- fix screen scale factor on 4K monitor -> canvas scaler. Constant pixel/scale with screen size. Latter: reference resolution, screen match mode (width or hight)
 - do not fix FPS at 60
 - base scene
 - easier material/shader handling
