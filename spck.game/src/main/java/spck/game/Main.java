@@ -2,6 +2,7 @@ package spck.game;
 
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import spck.engine.Antialiasing;
 import spck.engine.Engine;
 import spck.engine.bus.KeyEvent;
 import spck.engine.bus.LifeCycle;
@@ -10,16 +11,24 @@ import spck.engine.debug.DebugInputListener;
 import spck.engine.debug.FreeCameraController;
 import spck.engine.ecs.Entity;
 import spck.engine.ecs.render.components.RenderComponent;
+import spck.engine.framework.Window;
 import spck.engine.lights.AmbientLight;
+import spck.engine.lights.Attenuation;
 import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
+import spck.engine.lights.PointLight;
 import spck.engine.model.primitives.Cube;
 import spck.engine.render.Camera;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 
 public class Main {
-    private final Camera camera = Camera.perspective(60.0f, 01f, 1000f);
+    private final static Camera CAMERA = Camera.perspective(60.0f, 01f, 1000f);
+    private final static Window.Preferences WINDOW_PREFERENCES = new Window.Preferences(
+            true,
+            Antialiasing.ANTIALISING_2X,
+            false
+    );
     private static final int CUBES = 10000;
     private Cube[] cubes = new Cube[CUBES];
 
@@ -28,17 +37,17 @@ public class Main {
     }
 
     private void run() {
-        Engine engine = new Engine(camera);
+        Engine engine = new Engine(CAMERA, WINDOW_PREFERENCES);
         MessageBus.register(LifeCycle.GAME_START.eventID(), this::start);
 
         engine.launch();
     }
 
     private void start() {
-        new DebugInputListener(camera);
-        new FreeCameraController(camera);
+        new DebugInputListener(CAMERA);
+        new FreeCameraController(CAMERA);
 
-        camera.setPosition(new Vector3f(50, 50, 150));
+        CAMERA.setPosition(new Vector3f(50, 50, 150));
 
         LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.4f));
         LightSystem.addLight(new DirectionalLight(
@@ -46,6 +55,7 @@ public class Main {
                 0.7f,
                 new Vector3f(40, 20, 10)
         ));
+        LightSystem.addLight(new PointLight(new Vector4f(1, 0, 0, 1), 100f, new Vector3f(50, 20, 50), Attenuation.distance50()));
 
         /*Random random = new Random();
         MessageBus.register(KeyEvent.keyHeldDown(GLFW_KEY_R), () -> {

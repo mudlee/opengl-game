@@ -48,7 +48,7 @@ public class Engine implements Runnable{
     private final Thread GAME_LOOP_THREAD;
     private final GameLoop gameLoop;
 
-    public Engine(Camera camera) {
+    public Engine(Camera camera, Window.Preferences windowPreferences) {
         String osName = System.getProperty("os.name");
         preferences.os = OSNameParser.parse(osName);
 
@@ -64,11 +64,7 @@ public class Engine implements Runnable{
         LOGGER.debug("Creating GAME_LOOP_THREAD...");
         this.GAME_LOOP_THREAD=new Thread(this,"GAME_LOOP_THREAD");
 
-        window = new Window(new Window.Preferences(
-                true,
-                Antialiasing.ANTIALISING_2X,
-                false
-        ));
+        window = new Window(windowPreferences);
         LOGGER.debug("Window preferences: {}", window.getPreferences());
 
         EntityBatchStore batchStore = new EntityBatchStore();

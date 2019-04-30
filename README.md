@@ -1,11 +1,17 @@
 ## TODO
 
+- fix screen scale factor on 4K monitor
+- do not fix FPS at 60
+- base scene
+- easier material/shader handling
+- vulkan renderer
 - remove todos
 - input handling
+- shadows
 
 # SPCK Framework
 
-It's a lightweight OpenGL framework, using LWJGL3.
+It's a lightweight OpenGL/Vulkan framework, using LWJGL3.
 
 ## Running from IntelliJ IDEA
 
