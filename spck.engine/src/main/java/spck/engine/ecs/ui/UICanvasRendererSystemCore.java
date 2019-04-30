@@ -2,6 +2,7 @@ package spck.engine.ecs.ui;
 
 import com.artemis.Aspect;
 import com.artemis.BaseEntitySystem;
+import com.artemis.Component;
 import com.artemis.ComponentMapper;
 import com.artemis.utils.IntBag;
 import spck.engine.Antialiasing;
@@ -10,18 +11,20 @@ import spck.engine.framework.Graphics;
 import spck.engine.framework.UIRenderer;
 import spck.engine.util.RunOnce;
 
-public class UIRendererSystem extends BaseEntitySystem {
-    private final UIRenderer uiRenderer = new UIRenderer(Engine.preferences.defaultFont);
-    private ComponentMapper<UITextComponent> textComponents;
-    private ComponentMapper<UIImageComponent> imageComponents;
+public abstract class UICanvasRendererSystemCore extends BaseEntitySystem {
+    private final UIRenderer uiRenderer;
 
-    public UIRendererSystem() {
-        super(Aspect.one(UITextComponent.class, UIImageComponent.class));
+    public UICanvasRendererSystemCore(UIRenderer uiRenderer, Class<? extends Component> componentClass) {
+        super(Aspect.one(componentClass));
+        this.uiRenderer = uiRenderer;
     }
 
     @Override
     protected void processSystem() {
-        RunOnce.run("UIRendererSystem init", () -> uiRenderer.init(Engine.window.getPreferences().getAntialiasing() != Antialiasing.OFF));
+    }
+
+    protected void run(ComponentMapper<? extends UICanvasComponent> canvasComponents) {
+        RunOnce.run("Canvas rendering init", () -> uiRenderer.init(Engine.window.getPreferences().getAntialiasing() != Antialiasing.OFF));
 
         IntBag actives = subscription.getEntities();
         int[] ids = actives.getData();
@@ -37,14 +40,17 @@ public class UIRendererSystem extends BaseEntitySystem {
         uiRenderer.beginFrame(Engine.window.getPreferences().getWidth(), Engine.window.getPreferences().getHeight(), Engine.window.getPreferences().getScreenScaleFactor());
 
         for (int i = 0, s = actives.size(); s > i; i++) {
-            if (textComponents.has(ids[i])) {
-                UITextComponent component = textComponents.get(ids[i]);
-                updateScreenScaleFactorIfNeeded(component);
-                uiRenderer.renderText(component);
-            } else if (imageComponents.has(ids[i])) {
-                UIImageComponent component = imageComponents.get(ids[i]);
-                updateScreenScaleFactorIfNeeded(component);
-                uiRenderer.renderImage(component);
+            if (canvasComponents.has(ids[i])) {
+                UICanvasComponent component = canvasComponents.get(ids[i]);
+                for (UIText text : component.getTexts()) {
+                    updateScreenScaleFactorIfNeeded(text);
+                    uiRenderer.renderText(text);
+                }
+
+                for (UIImage image : component.getImages()) {
+                    updateScreenScaleFactorIfNeeded(image);
+                    uiRenderer.renderImage(image);
+                }
             }
         }
 
@@ -55,7 +61,7 @@ public class UIRendererSystem extends BaseEntitySystem {
         }
     }
 
-    private void updateScreenScaleFactorIfNeeded(UIComponent component) {
+    private void updateScreenScaleFactorIfNeeded(UIElement component) {
         if (component.screenScaleFactor != Engine.window.getPreferences().getScreenScaleFactor()) {
             component.updateScreenCoords(Engine.window.getPreferences().getScreenScaleFactor());
         }

@@ -10,11 +10,13 @@ import spck.engine.ecs.ECS;
 import spck.engine.ecs.EntityBatchStore;
 import spck.engine.ecs.debug.StatUIEntitiesBuilder;
 import spck.engine.ecs.debug.StatUITextSystem;
+import spck.engine.ecs.debug.StatusUICanvasRendererSystem;
 import spck.engine.ecs.render.PreRenderSystem;
 import spck.engine.ecs.render.RenderSystem;
-import spck.engine.ecs.ui.UIRendererSystem;
+import spck.engine.ecs.ui.UICanvasRendererSystem;
 import spck.engine.framework.OpenGLStandardRenderer;
 import spck.engine.framework.OpenGLStandardShader;
+import spck.engine.framework.UIRenderer;
 import spck.engine.framework.Window;
 import spck.engine.render.Camera;
 import spck.engine.util.OSNameParser;
@@ -68,12 +70,14 @@ public class Engine implements Runnable{
         LOGGER.debug("Window preferences: {}", window.getPreferences());
 
         EntityBatchStore batchStore = new EntityBatchStore();
+        UIRenderer uiRenderer = new UIRenderer(Engine.preferences.defaultFont);
 
         new ECS(Arrays.asList(
                 new PreRenderSystem(batchStore),
                 new RenderSystem(batchStore, camera),
                 new StatUITextSystem(camera),
-                new UIRendererSystem()
+                new UICanvasRendererSystem(uiRenderer),
+                new StatusUICanvasRendererSystem(uiRenderer)
         ));
 
         new StatUIEntitiesBuilder().build();

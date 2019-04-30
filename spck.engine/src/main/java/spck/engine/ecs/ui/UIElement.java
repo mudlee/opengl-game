@@ -3,17 +3,17 @@ package spck.engine.ecs.ui;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import spck.engine.Engine;
-import spck.engine.ecs.ECSComponent;
 import spck.engine.ui.UIObjectPosition;
 import spck.engine.util.Pixel;
 
-public class UIComponent extends ECSComponent {
-    UIObjectPosition position = UIObjectPosition.topLeft(0, 0);
-    public Vector2i screenOffset = new Vector2i().zero();
-    public Vector2f screenCoords = new Vector2f();
-    public int screenScaleFactor = 1;
+class UIElement {
+    protected String customID;
+    protected UIObjectPosition position = UIObjectPosition.topLeft(0, 0);
+    protected Vector2i screenOffset = new Vector2i().zero();
+    protected Vector2f screenCoords = new Vector2f();
+    protected int screenScaleFactor = 1;
 
-    public void updateScreenCoords(int screenScaleFactor) {
+    void updateScreenCoords(int screenScaleFactor) {
         this.screenScaleFactor = screenScaleFactor;
 
         switch (position.getAlign()) {
@@ -42,5 +42,45 @@ public class UIComponent extends ECSComponent {
                 screenCoords.y = (float) Engine.window.getPreferences().getHeight() / 2 - (float) Pixel.scaled(screenOffset.y) / 2;
                 break;
         }
+    }
+
+    public void setCustomID(String customID) {
+        this.customID = customID;
+    }
+
+    public void setPosition(UIObjectPosition position) {
+        this.position = position;
+    }
+
+    public void setScreenOffset(Vector2i screenOffset) {
+        this.screenOffset = screenOffset;
+    }
+
+    public void setScreenCoords(Vector2f screenCoords) {
+        this.screenCoords = screenCoords;
+    }
+
+    public void setScreenScaleFactor(int screenScaleFactor) {
+        this.screenScaleFactor = screenScaleFactor;
+    }
+
+    public String getCustomID() {
+        return customID;
+    }
+
+    public UIObjectPosition getPosition() {
+        return position;
+    }
+
+    public Vector2i getScreenOffset() {
+        return screenOffset;
+    }
+
+    public Vector2f getScreenCoords() {
+        return screenCoords;
+    }
+
+    public int getScreenScaleFactor() {
+        return screenScaleFactor;
     }
 }

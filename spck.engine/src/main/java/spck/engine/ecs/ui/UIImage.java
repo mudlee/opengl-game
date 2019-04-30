@@ -1,6 +1,6 @@
 package spck.engine.ecs.ui;
 
-public class UIImageComponent extends UIComponent {
+public class UIImage extends UIElement {
     public int textureId;
     public int width;
     public int height;

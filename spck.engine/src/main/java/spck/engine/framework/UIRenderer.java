@@ -6,8 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
-import spck.engine.ecs.ui.UIImageComponent;
-import spck.engine.ecs.ui.UITextComponent;
+import spck.engine.ecs.ui.UIImage;
+import spck.engine.ecs.ui.UIText;
 import spck.engine.util.Pixel;
 import spck.engine.util.ResourceLoader;
 
@@ -91,33 +91,33 @@ public class UIRenderer {
         restoreGLState();
     }
 
-    public void renderImage(UIImageComponent component) {
+    public void renderImage(UIImage image) {
         checkIfInitialised();
 
-        int imageID = nvglCreateImageFromHandle(pointer, component.textureId, Pixel.scaled(component.width), Pixel.scaled(component.height), 0);
+        int imageID = nvglCreateImageFromHandle(pointer, image.textureId, Pixel.scaled(image.width), Pixel.scaled(image.height), 0);
         NVGPaint paint = NVGPaint.create();
-        nvgImagePattern(pointer, component.screenCoords.x, component.screenCoords.y, Pixel.scaled(component.width), Pixel.scaled(component.height), 0, imageID, 1f, paint);
+        nvgImagePattern(pointer, image.getScreenCoords().x, image.getScreenCoords().y, Pixel.scaled(image.width), Pixel.scaled(image.height), 0, imageID, 1f, paint);
         nvgBeginPath(pointer);
-        nvgRect(pointer, component.screenCoords.x, component.screenCoords.y, Pixel.scaled(component.width), Pixel.scaled(component.height));
+        nvgRect(pointer, image.getScreenCoords().x, image.getScreenCoords().y, Pixel.scaled(image.width), Pixel.scaled(image.height));
         nvgFillPaint(pointer, paint);
         nvgFill(pointer);
     }
 
-    public void renderText(UITextComponent component) {
+    public void renderText(UIText text) {
         checkIfInitialised();
 
         // setting fontFace is a slow operation, so we suppose that all the texts are using the default font
         // if not, we handle it here. Use the current text's font, then set back the default
-        if (!component.font.equals(defaultFont)) {
-            nvgFontFace(pointer, component.font);
+        if (!text.getFont().equals(defaultFont)) {
+            nvgFontFace(pointer, text.getFont());
         }
 
-        nvgFontSize(pointer, Pixel.scaled(component.size));
-        nvgTextAlign(pointer, component.align);
-        nvgFillColor(pointer, component.color.getColor());
-        nvgText(pointer, component.screenCoords.x, component.screenCoords.y, component.text);
+        nvgFontSize(pointer, Pixel.scaled(text.getSize()));
+        nvgTextAlign(pointer, text.getAlign());
+        nvgFillColor(pointer, text.getColor().getColor());
+        nvgText(pointer, text.getScreenCoords().x, text.getScreenCoords().y, text.getText());
 
-        if (!component.font.equals(defaultFont)) {
+        if (!text.getFont().equals(defaultFont)) {
             nvgFontFace(pointer, defaultFont);
         }
     }
