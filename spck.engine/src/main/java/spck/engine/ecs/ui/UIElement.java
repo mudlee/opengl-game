@@ -4,7 +4,6 @@ import org.joml.Vector2f;
 import org.joml.Vector2i;
 import spck.engine.Engine;
 import spck.engine.ui.UIObjectPosition;
-import spck.engine.util.ScreenScale;
 
 public abstract class UIElement {
     protected UIObjectPosition position = UIObjectPosition.topLeft(0, 0);
@@ -41,28 +40,28 @@ public abstract class UIElement {
 
         switch (position.getAlign()) {
             case TOP_LEFT:
-                screenCoords.x = ScreenScale.applyScaleFactor(position.getLeft());
-                screenCoords.y = ScreenScale.applyScaleFactor(position.getTop());
+                screenCoords.x = position.getLeft();
+                screenCoords.y = position.getTop();
                 break;
             case TOP_RIGHT:
-                screenCoords.x = Engine.window.getPreferences().getWidth() - (ScreenScale.applyScaleFactor(position.getRight()) + ScreenScale.applyScaleFactor(screenOffset.x));
-                screenCoords.y = ScreenScale.applyScaleFactor(position.getTop());
+                screenCoords.x = Engine.window.getPreferences().getWidth() - (position.getRight()) + screenOffset.x;
+                screenCoords.y = position.getTop();
                 break;
             case BOTTOM_LEFT:
-                screenCoords.x = ScreenScale.applyScaleFactor(position.getLeft());
+                screenCoords.x = position.getLeft();
                 screenCoords.y = Engine.window.getPreferences().getHeight()
-                        - ScreenScale.applyScaleFactor(screenOffset.y)
-                        - ScreenScale.applyScaleFactor(position.getBottom());
+                        - screenOffset.y
+                        - position.getBottom();
                 break;
             case BOTTOM_RIGHT:
-                screenCoords.x = Engine.window.getPreferences().getWidth() - (ScreenScale.applyScaleFactor(position.getRight()) + ScreenScale.applyScaleFactor(screenOffset.x));
+                screenCoords.x = Engine.window.getPreferences().getWidth() - (position.getRight()) + screenOffset.x;
                 screenCoords.y = Engine.window.getPreferences().getHeight()
-                        - ScreenScale.applyScaleFactor(screenOffset.y)
-                        - ScreenScale.applyScaleFactor(position.getBottom());
+                        - screenOffset.y
+                        - position.getBottom();
                 break;
             case CENTER_CENTER:
-                screenCoords.x = (float) Engine.window.getPreferences().getWidth() / 2 - (float) ScreenScale.applyScaleFactor(screenOffset.x) / 2;
-                screenCoords.y = (float) Engine.window.getPreferences().getHeight() / 2 - (float) ScreenScale.applyScaleFactor(screenOffset.y) / 2;
+                screenCoords.x = (float) Engine.window.getPreferences().getWidth() / 2 - (float) screenOffset.x / 2;
+                screenCoords.y = (float) Engine.window.getPreferences().getHeight() / 2 - (float) screenOffset.y / 2;
                 break;
         }
     }
