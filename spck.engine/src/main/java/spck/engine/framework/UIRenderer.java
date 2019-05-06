@@ -10,38 +10,15 @@ import spck.engine.ecs.ui.UICanvasScaler;
 import spck.engine.ecs.ui.UIImage;
 import spck.engine.ecs.ui.UIText;
 import spck.engine.util.ResourceLoader;
-import spck.engine.util.ScreenScale;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_BOTTOM;
-import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_LEFT;
-import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_RIGHT;
-import static org.lwjgl.nanovg.NanoVG.NVG_ALIGN_TOP;
-import static org.lwjgl.nanovg.NanoVG.nvgBeginFrame;
-import static org.lwjgl.nanovg.NanoVG.nvgBeginPath;
-import static org.lwjgl.nanovg.NanoVG.nvgCreateFontMem;
-import static org.lwjgl.nanovg.NanoVG.nvgEndFrame;
-import static org.lwjgl.nanovg.NanoVG.nvgFill;
-import static org.lwjgl.nanovg.NanoVG.nvgFillColor;
-import static org.lwjgl.nanovg.NanoVG.nvgFillPaint;
-import static org.lwjgl.nanovg.NanoVG.nvgFontFace;
-import static org.lwjgl.nanovg.NanoVG.nvgFontSize;
-import static org.lwjgl.nanovg.NanoVG.nvgImagePattern;
-import static org.lwjgl.nanovg.NanoVG.nvgRect;
-import static org.lwjgl.nanovg.NanoVG.nvgText;
-import static org.lwjgl.nanovg.NanoVG.nvgTextAlign;
-import static org.lwjgl.nanovg.NanoVGGL3.NVG_ANTIALIAS;
-import static org.lwjgl.nanovg.NanoVGGL3.NVG_STENCIL_STROKES;
-import static org.lwjgl.nanovg.NanoVGGL3.nvgCreate;
-import static org.lwjgl.nanovg.NanoVGGL3.nvglCreateImageFromHandle;
+import static org.lwjgl.nanovg.NanoVG.*;
+import static org.lwjgl.nanovg.NanoVGGL3.*;
 import static org.lwjgl.nanovg.NanoVGGLES2.nvgDelete;
-import static org.lwjgl.opengl.GL41.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL41.GL_UNIFORM_BUFFER;
-import static org.lwjgl.opengl.GL41.glBindBuffer;
-import static org.lwjgl.opengl.GL41.glBindVertexArray;
+import static org.lwjgl.opengl.GL41.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class UIRenderer {
@@ -95,8 +72,8 @@ public class UIRenderer {
     public void renderImage(UIImage image, UICanvasScaler canvasScaler) {
         checkIfInitialised();
 
-        int width = (int) canvasScaler.apply(ScreenScale.applyScaleFactor(image.getWidth()));
-        int height = (int) canvasScaler.apply(ScreenScale.applyScaleFactor(image.getHeight()));
+        int width = (int) canvasScaler.apply(image.getWidth());
+        int height = (int) canvasScaler.apply(image.getHeight());
         float x = canvasScaler.apply(image.getScreenCoords().x);
         float y = canvasScaler.apply(image.getScreenCoords().y);
 
@@ -118,7 +95,7 @@ public class UIRenderer {
             nvgFontFace(pointer, text.getFont());
         }
 
-        nvgFontSize(pointer, canvasScaler.apply(ScreenScale.applyScaleFactor(text.getSize())));
+        nvgFontSize(pointer, canvasScaler.apply(text.getSize()));
         nvgTextAlign(pointer, text.getAlign());
         nvgFillColor(pointer, text.getColor().getColor());
         nvgText(pointer, canvasScaler.apply(text.getScreenCoords().x), canvasScaler.apply(text.getScreenCoords().y), text.getText());
