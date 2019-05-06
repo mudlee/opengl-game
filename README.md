@@ -1,6 +1,5 @@
 ## TODO
 
-- performance improvements
 - base scene
 - easier material/shader handling
 - vulkan renderer

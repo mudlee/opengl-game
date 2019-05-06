@@ -52,7 +52,7 @@ public class Main {
         new DebugInputListener(CAMERA);
         new FreeCameraController(CAMERA);
 
-        CAMERA.setPosition(new Vector3f(50, 50, 150));
+        CAMERA.setPosition(new Vector3f(0, 20, 60));
 
         LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.4f));
         LightSystem.addLight(new DirectionalLight(
@@ -66,29 +66,37 @@ public class Main {
         Engine.window.captureMouse();
 
         //Entity.create(new Terrain());
+        testScene();
+        //createCubes();
+    }
 
-        Cube cube = new Cube();
+    private void testScene() {
+        Cube reference = new Cube();
+        Cube bottomPlane = new Cube();
+        Cube topPlane = new Cube();
+        Cube leftPlane = new Cube();
 
-        MessageBus.register(KeyEvent.keyHeldDown(GLFW_KEY_R), () -> {
-            for (Cube cube1 : cubes) {
-                cube1.getComponent(RenderComponent.class).ifPresent(component -> {
-                    Vector3f rotation = component.transform.getRotation();
-                    rotation.x += 1;
-                    rotation.y += 1;
-                    rotation.z += 1;
-                    component.transform.setRotation(rotation);
-                });
-            }
+        Entity.create(reference);
+        Entity.create(bottomPlane);
+        Entity.create(topPlane);
+        Entity.create(leftPlane);
+
+        reference.getComponent(RenderComponent.class).ifPresent(component -> {
+            component.transform.setPosition(new Vector3f(0, 5, 10));
         });
 
-        Entity.create(cube).getComponent(RenderComponent.class).ifPresent(component -> {
-            component.transform.setScale(new Vector3f(10, 10, 10));
-            component.transform.setPosition(new Vector3f(50, 20, 50));
-            component.material.setDiffuseColor(RGBAColor.rgbToVector3f(205, 66, 229));
-
+        bottomPlane.getComponent(RenderComponent.class).ifPresent(component -> {
+            component.transform.setScale(new Vector3f(20f, 1f, 20f));
         });
-
-        createCubes();
+        topPlane.getComponent(RenderComponent.class).ifPresent(component -> {
+            component.transform.setScale(new Vector3f(20f, 1f, 20f));
+            component.transform.setPosition(new Vector3f(0, 40, 0));
+        });
+        leftPlane.getComponent(RenderComponent.class).ifPresent(component -> {
+            component.transform.setScale(new Vector3f(20f, 1f, 20f));
+            component.transform.setPosition(new Vector3f(-10, 20, 0)); // TODO: miert nem eleg a -10, miert kell -20?????
+            component.transform.setRotation(new Vector3f(0, 0, 90));
+        });
     }
 
     private void createCubes() {
@@ -115,5 +123,17 @@ public class Main {
             });
             cubes[i] = cube;
         }
+
+        MessageBus.register(KeyEvent.keyHeldDown(GLFW_KEY_R), () -> {
+            for (Cube cube1 : cubes) {
+                cube1.getComponent(RenderComponent.class).ifPresent(component -> {
+                    Vector3f rotation = component.transform.getRotation();
+                    rotation.x += 1;
+                    rotation.y += 1;
+                    rotation.z += 1;
+                    component.transform.setRotation(rotation);
+                });
+            }
+        });
     }
 }

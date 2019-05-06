@@ -25,8 +25,8 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
 // - miert mozog rossz iranyba a controller
 public class FreeCameraController {
     private static final Map<MoveDirection, Integer> moveKeyMap = new HashMap<>();
-    private static final float MAX_SPEED = 1f;
-    private static final float ACCELERATION = 0.5f;
+    private static final float MAX_SPEED = 0.5f;
+    private static final float ACCELERATION = 0.2f;
 
     static {
         moveKeyMap.put(MoveDirection.LEFT, GLFW_KEY_A);
