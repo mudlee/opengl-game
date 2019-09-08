@@ -55,10 +55,10 @@ public class Mesh {
         changed = true;
     }
 
-    public void ackAndComputeChanged(Runnable runnable) {
+    public void processChanges(Runnable callback) {
         if (changed) {
             changed = false;
-            runnable.run();
+            callback.run();
         }
     }
 

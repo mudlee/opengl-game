@@ -37,17 +37,17 @@ public class PreRenderSystem extends IteratingSystem {
         }
 
         if (batchStore.contains(entityId)) {
-            component.material.ackAndComputeChanged(() -> batchStore.entityMaterialHasChanged(entityId, component));
-            component.mesh.ackAndComputeChanged(() -> batchStore.entityMeshHasChanged(entityId, component));
-            component.transform.ackAndComputeChanged(() -> batchStore.entityTransformHasChanged(entityId, component));
+            component.material.processChanges(() -> batchStore.entityMaterialHasChanged(entityId, component));
+            component.mesh.processChanges(() -> batchStore.entityMeshHasChanged(entityId, component));
+            component.transform.processChanges(() -> batchStore.entityTransformHasChanged(entityId, component));
         } else {
             batchStore.add(entityId, component);
             initShaderIfNeeded(component.material.getShader());
 
             // mark everything up2date as the data was just uploaded to the GPU
-            component.material.ackAndComputeChanged(doNothing);
-            component.mesh.ackAndComputeChanged(doNothing);
-            component.transform.ackAndComputeChanged(doNothing);
+            component.material.processChanges(doNothing);
+            component.mesh.processChanges(doNothing);
+            component.transform.processChanges(doNothing);
         }
     }
 

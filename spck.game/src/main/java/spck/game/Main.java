@@ -13,11 +13,7 @@ import spck.engine.ecs.Entity;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.framework.RGBAColor;
 import spck.engine.framework.Window;
-import spck.engine.lights.AmbientLight;
-import spck.engine.lights.Attenuation;
-import spck.engine.lights.DirectionalLight;
-import spck.engine.lights.LightSystem;
-import spck.engine.lights.PointLight;
+import spck.engine.lights.*;
 import spck.engine.model.primitives.Cube;
 import spck.engine.render.Camera;
 
@@ -82,7 +78,17 @@ public class Main {
         Entity.create(leftPlane);
 
         reference.getComponent(RenderComponent.class).ifPresent(component -> {
-            component.transform.setPosition(new Vector3f(0, 5, 10));
+            component.transform.setPosition(new Vector3f(0, 0, 0));
+        });
+        bottomPlane.getComponent(RenderComponent.class).ifPresent(component -> {
+            component.transform.setPosition(new Vector3f(1, 1, 0));
+        });
+        topPlane.getComponent(RenderComponent.class).ifPresent(component -> {
+            component.transform.setPosition(new Vector3f(2, 2, 0));
+        });
+
+        /*reference.getComponent(RenderComponent.class).ifPresent(component -> {
+            component.transform.setPosition(new Vector3f(0, 1, 10));
         });
 
         bottomPlane.getComponent(RenderComponent.class).ifPresent(component -> {
@@ -94,9 +100,9 @@ public class Main {
         });
         leftPlane.getComponent(RenderComponent.class).ifPresent(component -> {
             component.transform.setScale(new Vector3f(20f, 1f, 20f));
-            component.transform.setPosition(new Vector3f(-10, 20, 0)); // TODO: miert nem eleg a -10, miert kell -20?????
+            component.transform.setPosition(new Vector3f(-10, 20, 0));
             component.transform.setRotation(new Vector3f(0, 0, 90));
-        });
+        });*/
     }
 
     private void createCubes() {

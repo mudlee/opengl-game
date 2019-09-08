@@ -13,16 +13,8 @@ import spck.engine.render.Camera;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
+import static org.lwjgl.glfw.GLFW.*;
 
-// TODO
-// - miert dol meg a kamera
-// - miert mozog rossz iranyba a controller
 public class FreeCameraController {
     private static final Map<MoveDirection, Integer> moveKeyMap = new HashMap<>();
     private static final float MAX_SPEED = 0.5f;

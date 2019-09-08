@@ -7,12 +7,7 @@ import spck.engine.render.Batch;
 import spck.engine.render.BatchGroup;
 import spck.engine.render.Material;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class EntityBatchStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityBatchStore.class);
@@ -196,7 +191,11 @@ public class EntityBatchStore {
                     .orElseThrow(() -> new RuntimeException(String.format("Batch %d was not found in BatchGroup %d", batchID, batchGroupID)));
 
             if (newBatchDataQueue.contains(batch)) {
-                LOGGER.trace("BatchGroup {} Batch {} data won't be updated as it's still waiting for data uploading");
+                LOGGER.trace(
+                        "BatchGroup {} Batch {} data won't be updated as it's still waiting for data uploading",
+                        batchGroupID,
+                        batchID
+                );
             } else {
                 changedBatchDataQueue.add(batch);
             }

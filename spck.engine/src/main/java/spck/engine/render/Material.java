@@ -35,7 +35,7 @@ public interface Material {
 
     float getShininess();
 
-    void ackAndComputeChanged(Runnable runnable);
+    void processChanges(Runnable runnable);
 
     void setNew(Material material);
 }

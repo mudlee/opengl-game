@@ -32,40 +32,33 @@ public class Transform {
         return result;
     }
 
-    public void ackAndComputeChanged(Runnable runnable) {
-        if (changed) {
-            changed = false;
-            runnable.run();
-        }
-    }
-
     public Vector3f getPosition() {
         return position;
     }
 
     public Transform setPosition(Vector3f position) {
         this.position.set(position);
-        dataChanged();
+        changed = true;
         return this;
     }
 
     public Transform setPosition(float x, float y, float z) {
         this.position.set(x, y, z);
-        dataChanged();
+        changed = true;
         return this;
     }
 
     public Transform setPosition(Vector2f position) {
         this.position.x = position.x;
         this.position.y = position.y;
-        dataChanged();
+        changed = true;
         return this;
     }
 
     public Transform setPosition(float x, float y) {
         this.position.x = x;
         this.position.y = y;
-        dataChanged();
+        changed = true;
         return this;
     }
 
@@ -75,7 +68,7 @@ public class Transform {
 
     public Transform setRotation(Vector3f rotation) {
         this.rotation.set(rotation);
-        dataChanged();
+        changed = true;
         return this;
     }
 
@@ -85,7 +78,7 @@ public class Transform {
 
     public Transform setScale(Vector3f scale) {
         this.scale.set(scale);
-        dataChanged();
+        changed = true;
         return this;
     }
 
@@ -93,9 +86,11 @@ public class Transform {
         return transformationMatrixReusable;
     }
 
-    // TODO only calculate once if all is updated
-    private void dataChanged() {
-        transformationMatrixReusable.set(TransformationMatrixCreator.create(position, rotation, scale));
-        changed = true;
+    public void processChanges(Runnable callback) {
+        if (changed) {
+            transformationMatrixReusable.set(TransformationMatrixCreator.create(position, rotation, scale));
+            changed = false;
+            callback.run();
+        }
     }
 }
