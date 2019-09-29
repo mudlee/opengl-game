@@ -202,7 +202,7 @@ public class OpenGLStandardRenderer implements Renderer {
                 vboData[offset++] = modifier.getOffset().x;
                 vboData[offset++] = modifier.getOffset().y;
             } else {
-                vboData[offset++] = 0;
+                vboData[offset++] = 1;
                 vboData[offset++] = 0;
                 vboData[offset++] = 0;
             }
