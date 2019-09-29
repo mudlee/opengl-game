@@ -11,6 +11,6 @@ Clone out https://github.com/junkdog/artemis-odb and copy artemis-core/artemis/s
 ## Commands to run
 
 ```bash
-jdeps --module-path automatic-modules --generate-module-info . automatic-modules/artemis-odb-2.2.0-SNAPSHOT.jar
-javac -d artemis.odb/ --source-path src/ artemis.odb/module-info.java
+jdeps --module-path automatic-modules --generate-module-meshMaterialMap . automatic-modules/artemis-odb-2.2.0-SNAPSHOT.jar
+javac -d artemis.odb/ --source-path src/ artemis.odb/module-meshMaterialMap.java
 ```

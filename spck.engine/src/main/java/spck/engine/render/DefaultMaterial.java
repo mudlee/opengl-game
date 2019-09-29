@@ -125,10 +125,14 @@ public class DefaultMaterial implements Material {
     }
 
     @Override
-    public void processChanges(Runnable callback) {
+    public boolean isChanged() {
+        return changed;
+    }
+
+    @Override
+    public void ackChanges() {
         if (changed) {
             changed = false;
-            callback.run();
         }
     }
 

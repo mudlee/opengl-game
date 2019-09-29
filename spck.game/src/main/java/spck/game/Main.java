@@ -11,9 +11,10 @@ import spck.engine.debug.DebugInputListener;
 import spck.engine.debug.FreeCameraController;
 import spck.engine.ecs.Entity;
 import spck.engine.ecs.render.components.RenderComponent;
-import spck.engine.framework.RGBAColor;
 import spck.engine.framework.Window;
-import spck.engine.lights.*;
+import spck.engine.lights.AmbientLight;
+import spck.engine.lights.DirectionalLight;
+import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.render.Camera;
 
@@ -50,19 +51,16 @@ public class Main {
 
         CAMERA.setPosition(new Vector3f(0, 20, 60));
 
-        LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.4f));
+        LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.9f));
         LightSystem.addLight(new DirectionalLight(
                 new Vector4f(1, 1, 1, 1),
-                0.7f,
+                0.3f,
                 new Vector3f(40, 20, 10)
         ));
-        Vector3f color = RGBAColor.rgbToVector3f(205, 66, 229);
-        LightSystem.addLight(new PointLight(new Vector4f(color.x, color.y, color.z, 1), 100f, new Vector3f(50, 20, 50), Attenuation.distance50()));
 
         Engine.window.captureMouse();
 
-        Tree tree = new Tree();
-        Entity.create(tree);
+        Entity.create(new Tree());
 
         //Entity.create(new Terrain());
         //createCubes();
@@ -87,7 +85,7 @@ public class Main {
             Entity.create(cube);
             cube.getComponent(RenderComponent.class).ifPresent(component -> {
                 //component.material.setDiffuseColor(new Vector3f(random.nextFloat(), random.nextFloat(), random.nextFloat()));
-                component.material.setDiffuseColor(new Vector3f(0.5f, 0.2f, 0.7f));
+                //component.material.setDiffuseColor(new Vector3f(0.5f, 0.2f, 0.7f));
                 component.transform.setPosition(random.nextInt((200) + 1), random.nextInt((200) + 1), random.nextInt((200) + 1));
             });
             cubes[i] = cube;

@@ -11,10 +11,7 @@ import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.framework.assets.TextureLoader;
 import spck.engine.framework.assets.TextureStorage;
-import spck.engine.render.DefaultMaterial;
-import spck.engine.render.Material;
-import spck.engine.render.Mesh;
-import spck.engine.render.ShaderUniform;
+import spck.engine.render.*;
 import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureRegistry;
 import spck.engine.util.ResourceLoader;
@@ -34,7 +31,7 @@ public class ModelLoader {
 
     private final static Map<String, AIScene> modelCache = new HashMap<>();
 
-    public static ModelInfo load(String resourcePath) {
+    public static MeshMaterialCollection load(String resourcePath) {
         RunOnce.run("ModelLoader CleanUp", () -> {
             MessageBus.register(LifeCycle.CLEANUP.eventID(), ModelLoader::cleanUp);
         });
@@ -77,7 +74,11 @@ public class ModelLoader {
 
         List<ModelPart> parts = loadModelParts(scene, resourcePath, extension);
         LOGGER.debug("    Model {} has been loaded. Contains {} meshes", resourcePath, parts.size());
-        return new ModelInfo(parts);
+        List<MeshMaterialPair> meshMaterialPairs = new ArrayList<>();
+        for (ModelPart part : parts) {
+            meshMaterialPairs.add(new MeshMaterialPair(part.getMesh(), part.getMaterial()));
+        }
+        return new MeshMaterialCollection(meshMaterialPairs);
     }
 
     private static void cleanUp() {

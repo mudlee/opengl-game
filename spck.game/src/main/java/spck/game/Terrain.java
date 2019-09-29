@@ -3,12 +3,10 @@ package spck.game;
 import org.joml.Vector3f;
 import spck.engine.ecs.Entity;
 import spck.engine.ecs.render.components.RenderComponent;
-import spck.engine.render.DefaultMaterial;
-import spck.engine.render.Mesh;
-import spck.engine.render.MeshTriangle;
-import spck.engine.render.Transform;
+import spck.engine.render.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -16,8 +14,7 @@ public class Terrain extends Entity {
     @Override
     public void onEntityCreated() {
         RenderComponent cRender = addComponent(RenderComponent.class);
-        cRender.material = new DefaultMaterial();
-        cRender.mesh = createMesh();
+        cRender.meshMaterialCollection = new MeshMaterialCollection(Collections.singletonList(new MeshMaterialPair(createMesh(), new DefaultMaterial())));
         cRender.transform = new Transform();
     }
 

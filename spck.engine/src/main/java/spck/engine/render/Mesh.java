@@ -55,10 +55,13 @@ public class Mesh {
         changed = true;
     }
 
-    public void processChanges(Runnable callback) {
+    public boolean isChanged() {
+        return changed;
+    }
+
+    public void ackChanges() {
         if (changed) {
             changed = false;
-            callback.run();
         }
     }
 

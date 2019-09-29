@@ -9,8 +9,9 @@ import spck.engine.bus.MessageBus;
 import spck.engine.debug.Stats;
 import spck.engine.ecs.ECS;
 import spck.engine.ecs.render.components.RenderComponent;
-import spck.engine.render.Batch;
 import spck.engine.render.LayoutQualifier;
+import spck.engine.render.Material;
+import spck.engine.render.MeshMaterialBatch;
 import spck.engine.render.Renderer;
 import spck.engine.render.textures.TextureUVModifier;
 
@@ -19,6 +20,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class OpenGLStandardRenderer implements Renderer {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenGLStandardRenderer.class);
@@ -31,7 +33,7 @@ public class OpenGLStandardRenderer implements Renderer {
     }
 
     @Override
-    public void uploadBatchDataToGPU(Batch batch) {
+    public void uploadBatchDataToGPU(MeshMaterialBatch batch) {
         LOGGER.trace("Uploading data to GPU for batch {}, num of Entities: {}", batch.getID(), batch.getNumOfEntities());
         GL.genVaoContext(vaoId -> {
             LOGGER.trace("    VAO created {}", vaoId);
@@ -51,7 +53,7 @@ public class OpenGLStandardRenderer implements Renderer {
     }
 
     @Override
-    public void updateBatchDataInGPU(Batch batch) {
+    public void updateBatchDataInGPU(MeshMaterialBatch batch) {
         if (batch.getNumOfEntities() == 0) {
             LOGGER.trace("Batch {} is empty, removing its data from GPU", batch.getID());
             Stats.vboMemoryUsed -= batch.getOldSize() * batch.getEntityMemoryUsage();
@@ -82,7 +84,7 @@ public class OpenGLStandardRenderer implements Renderer {
     }
 
     @Override
-    public void render(Batch batch) {
+    public void render(MeshMaterialBatch batch) {
         Stats.numOfVerts += batch.getMesh().getIndices().length;
         Stats.numOfTotalVerts += batch.getMesh().getIndices().length * batch.getNumOfEntities();
 
@@ -124,7 +126,7 @@ public class OpenGLStandardRenderer implements Renderer {
         });
     }
 
-    private void removeBatchDataFromGPU(Batch batch) {
+    private void removeBatchDataFromGPU(MeshMaterialBatch batch) {
         LOGGER.trace("Removing Batch {} data from GPU...", batch.getID());
         // Batch is now empty, delete datas
         GL41.glDeleteVertexArrays(batch.getVaoID());
@@ -151,7 +153,7 @@ public class OpenGLStandardRenderer implements Renderer {
         vbos.forEach(GL41::glDeleteBuffers);
     }
 
-    private void setupInstancedRendering(Batch batch) {
+    private void setupInstancedRendering(MeshMaterialBatch batch) {
         LOGGER.trace("Setting up instanced rendering for {} in [VAO:{}]", batch.getMesh(), batch.getVaoID());
 
         // Create VBO for instanced attributes
@@ -173,7 +175,7 @@ public class OpenGLStandardRenderer implements Renderer {
         });
     }
 
-    private void loadInstancedRenderingData(Batch batch) {
+    private void loadInstancedRenderingData(MeshMaterialBatch batch) {
         GL.bufferContext(batch.getInstancedVboID(), () -> {
             float[] instancedVBOData = getInstancedVBOData(batch);
             GL41.glBufferData(batch.getInstancedVboID(), instancedVBOData, GL41.GL_DYNAMIC_DRAW);
@@ -181,7 +183,7 @@ public class OpenGLStandardRenderer implements Renderer {
         });
     }
 
-    private float[] getInstancedVBOData(Batch batch) {
+    private float[] getInstancedVBOData(MeshMaterialBatch batch) {
         float[] vboData = new float[batch.getNumOfEntities() * INSTANCED_DATA_SIZE_IN_BYTES];
         int offset = 0;
 
@@ -191,8 +193,11 @@ public class OpenGLStandardRenderer implements Renderer {
             component.transform.getTransformationMatrix().get(vboData, offset);
             offset += 16;
 
-            if (component.material.getDiffuseTextureUVModifier().isPresent()) {
-                TextureUVModifier modifier = component.material.getDiffuseTextureUVModifier().get();
+            Supplier<RuntimeException> exceptionSupplier = () -> new RuntimeException("Material not found");
+            Material componentMaterial = component.meshMaterialCollection.findMaterial(batch.getMaterial()).orElseThrow(exceptionSupplier);
+
+            if (componentMaterial.getDiffuseTextureUVModifier().isPresent()) {
+                TextureUVModifier modifier = componentMaterial.getDiffuseTextureUVModifier().get();
                 vboData[offset++] = modifier.getScale();
                 vboData[offset++] = modifier.getOffset().x;
                 vboData[offset++] = modifier.getOffset().y;
@@ -214,7 +219,7 @@ public class OpenGLStandardRenderer implements Renderer {
         return vboData;
     }
 
-    private void loadBatchMeshDataIntoVAO(Batch batch) {
+    private void loadBatchMeshDataIntoVAO(MeshMaterialBatch batch) {
         LOGGER.trace("Loading mesh {} into [VAO:{}]", batch.getMesh(), batch.getVaoID());
 
         // vertices

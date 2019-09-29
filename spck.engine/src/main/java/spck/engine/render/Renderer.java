@@ -1,9 +1,9 @@
 package spck.engine.render;
 
 public interface Renderer {
-    void uploadBatchDataToGPU(Batch batch);
+    void uploadBatchDataToGPU(MeshMaterialBatch batch);
 
-    void updateBatchDataInGPU(Batch batch);
+    void updateBatchDataInGPU(MeshMaterialBatch batch);
 
-    void render(Batch batch);
+    void render(MeshMaterialBatch batch);
 }

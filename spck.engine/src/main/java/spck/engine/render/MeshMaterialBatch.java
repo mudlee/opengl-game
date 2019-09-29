@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Batch {
-    private final static Logger LOGGER = LoggerFactory.getLogger(Batch.class);
+public class MeshMaterialBatch {
+    private final static Logger LOGGER = LoggerFactory.getLogger(MeshMaterialBatch.class);
     private final String ID;
     private final Mesh mesh;
     private final Material material;
@@ -23,7 +23,7 @@ public class Batch {
     private int oldSize;
     private int entityMemoryUsage = 0;
 
-    public Batch(Mesh mesh, Material material) {
+    public MeshMaterialBatch(Mesh mesh, Material material) {
         this.mesh = mesh;
         this.material = material;
         this.ID = material.hashCode() + "-" + mesh.hashCode();
@@ -32,9 +32,9 @@ public class Batch {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Batch)) return false;
+        if (!(o instanceof MeshMaterialBatch)) return false;
 
-        Batch batch = (Batch) o;
+        MeshMaterialBatch batch = (MeshMaterialBatch) o;
 
         return ID.equals(batch.ID);
     }
@@ -48,7 +48,7 @@ public class Batch {
         return ID;
     }
 
-    public void add(int entityId) {
+    public void addEntity(int entityId) {
         if (entities.contains(entityId)) {
             throw new RuntimeException(String.format("Entity %s is already added", entityId));
         }
@@ -60,7 +60,7 @@ public class Batch {
         LOGGER.trace("Entity {} added to batch {}, size {}->{}", entityId, ID, oldSize, currentSize);
     }
 
-    public void remove(Integer entityId) {
+    public void removeEntity(Integer entityId) {
         entities.remove(entityId);
         batchSizeChanged = true;
         int oldSize = currentSize;
@@ -111,6 +111,10 @@ public class Batch {
 
     public int getNumOfEntities() {
         return entities.size();
+    }
+
+    public Set<Integer> getEntityIDs() {
+        return entities;
     }
 
     public Set<Integer> getEntities() {
