@@ -15,7 +15,7 @@ public abstract class Entity {
 
 	public static Entity create(Entity entity) {
 		entity.id = ECS.world.create();
-		LOGGER.trace("Entity {} [{}] is created", entity.id, entity.getClass().getSimpleName());
+        LOGGER.debug("Entity {} [{}] is created", entity.id, entity.getClass().getSimpleName());
         entity.onEntityCreated();
 		return entity;
     }
@@ -38,7 +38,7 @@ public abstract class Entity {
         for (Component component : componentBag) {
             if (component instanceof StateAwareComponent) {
                 ((StateAwareComponent) component).state = ComponentState.MARKED_FOR_DESTROY;
-                LOGGER.trace("Entity {} is marked for deletion", id);
+                LOGGER.debug("Entity {} is marked for deletion", id);
             }
         }
         componentBag.clear();
@@ -69,7 +69,7 @@ public abstract class Entity {
             throw new RuntimeException(String.format("%s is not extended from %s", componentClass, Component.class));
         }
 
-        LOGGER.trace("Adding {} to Entity {}", componentClass.getSimpleName(), id);
+        LOGGER.debug("Adding {} to Entity {}", componentClass.getSimpleName(), id);
         T ecsComponent = (T) ECS.world.getMapper((Class<? extends Component>) componentClass).create(id);
         ((ECSComponent) ecsComponent).entityId = id;
         return ecsComponent;
