@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-class BatchTest {
+class MeshMaterialBatchTest {
     private MeshMaterialBatch batch;
 
     @BeforeEach

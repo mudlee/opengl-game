@@ -7,7 +7,7 @@ import org.mockito.Mockito;
 
 import java.util.Map;
 
-class BatchGroupTest {
+class MaterialBatchGroupTest {
     private MaterialBatchGroup group;
 
     @BeforeEach
