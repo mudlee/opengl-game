@@ -61,7 +61,7 @@ public class Main {
         Engine.window.captureMouse();
 
         //Entity.create(new Tree());
-        Entity.create(new IronMan());
+        Entity.create(new Monu9());
 
         //Entity.create(new Terrain());
         //createCubes();
