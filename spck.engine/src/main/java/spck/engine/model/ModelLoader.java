@@ -2,14 +2,7 @@ package spck.engine.model;
 
 import org.joml.Vector3f;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.assimp.AIColor4D;
-import org.lwjgl.assimp.AIFace;
-import org.lwjgl.assimp.AIMaterial;
-import org.lwjgl.assimp.AIMesh;
-import org.lwjgl.assimp.AIScene;
-import org.lwjgl.assimp.AIString;
-import org.lwjgl.assimp.AIVector3D;
-import org.lwjgl.assimp.Assimp;
+import org.lwjgl.assimp.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spck.engine.Engine;
@@ -27,28 +20,15 @@ import spck.engine.render.textures.TextureRegistry;
 import spck.engine.util.ResourceLoader;
 import spck.engine.util.RunOnce;
 
-import java.io.File;
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ModelLoader {
-    private static class LoadedMesh {
-        Mesh mesh;
-        int materialIndex;
-
-        LoadedMesh(Mesh mesh, int materialIndex) {
-            this.mesh = mesh;
-            this.materialIndex = materialIndex;
-        }
-    }
-
     private final static Logger LOGGER = LoggerFactory.getLogger(ModelLoader.class);
     private final static int IMPORT_FLAGS = Assimp.aiProcess_JoinIdenticalVertices | Assimp.aiProcess_Triangulate | Assimp.aiProcess_FixInfacingNormals | Assimp.aiProcess_OptimizeMeshes;
 
@@ -59,24 +39,27 @@ public class ModelLoader {
             MessageBus.register(LifeCycle.CLEANUP.eventID(), ModelLoader::cleanUp);
         });
 
-        LOGGER.trace("# Trying to load model {}...", resourcePath);
+        LOGGER.debug("# Trying to load model {}...", resourcePath);
 
         AIScene scene;
         String extension = resourcePath.substring(resourcePath.lastIndexOf("."));
 
         if (modelCache.containsKey(resourcePath)) {
-            LOGGER.trace("    Loading from cache");
+            LOGGER.debug("    Loading from cache");
             scene = modelCache.get(resourcePath);
         } else {
-            LOGGER.trace("    Extension: {}", extension);
+            LOGGER.debug("    Extension: {}", extension);
 
             URL res = ModelLoader.class.getResource(resourcePath);
+            if (res == null) {
+                throw new RuntimeException(String.format("Model could not be find: %s", resourcePath));
+            }
             String modelPath = getmodelPath(res.getPath());
 
-            LOGGER.trace("    Loading model from PATH->'{}', RES->'{}'", modelPath, res.toString());
+            LOGGER.debug("    Loading model from PATH->'{}', RES->'{}'", modelPath, res.toString());
 
             if (res.toString().startsWith("jar:") || res.toString().startsWith("jrt:")) {
-                modelPath = unpackModelsFromJar(resourcePath, extension);
+                modelPath = ModelJarUtil.unpackFromJar(resourcePath, extension);
             }
 
             scene = Assimp.aiImportFile(
@@ -92,14 +75,9 @@ public class ModelLoader {
             modelCache.put(resourcePath, scene);
         }
 
-        // MESH
-        LoadedMesh loadedMesh = loadMesh(scene, resourcePath);
-
-        // MATERIAL
-        Material material = loadMaterial(scene, loadedMesh.materialIndex, resourcePath, extension);
-
-        LOGGER.trace("    Model {} has been loaded. Mesh: {}, Material: {}", resourcePath, loadedMesh.mesh, material);
-        return new ModelInfo(loadedMesh.mesh, material);
+        List<ModelPart> parts = loadModelParts(scene, resourcePath, extension);
+        LOGGER.debug("    Model {} has been loaded. Contains {} meshes", resourcePath, parts.size());
+        return new ModelInfo(parts);
     }
 
     private static void cleanUp() {
@@ -114,31 +92,14 @@ public class ModelLoader {
         return path;
     }
 
-    private static Material loadMaterial(AIScene scene, int materialIndex, String resourcePath, String extension) {
-        int numMaterials = scene.mNumMaterials();
-        Material material;
+    private static List<ModelPart> loadModelParts(AIScene scene, String resourcePath, String extension) {
+        List<ModelPart> parts = new ArrayList<>();
 
-        if (numMaterials == 0) {
-            LOGGER.trace("    Mesh has no materials defined, using the default one");
-            material = new DefaultMaterial();
-        } else {
-            LOGGER.trace("    Processing material...");
-            PointerBuffer aiMaterials = scene.mMaterials();
-
-            if (aiMaterials == null) {
-                throw new RuntimeException("aiMaterials PointBuffer was null for model " + resourcePath);
-            }
-
-            AIMaterial aiMaterial = AIMaterial.create(aiMaterials.get(materialIndex));
-            material = processMaterial(aiMaterial, resourcePath, extension);
-            LOGGER.trace("    Material loaded");
-        }
-        return material;
-    }
-
-    private static LoadedMesh loadMesh(AIScene scene, String resourcePath) {
         int numMeshes = scene.mNumMeshes();
-        LOGGER.trace("    Found {} meshes...", numMeshes);
+        int numMaterials = scene.mNumMaterials();
+        LOGGER.debug("    Found {} meshes...", numMeshes);
+        LOGGER.debug("    Found {} materials...", numMaterials);
+
         PointerBuffer aiMeshes = scene.mMeshes();
 
         if (aiMeshes == null) {
@@ -149,69 +110,40 @@ public class ModelLoader {
             throw new RuntimeException("Could not find any mesh for model " + resourcePath);
         }
 
-        // we care only about the first mesh
-        LOGGER.trace("    Processing mesh at index 0...");
-        AIMesh aiMesh = AIMesh.create(aiMeshes.get(0));
+        List<Material> materials = new ArrayList<>();
+        PointerBuffer aiMaterials = scene.mMaterials();
 
-        int materialIndex = aiMesh.mMaterialIndex();
-
-        Mesh mesh = new Mesh(
-                processVertices(aiMesh),
-                processIndices(aiMesh),
-                processNormals(aiMesh),
-                processUVCoords(aiMesh),
-                new ArrayList<>()
-        );
-
-        LOGGER.trace("    Mesh has been loaded. Verts: {}, normals: {}, mat idx: {}", mesh.getIndices().length, mesh.getNormals().length / 3, materialIndex);
-        return new LoadedMesh(mesh, materialIndex);
-    }
-
-    private static String unpackModelsFromJar(String resourcePath, String extension) {
-        String origName = resourcePath.substring(resourcePath.lastIndexOf("/") + 1).replace(extension, "");
-
-        try {
-            final String tempDir = System.getProperty("java.io.tmpdir");
-            LOGGER.trace("    Model found in a jar file, extracting files to a temp directory: {}", tempDir);
-
-            File modelFile = new File(tempDir, origName + extension);
-            modelFile.deleteOnExit();
-            modelFile.createNewFile();
-
-            InputStream modelInput = ModelLoader.class.getResourceAsStream(resourcePath);
-            Files.write(modelFile.toPath(), modelInput.readAllBytes());
-            LOGGER.trace("    File {} extracted", tempDir + origName + extension);
-
-            // MTL
-            File mtlFile = new File(tempDir, origName + ".mtl");
-            mtlFile.deleteOnExit();
-            mtlFile.createNewFile();
-
-            InputStream mtlInput = ModelLoader.class.getResourceAsStream(resourcePath.replace(extension, ".mtl"));
-            if (mtlInput == null) {
-                LOGGER.trace("    MTL file was not found for {}, skipping", origName);
-            } else {
-                Files.write(mtlFile.toPath(), mtlInput.readAllBytes());
-                LOGGER.trace("    File {} extracted", origName + ".mtl");
-            }
-
-            // TEXTURE
-            File textureFile = new File(tempDir, origName + ".png");
-            textureFile.deleteOnExit();
-            textureFile.createNewFile();
-
-            InputStream textureInput = ModelLoader.class.getResourceAsStream(resourcePath.replace(extension, ".png"));
-            if (textureInput == null) {
-                LOGGER.trace("    Texture file was not found for {}, skipping", origName);
-            } else {
-                Files.write(textureFile.toPath(), textureInput.readAllBytes());
-                LOGGER.trace("    File {} extracted", origName + ".png");
-            }
-
-            return modelFile.getPath();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if (aiMaterials == null) {
+            throw new RuntimeException("aiMaterials PointBuffer was null for model " + resourcePath);
         }
+
+        for (int i = 0; i < numMaterials; i++) {
+            LOGGER.debug("    Processing material at index {}...", i);
+            AIMaterial aiMaterial = AIMaterial.create(aiMaterials.get(i));
+            materials.add(processMaterial(aiMaterial, resourcePath, extension));
+            LOGGER.debug("    Material loaded");
+        }
+
+        for (int i = 0; i < numMeshes; i++) {
+            LOGGER.debug("    Processing mesh at index {}...", i);
+            AIMesh aiMesh = AIMesh.create(aiMeshes.get(i));
+
+            int materialIndex = aiMesh.mMaterialIndex();
+
+            Mesh mesh = new Mesh(
+                    getVerticesFromMesh(aiMesh),
+                    getIndicesFromMesh(aiMesh),
+                    getNormalsFromMesh(aiMesh),
+                    getUVCoordsFromMesh(aiMesh),
+                    new ArrayList<>()
+            );
+
+            LOGGER.debug("    Mesh has been loaded. Verts: {}, normals: {}, mat idx: {}", mesh.getIndices().length, mesh.getNormals().length / 3, materialIndex);
+            Material material = materials.isEmpty() ? new DefaultMaterial() : materials.get(materialIndex);
+            parts.add(new ModelPart(mesh, material));
+        }
+
+        return parts;
     }
 
     private static Material processMaterial(AIMaterial aiMaterial, String modelPath, String extension) {
@@ -234,7 +166,7 @@ public class ModelLoader {
 
         String textPath = modelPath.replace(extension, ".png");
 
-        LOGGER.trace("    Trying to load texture from {}", textPath);
+        LOGGER.debug("    Trying to load texture from {}", textPath);
         try {
             ByteBuffer buffer = ResourceLoader.loadToByteBuffer(textPath);
             Texture2D texture = (Texture2D) TextureRegistry.register(TextureStorage.loadFromTextureData(
@@ -243,7 +175,7 @@ public class ModelLoader {
                     ShaderUniform.Material.DIFFUSE_TEXTURE_SAMPLER.getUniformName(),
                     new ModelTextureRegistryID(textPath)
             ));
-            LOGGER.trace("    Material {} texture is {}, - {}", textureType, textPath, texture);
+            LOGGER.debug("    Material {} texture is {}, - {}", textureType, textPath, texture);
             return texture;
         } catch (Exception e) {
             LOGGER.error("    Texture was not found at {}", textPath);
@@ -255,11 +187,11 @@ public class ModelLoader {
         AIColor4D color = AIColor4D.create();
         Assimp.aiGetMaterialColor(aiMaterial, colorType, Assimp.aiTextureType_NONE, 0, color);
         Vector3f matColor = new Vector3f(color.r(), color.g(), color.b());
-        LOGGER.trace("    Material {} color is {}", colorType, matColor);
+        LOGGER.debug("    Material {} color is {}", colorType, matColor);
         return matColor;
     }
 
-    private static float[] processVertices(AIMesh aiMesh) {
+    private static float[] getVerticesFromMesh(AIMesh aiMesh) {
         AIVector3D.Buffer aiVertices = aiMesh.mVertices();
         float[] result = new float[aiVertices.capacity() * 3];
 
@@ -274,7 +206,7 @@ public class ModelLoader {
         return result;
     }
 
-    private static float[] processNormals(AIMesh aiMesh) {
+    private static float[] getNormalsFromMesh(AIMesh aiMesh) {
         AIVector3D.Buffer aiNormals = aiMesh.mNormals();
 
         if (aiNormals == null) {
@@ -294,7 +226,7 @@ public class ModelLoader {
         return result;
     }
 
-    private static int[] processIndices(AIMesh aiMesh) {
+    private static int[] getIndicesFromMesh(AIMesh aiMesh) {
         int numFaces = aiMesh.mNumFaces();
         AIFace.Buffer aiFaces = aiMesh.mFaces();
 
@@ -316,7 +248,7 @@ public class ModelLoader {
         return result;
     }
 
-    private static float[] processUVCoords(AIMesh aiMesh) {
+    private static float[] getUVCoordsFromMesh(AIMesh aiMesh) {
         AIVector3D.Buffer uvCoords = aiMesh.mTextureCoords(0);
         int numUVCoords = uvCoords != null ? uvCoords.remaining() : 0;
 

@@ -31,4 +31,5 @@ module spck.engine {
     exports spck.engine.model.primitives;
     exports spck.engine.render;
     exports spck.engine.render.textures;
+    exports spck.engine.model;
 }

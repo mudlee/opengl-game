@@ -61,48 +61,11 @@ public class Main {
 
         Engine.window.captureMouse();
 
+        Tree tree = new Tree();
+        Entity.create(tree);
+
         //Entity.create(new Terrain());
-        testScene();
         //createCubes();
-    }
-
-    private void testScene() {
-        Cube reference = new Cube();
-        Cube bottomPlane = new Cube();
-        Cube topPlane = new Cube();
-        Cube leftPlane = new Cube();
-
-        Entity.create(reference);
-        Entity.create(bottomPlane);
-        Entity.create(topPlane);
-        Entity.create(leftPlane);
-
-        reference.getComponent(RenderComponent.class).ifPresent(component -> {
-            component.transform.setPosition(new Vector3f(0, 0, 0));
-        });
-        bottomPlane.getComponent(RenderComponent.class).ifPresent(component -> {
-            component.transform.setPosition(new Vector3f(1, 1, 0));
-        });
-        topPlane.getComponent(RenderComponent.class).ifPresent(component -> {
-            component.transform.setPosition(new Vector3f(2, 2, 0));
-        });
-
-        /*reference.getComponent(RenderComponent.class).ifPresent(component -> {
-            component.transform.setPosition(new Vector3f(0, 1, 10));
-        });
-
-        bottomPlane.getComponent(RenderComponent.class).ifPresent(component -> {
-            component.transform.setScale(new Vector3f(20f, 1f, 20f));
-        });
-        topPlane.getComponent(RenderComponent.class).ifPresent(component -> {
-            component.transform.setScale(new Vector3f(20f, 1f, 20f));
-            component.transform.setPosition(new Vector3f(0, 40, 0));
-        });
-        leftPlane.getComponent(RenderComponent.class).ifPresent(component -> {
-            component.transform.setScale(new Vector3f(20f, 1f, 20f));
-            component.transform.setPosition(new Vector3f(-10, 20, 0));
-            component.transform.setRotation(new Vector3f(0, 0, 90));
-        });*/
     }
 
     private void createCubes() {

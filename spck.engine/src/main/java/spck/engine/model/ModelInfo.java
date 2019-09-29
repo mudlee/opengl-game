@@ -1,22 +1,15 @@
 package spck.engine.model;
 
-import spck.engine.render.Material;
-import spck.engine.render.Mesh;
+import java.util.List;
 
 public class ModelInfo {
-    private final Mesh mesh;
-    private final Material material;
+    private List<ModelPart> parts;
 
-    ModelInfo(Mesh mesh, Material material) {
-        this.mesh = mesh;
-        this.material = material;
+    public ModelInfo(List<ModelPart> parts) {
+        this.parts = parts;
     }
 
-    public Mesh getMesh() {
-        return mesh;
-    }
-
-    public Material getMaterial() {
-        return material;
+    public List<ModelPart> getParts() {
+        return parts;
     }
 }
