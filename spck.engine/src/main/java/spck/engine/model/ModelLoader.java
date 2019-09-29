@@ -39,11 +39,13 @@ public class ModelLoader {
         LOGGER.debug("# Trying to load model {}...", resourcePath);
 
         AIScene scene;
+        boolean fromCache = false;
         String extension = resourcePath.substring(resourcePath.lastIndexOf("."));
 
         if (modelCache.containsKey(resourcePath)) {
             LOGGER.debug("    Loading from cache");
             scene = modelCache.get(resourcePath);
+            fromCache = true;
         } else {
             LOGGER.debug("    Extension: {}", extension);
 
@@ -72,7 +74,7 @@ public class ModelLoader {
             modelCache.put(resourcePath, scene);
         }
 
-        List<ModelPart> parts = loadModelParts(scene, resourcePath, extension);
+        List<ModelPart> parts = loadModelParts(scene, resourcePath, extension, fromCache);
         LOGGER.debug("    Model {} has been loaded. Contains {} meshes", resourcePath, parts.size());
         List<MeshMaterialPair> meshMaterialPairs = new ArrayList<>();
         for (ModelPart part : parts) {
@@ -93,13 +95,15 @@ public class ModelLoader {
         return path;
     }
 
-    private static List<ModelPart> loadModelParts(AIScene scene, String resourcePath, String extension) {
+    private static List<ModelPart> loadModelParts(AIScene scene, String resourcePath, String extension, boolean fromCache) {
         List<ModelPart> parts = new ArrayList<>();
 
         int numMeshes = scene.mNumMeshes();
         int numMaterials = scene.mNumMaterials();
-        LOGGER.debug("    Found {} meshes...", numMeshes);
-        LOGGER.debug("    Found {} materials...", numMaterials);
+        if (!fromCache) {
+            LOGGER.debug("    Found {} meshes...", numMeshes);
+            LOGGER.debug("    Found {} materials...", numMaterials);
+        }
 
         PointerBuffer aiMeshes = scene.mMeshes();
 
@@ -119,14 +123,14 @@ public class ModelLoader {
         }
 
         for (int i = 0; i < numMaterials; i++) {
-            LOGGER.debug("    Processing material at index {}...", i);
+            if (!fromCache) LOGGER.debug("    Processing material at index {}...", i);
             AIMaterial aiMaterial = AIMaterial.create(aiMaterials.get(i));
-            materials.add(processMaterial(aiMaterial, resourcePath, extension));
-            LOGGER.debug("    Material loaded");
+            materials.add(processMaterial(aiMaterial, resourcePath, extension, fromCache));
+            if (!fromCache) LOGGER.debug("    Material loaded");
         }
 
         for (int i = 0; i < numMeshes; i++) {
-            LOGGER.debug("    Processing mesh at index {}...", i);
+            if (!fromCache) LOGGER.debug("    Processing mesh at index {}...", i);
             AIMesh aiMesh = AIMesh.create(aiMeshes.get(i));
 
             int materialIndex = aiMesh.mMaterialIndex();
@@ -139,7 +143,8 @@ public class ModelLoader {
                     new ArrayList<>()
             );
 
-            LOGGER.debug("    Mesh has been loaded. Verts: {}, normals: {}, mat idx: {}", mesh.getIndices().length, mesh.getNormals().length / 3, materialIndex);
+            if (!fromCache)
+                LOGGER.debug("    Mesh has been loaded. Verts: {}, normals: {}, mat idx: {}", mesh.getIndices().length, mesh.getNormals().length / 3, materialIndex);
             Material material = materials.isEmpty() ? new DefaultMaterial() : materials.get(materialIndex);
             parts.add(new ModelPart(mesh, material));
         }
@@ -147,11 +152,11 @@ public class ModelLoader {
         return parts;
     }
 
-    private static Material processMaterial(AIMaterial aiMaterial, String modelPath, String extension) {
+    private static Material processMaterial(AIMaterial aiMaterial, String modelPath, String extension, boolean fromCache) {
         DefaultMaterial material = new DefaultMaterial();
-        material.setDiffuseColor(getMaterialColor(aiMaterial, Assimp.AI_MATKEY_COLOR_DIFFUSE));
-        material.setSpecularColor(getMaterialColor(aiMaterial, Assimp.AI_MATKEY_COLOR_SPECULAR));
-        material.setAmbientColor(getMaterialColor(aiMaterial, Assimp.AI_MATKEY_COLOR_AMBIENT));
+        material.setDiffuseColor(getMaterialColor(aiMaterial, Assimp.AI_MATKEY_COLOR_DIFFUSE, fromCache));
+        material.setSpecularColor(getMaterialColor(aiMaterial, Assimp.AI_MATKEY_COLOR_SPECULAR, fromCache));
+        material.setAmbientColor(getMaterialColor(aiMaterial, Assimp.AI_MATKEY_COLOR_AMBIENT, fromCache));
         material.setDiffuseTexture(getMaterialTexture(aiMaterial, Assimp.aiTextureType_DIFFUSE, modelPath, extension));
 
         return material;
@@ -184,11 +189,11 @@ public class ModelLoader {
         }
     }
 
-    private static Vector3f getMaterialColor(AIMaterial aiMaterial, String colorType) {
+    private static Vector3f getMaterialColor(AIMaterial aiMaterial, String colorType, boolean fromCache) {
         AIColor4D color = AIColor4D.create();
         Assimp.aiGetMaterialColor(aiMaterial, colorType, Assimp.aiTextureType_NONE, 0, color);
         Vector3f matColor = new Vector3f(color.r(), color.g(), color.b());
-        LOGGER.debug("    Material {} color is {}", colorType, matColor);
+        if (!fromCache) LOGGER.debug("    Material {} color is {}", colorType, matColor);
         return matColor;
     }
 
