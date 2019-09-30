@@ -16,14 +16,13 @@ import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.render.camera.Camera;
-import spck.engine.render.camera.PerspectiveCamera;
 
 import java.util.Random;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 
 public class Main {
-    private final static Camera CAMERA = new PerspectiveCamera(60.0f, 01f, 10000f);
+    private final static Camera CAMERA = new RPGCamera(60.0f, 01f, 10000f);
     private final static Window.Preferences WINDOW_PREFERENCES = new Window.Preferences(
             false,
             Antialiasing.ANTIALISING_2X,

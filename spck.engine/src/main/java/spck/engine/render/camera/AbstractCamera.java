@@ -8,17 +8,17 @@ import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 
 public class AbstractCamera {
-    protected final Vector3f REUSABLE_UP_VECTOR = new Vector3f(0, 1, 0);
     private final Vector3f REUSABLE_RAY_VECTOR = new Vector3f().zero();
+    private final Matrix4f viewMatrix = new Matrix4f();
+    private boolean viewMatrixChanged = true;
+    protected final Vector3f REUSABLE_UP_VECTOR = new Vector3f(0, 1, 0);
     protected final Vector3f REUSABLE_3D_VECTOR = new Vector3f().zero();
     protected final Vector3f position = new Vector3f(0, 0, 0);
     // Yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right
     // (due to how Eular angles work) so we initially rotate a bit to the left.
-    private final Vector3f rotation = new Vector3f(0, -90, 0);
+    protected final Vector3f rotation = new Vector3f(0, -90, 0);
     protected final Matrix4f projectionMatrix = new Matrix4f();
-    private final Matrix4f viewMatrix = new Matrix4f();
     protected final Vector3f camFrontVector = new Vector3f(0, 0, -1);
-    private boolean viewMatrixChanged = true;
     protected boolean projectionMatrixChanged = true;
     protected boolean positionChanged = true;
     protected Runnable projectionMatrixUpdater;
