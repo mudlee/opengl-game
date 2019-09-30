@@ -32,4 +32,5 @@ module spck.engine {
     exports spck.engine.render;
     exports spck.engine.render.textures;
     exports spck.engine.model;
+    exports spck.engine.render.camera;
 }

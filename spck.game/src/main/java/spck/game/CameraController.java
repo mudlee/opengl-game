@@ -1,4 +1,4 @@
-package spck.engine.debug;
+package spck.game;
 
 import org.joml.Vector3f;
 import spck.engine.Axis;
@@ -7,7 +7,6 @@ import spck.engine.Time;
 import spck.engine.bus.KeyEvent;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
-import spck.engine.bus.MouseEvent;
 import spck.engine.render.camera.Camera;
 
 import java.util.HashMap;
@@ -15,7 +14,7 @@ import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class FreeCameraController {
+public class CameraController {
     private static final Map<MoveDirection, Integer> moveKeyMap = new HashMap<>();
     private static final float MAX_SPEED = 0.5f;
     private static final float ACCELERATION = 0.2f;
@@ -33,7 +32,7 @@ public class FreeCameraController {
     private final Vector3f movementVector = new Vector3f().zero();
     private final Map<Axis, Boolean> movingAxes = new HashMap<>();
 
-    public FreeCameraController(Camera camera) {
+    public CameraController(Camera camera) {
         movingAxes.put(Axis.X, false);
         movingAxes.put(Axis.Y, false);
         movingAxes.put(Axis.Z, false);
@@ -49,16 +48,6 @@ public class FreeCameraController {
                 moving(entry.getKey());
             });
         }
-
-        MessageBus.register(MouseEvent.moved(), (event) -> {
-            //noinspection SuspiciousNameCombination
-            rotation.y += ((MouseEvent) event).getMouseOffsetVector().x; // yaw
-            //noinspection SuspiciousNameCombination
-            rotation.x += ((MouseEvent) event).getMouseOffsetVector().y; // pitch
-
-            constraintPitch();
-            camera.setRotation(rotation);
-        });
 
         MessageBus.register(LifeCycle.UPDATE.eventID(), () -> {
             if (movementVector.x != 0 || movementVector.y != 0 || movementVector.z != 0) {

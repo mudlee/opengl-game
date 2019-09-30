@@ -7,7 +7,7 @@ import spck.engine.Engine;
 import spck.engine.debug.Measure;
 import spck.engine.debug.Stats;
 import spck.engine.ecs.ui.UIText;
-import spck.engine.render.Camera;
+import spck.engine.render.camera.Camera;
 import spck.engine.util.NumberFormatter;
 
 public class StatUITextSystem extends IteratingSystem {

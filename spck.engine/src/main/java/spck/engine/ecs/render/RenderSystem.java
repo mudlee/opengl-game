@@ -4,10 +4,10 @@ import com.artemis.BaseSystem;
 import spck.engine.Engine;
 import spck.engine.debug.Stats;
 import spck.engine.ecs.EntityBatchStore;
-import spck.engine.render.Camera;
 import spck.engine.render.MaterialBatchGroup;
 import spck.engine.render.MeshMaterialBatch;
 import spck.engine.render.PolygonShader;
+import spck.engine.render.camera.Camera;
 import spck.engine.util.RunOnce;
 
 import java.util.HashSet;

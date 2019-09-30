@@ -2,6 +2,7 @@ package spck.engine.render;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spck.engine.render.camera.Camera;
 
 public class PolygonShader extends AbstractShader implements Shader {
     private final static Logger LOGGER = LoggerFactory.getLogger(PolygonShader.class);

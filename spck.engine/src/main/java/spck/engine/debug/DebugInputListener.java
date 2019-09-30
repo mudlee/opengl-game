@@ -6,7 +6,7 @@ import spck.engine.Engine;
 import spck.engine.bus.KeyEvent;
 import spck.engine.bus.MessageBus;
 import spck.engine.framework.Graphics;
-import spck.engine.render.Camera;
+import spck.engine.render.camera.Camera;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_F12;
 

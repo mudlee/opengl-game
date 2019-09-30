@@ -2,16 +2,12 @@ package spck.engine.framework;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spck.engine.lights.DirectionalLight;
-import spck.engine.lights.Light;
-import spck.engine.lights.LightSystem;
-import spck.engine.lights.PointLight;
-import spck.engine.lights.SpotLight;
+import spck.engine.lights.*;
 import spck.engine.render.AbstractShader;
-import spck.engine.render.Camera;
 import spck.engine.render.Material;
 import spck.engine.render.Shader;
 import spck.engine.render.ShaderUniform;
+import spck.engine.render.camera.Camera;
 import spck.engine.util.KeyValueTool;
 
 public class OpenGLStandardShader extends AbstractShader implements Shader {

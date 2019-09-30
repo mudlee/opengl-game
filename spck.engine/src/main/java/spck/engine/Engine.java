@@ -18,7 +18,7 @@ import spck.engine.framework.OpenGLStandardRenderer;
 import spck.engine.framework.OpenGLStandardShader;
 import spck.engine.framework.UIRenderer;
 import spck.engine.framework.Window;
-import spck.engine.render.Camera;
+import spck.engine.render.camera.Camera;
 import spck.engine.util.OSNameParser;
 
 import java.util.Arrays;

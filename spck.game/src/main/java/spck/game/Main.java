@@ -8,7 +8,6 @@ import spck.engine.bus.KeyEvent;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.DebugInputListener;
-import spck.engine.debug.FreeCameraController;
 import spck.engine.ecs.Entity;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.framework.Window;
@@ -16,14 +15,15 @@ import spck.engine.lights.AmbientLight;
 import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
-import spck.engine.render.Camera;
+import spck.engine.render.camera.Camera;
+import spck.engine.render.camera.PerspectiveCamera;
 
 import java.util.Random;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 
 public class Main {
-    private final static Camera CAMERA = Camera.perspective(60.0f, 01f, 10000f);
+    private final static Camera CAMERA = new PerspectiveCamera(60.0f, 01f, 10000f);
     private final static Window.Preferences WINDOW_PREFERENCES = new Window.Preferences(
             false,
             Antialiasing.ANTIALISING_2X,
@@ -47,9 +47,10 @@ public class Main {
 
     private void start() {
         new DebugInputListener(CAMERA);
-        new FreeCameraController(CAMERA);
+        new CameraController(CAMERA);
 
-        CAMERA.setPosition(new Vector3f(0, 20, 60));
+        CAMERA.setPosition(new Vector3f(-3, 11, 3));
+        CAMERA.setRotation(new Vector3f(-50, -45, 0));
 
         LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.9f));
         LightSystem.addLight(new DirectionalLight(
@@ -61,7 +62,13 @@ public class Main {
         Engine.window.captureMouse();
 
         //Entity.create(new Tree());
-        Entity.create(new Monu9());
+        Entity.create(new Ground());
+
+
+        Entity castle = Entity.create(new Castle());
+        castle.getComponent(RenderComponent.class).ifPresent(castleRender -> {
+            castleRender.transform.setPosition(new Vector3f(0, 1, 0));
+        });
 
         //Entity.create(new Terrain());
         //createCubes();
