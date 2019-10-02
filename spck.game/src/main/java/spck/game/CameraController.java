@@ -1,12 +1,12 @@
 package spck.game;
 
 import org.joml.Vector3f;
-import spck.engine.Axis;
 import spck.engine.MoveDirection;
 import spck.engine.Time;
 import spck.engine.bus.KeyEvent;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
+import spck.engine.bus.MouseEvent;
 import spck.engine.render.camera.Camera;
 
 import java.util.HashMap;
@@ -16,8 +16,9 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class CameraController {
     private static final Map<MoveDirection, Integer> moveKeyMap = new HashMap<>();
-    private static final float MAX_SPEED = 0.5f;
-    private static final float ACCELERATION = 0.2f;
+    private static final float ACCELERATION = 3f;
+    private static final float MOVE_SPEED = 1f;
+    private static final float SCROLL_SPEED = 2f;
 
     static {
         moveKeyMap.put(MoveDirection.LEFT, GLFW_KEY_A);
@@ -28,140 +29,54 @@ public class CameraController {
         moveKeyMap.put(MoveDirection.DOWNWARD, GLFW_KEY_LEFT_CONTROL);
     }
 
-    private final Vector3f rotation;
-    private final Vector3f movementVector = new Vector3f().zero();
-    private final Map<Axis, Boolean> movingAxes = new HashMap<>();
+    private final Camera camera;
+    private final Vector3f moveTarget;
 
     public CameraController(Camera camera) {
-        movingAxes.put(Axis.X, false);
-        movingAxes.put(Axis.Y, false);
-        movingAxes.put(Axis.Z, false);
-
-        rotation = new Vector3f(camera.getRotation());
+        this.camera = camera;
+        moveTarget = new Vector3f(camera.getPosition());
 
         for (Map.Entry<MoveDirection, Integer> entry : moveKeyMap.entrySet()) {
-            MessageBus.register(KeyEvent.released(entry.getValue()), () -> {
-                moveStopped(entry.getKey());
-            });
-
             MessageBus.register(KeyEvent.keyHeldDown(entry.getValue()), () -> {
-                moving(entry.getKey());
+                move(entry.getKey());
             });
         }
 
-        MessageBus.register(LifeCycle.UPDATE.eventID(), () -> {
-            if (movementVector.x != 0 || movementVector.y != 0 || movementVector.z != 0) {
-                camera.move(calculatePositionChange());
+        MessageBus.register(MouseEvent.SCROLL, event -> {
+            if (((MouseEvent) event).getMouseScrollOffsetVector().y > 0) {
+                move(MoveDirection.UPWARD);
+            } else {
+                move(MoveDirection.DOWNWARD);
             }
+        });
+
+        MessageBus.register(LifeCycle.UPDATE.eventID(), () -> {
+            // TODO don't move if we are there
+            camera.getPosition().lerp(moveTarget, Time.deltaTime * ACCELERATION);
+            camera.forceUpdate();
         });
     }
 
-    private Vector3f calculatePositionChange() {
-        if (movementVector.x > 0) {
-            if (!movingAxes.get(Axis.X)) {
-                movementVector.x -= ACCELERATION * Time.deltaTime;
-                if (movementVector.x < 0) {
-                    movementVector.x = 0;
-                }
-            }
-        } else if (movementVector.x < 0) {
-            if (!movingAxes.get(Axis.X)) {
-                movementVector.x += ACCELERATION * Time.deltaTime;
-                if (movementVector.x > 0) {
-                    movementVector.x = 0;
-                }
-            }
-        }
-
-        if (movementVector.z > 0) {
-            if (!movingAxes.get(Axis.Z)) {
-                movementVector.z -= ACCELERATION * Time.deltaTime;
-                if (movementVector.z < 0) {
-                    movementVector.z = 0;
-                }
-            }
-        } else if (movementVector.z < 0) {
-            if (!movingAxes.get(Axis.Z)) {
-                movementVector.z += ACCELERATION * Time.deltaTime;
-                if (movementVector.z > 0) {
-                    movementVector.z = 0;
-                }
-            }
-        }
-
-        if (movementVector.y > 0) {
-            if (!movingAxes.get(Axis.Y)) {
-                movementVector.y -= ACCELERATION * Time.deltaTime;
-                if (movementVector.y < 0) {
-                    movementVector.y = 0;
-                }
-            }
-        } else if (movementVector.y < 0) {
-            if (!movingAxes.get(Axis.Y)) {
-                movementVector.y += ACCELERATION * Time.deltaTime;
-                if (movementVector.y > 0) {
-                    movementVector.y = 0;
-                }
-            }
-        }
-
-        return movementVector;
-    }
-
-    private void moving(MoveDirection direction) {
-        movingAxes.put(direction.getAxis(), true);
-
+    private void move(MoveDirection direction) {
         switch (direction) {
-            case LEFT:
-                if (movementVector.x < -MAX_SPEED) {
-                    break;
-                }
-
-                movementVector.x -= ACCELERATION * Time.deltaTime;
-                break;
-            case RIGHT:
-                if (movementVector.x > MAX_SPEED) {
-                    break;
-                }
-                movementVector.x += ACCELERATION * Time.deltaTime;
-                break;
             case FORWARD:
-                if (movementVector.z > MAX_SPEED) {
-                    break;
-                }
-                movementVector.z += ACCELERATION * Time.deltaTime;
+                moveTarget.set(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z + MOVE_SPEED);
                 break;
             case BACKWARD:
-                if (movementVector.z < -MAX_SPEED) {
-                    break;
-                }
-                movementVector.z -= ACCELERATION * Time.deltaTime;
+                moveTarget.set(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z - MOVE_SPEED);
+                break;
+            case LEFT:
+                moveTarget.set(camera.getPosition().x - MOVE_SPEED, camera.getPosition().y, camera.getPosition().z);
+                break;
+            case RIGHT:
+                moveTarget.set(camera.getPosition().x + MOVE_SPEED, camera.getPosition().y, camera.getPosition().z);
                 break;
             case UPWARD:
-                if (movementVector.y > MAX_SPEED) {
-                    break;
-                }
-                movementVector.y += ACCELERATION * Time.deltaTime;
+                moveTarget.set(camera.getPosition().x, camera.getPosition().y + SCROLL_SPEED, camera.getPosition().z);
                 break;
             case DOWNWARD:
-                if (movementVector.y < -MAX_SPEED) {
-                    break;
-                }
-                movementVector.y -= ACCELERATION * Time.deltaTime;
+                moveTarget.set(camera.getPosition().x, camera.getPosition().y - SCROLL_SPEED, camera.getPosition().z);
                 break;
-        }
-    }
-
-    private void moveStopped(MoveDirection direction) {
-        movingAxes.put(direction.getAxis(), false);
-    }
-
-    private void constraintPitch() {
-        if (rotation.x > 89) {
-            rotation.x = 89;
-        }
-        if (rotation.x < -89) {
-            rotation.x = -89;
         }
     }
 }

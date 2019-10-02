@@ -208,10 +208,19 @@ public class Window {
         glfwSetCursorPosCallback(ID, new GLFWCursorPosCallback() {
             @Override
             public void invoke(long window, double x, double y) {
-                mouseEvent.calculate(x, y);
-                MessageBus.broadcast(MouseEvent.moved(), mouseEvent);
+                mouseEvent.calculateMovement(x, y);
+                MessageBus.broadcast(MouseEvent.MOVE, mouseEvent);
             }
         });
+
+        glfwSetScrollCallback(ID, new GLFWScrollCallback() {
+            @Override
+            public void invoke(long window, double xOffset, double yOffset) {
+                mouseEvent.calculateScroll(xOffset, yOffset);
+                MessageBus.broadcast(MouseEvent.SCROLL, mouseEvent);
+            }
+        });
+
 
         // VSYNC
         if (preferences.vSyncEnabled) {

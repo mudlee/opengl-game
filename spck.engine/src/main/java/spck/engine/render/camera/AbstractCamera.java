@@ -10,7 +10,7 @@ import spck.engine.bus.MessageBus;
 public class AbstractCamera {
     private final Vector3f REUSABLE_RAY_VECTOR = new Vector3f().zero();
     private final Matrix4f viewMatrix = new Matrix4f();
-    private boolean viewMatrixChanged = true;
+    protected boolean viewMatrixChanged = true;
     protected final Vector3f REUSABLE_UP_VECTOR = new Vector3f(0, 1, 0);
     protected final Vector3f REUSABLE_3D_VECTOR = new Vector3f().zero();
     protected final Vector3f position = new Vector3f(0, 0, 0);

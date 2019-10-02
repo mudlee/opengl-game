@@ -24,7 +24,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 public class Main {
     private final static Camera CAMERA = new RPGCamera(60.0f, 01f, 10000f);
     private final static Window.Preferences WINDOW_PREFERENCES = new Window.Preferences(
-            false,
+            true,
             Antialiasing.ANTIALISING_2X,
             false,
             false);
@@ -46,10 +46,11 @@ public class Main {
 
     private void start() {
         new DebugInputListener(CAMERA);
-        new CameraController(CAMERA);
+
 
         CAMERA.setPosition(new Vector3f(-3, 11, 3));
         CAMERA.setRotation(new Vector3f(-50, -45, 0));
+        new CameraController(CAMERA);
 
         LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.9f));
         LightSystem.addLight(new DirectionalLight(
@@ -57,8 +58,6 @@ public class Main {
                 0.3f,
                 new Vector3f(40, 20, 10)
         ));
-
-        Engine.window.captureMouse();
 
         //Entity.create(new Tree());
         Entity.create(new Ground());

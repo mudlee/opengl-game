@@ -1,40 +1,51 @@
 package spck.engine.bus;
 
 import org.joml.Vector2d;
-import spck.engine.Engine;
 
 public class MouseEvent {
-    private static final float SENSITIVITY = 0.05f;
+    public static final String MOVE = "MOUSE_MOVED";
+    public static final String SCROLL = "MOUSE_SCROLLED";
+
+    // MOVEMENT
+    private static final float MOVE_SENSITIVITY = 0.05f;
     private final Vector2d mousePosition = new Vector2d().zero();
-    private final Vector2d mouseOffsetVector = new Vector2d().zero();
+    private final Vector2d mouseMoveOffsetVector = new Vector2d().zero();
     private final Vector2d previousMousePosition = new Vector2d().zero();
     private boolean mouseFirstMove = true;
 
-    public static String moved() {
-        return Engine.ID + "MOUSE_MOVED";
-    }
+    // SCROLL
+    private final Vector2d mouseScroll = new Vector2d().zero();
+    private final Vector2d mouseScrollOffsetVector = new Vector2d().zero();
 
-    public void calculate(double x, double y) {
-        mousePosition.set(x, y);
+    public void calculateMovement(double xOffset, double yOffset) {
+        mousePosition.set(xOffset, yOffset);
 
         if (mouseFirstMove) {
-            previousMousePosition.set(x, y);
+            previousMousePosition.set(xOffset, yOffset);
             mouseFirstMove = false;
         }
 
-        mouseOffsetVector.x = x - previousMousePosition.x;
-        mouseOffsetVector.y = previousMousePosition.y - y; // Reversed since y-coordinates range from bottom to top
+        mouseMoveOffsetVector.x = xOffset - previousMousePosition.x;
+        mouseMoveOffsetVector.y = previousMousePosition.y - yOffset; // Reversed since y-coordinates range from bottom to top
 
-        previousMousePosition.set(x, y);
+        previousMousePosition.set(xOffset, yOffset);
 
-        mouseOffsetVector.mul(SENSITIVITY);
+        mouseMoveOffsetVector.mul(MOVE_SENSITIVITY);
+    }
+
+    public void calculateScroll(double xOffset, double yOffset) {
+        mouseScrollOffsetVector.set(xOffset, yOffset);
     }
 
     public Vector2d getMousePosition() {
         return mousePosition;
     }
 
-    public Vector2d getMouseOffsetVector() {
-        return mouseOffsetVector;
+    public Vector2d getMouseMoveOffsetVector() {
+        return mouseMoveOffsetVector;
+    }
+
+    public Vector2d getMouseScrollOffsetVector() {
+        return mouseScrollOffsetVector;
     }
 }

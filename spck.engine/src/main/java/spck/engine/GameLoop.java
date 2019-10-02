@@ -19,13 +19,13 @@ class GameLoop {
 
     void loop() {
         LOGGER.debug("Running game loop...");
-        double lastLoopTime = Time.getTimeInSec();
+        double lastLoopTime = Time.getJVMTimeInSec();
 
         while (window.shouldNotClose()) {
             Stats.reset();
             Graphics.clearScreen(Engine.preferences.clearColor.x, Engine.preferences.clearColor.y, Engine.preferences.clearColor.z, Engine.preferences.clearColor.w);
 
-            double currentTime = Time.getTimeInSec();
+            double currentTime = Time.getJVMTimeInSec();
             Time.deltaTime = (float) (currentTime - lastLoopTime);
             lastLoopTime = currentTime;
 
@@ -53,7 +53,7 @@ class GameLoop {
     private void sync(double lastLoopTime) {
         float loopSlot = 1f / TARGET_FPS;
         double endTime = lastLoopTime + loopSlot;
-        while (Time.getTimeInSec() < endTime) {
+        while (Time.getJVMTimeInSec() < endTime) {
             try {
                 Thread.sleep(1);
             } catch (InterruptedException ie) {

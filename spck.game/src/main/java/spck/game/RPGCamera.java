@@ -24,12 +24,6 @@ public class RPGCamera extends PerspectiveCamera implements Camera {
 
     @Override
     public void move(Vector3f moveVector) {
-        // use this
-        REUSABLE_FRONT_VECTOR.x = (float) (Math.cos(0) * Math.cos(Math.toRadians(rotation.y)));
-        REUSABLE_FRONT_VECTOR.y = (float) (Math.sin(0));
-        REUSABLE_FRONT_VECTOR.z = (float) (Math.cos(0) * Math.sin(Math.toRadians(rotation.y)));
-        REUSABLE_FRONT_VECTOR.normalize();
-
         if (moveVector.x != 0) {
             REUSABLE_3D_VECTOR.set(REUSABLE_FRONT_VECTOR);
             position.add(REUSABLE_3D_VECTOR.cross(REUSABLE_UP_VECTOR).normalize().mul(moveVector.x));
@@ -50,5 +44,20 @@ public class RPGCamera extends PerspectiveCamera implements Camera {
         if (positionChanged) {
             updateViewMatrix();
         }
+    }
+
+    @Override
+    public void forceUpdate() {
+        positionChanged = true;
+        viewMatrixChanged = true;
+        updateViewMatrix();
+    }
+
+    @Override
+    public void setRotation(Vector3f rotation) {
+        super.setRotation(rotation);
+        REUSABLE_FRONT_VECTOR.x = (float) (Math.cos(Math.toRadians(rotation.y)));
+        REUSABLE_FRONT_VECTOR.z = (float) (Math.sin(Math.toRadians(rotation.y)));
+        REUSABLE_FRONT_VECTOR.normalize();
     }
 }
