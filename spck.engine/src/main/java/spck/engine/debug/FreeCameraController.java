@@ -20,6 +20,7 @@ public class FreeCameraController {
     private static final float ACCELERATION = 3f;
     private static final float MOVE_SPEED = 1f;
     private static final float SCROLL_SPEED = 2f;
+    private static final Vector3f REUSABLE_VECTOR = new Vector3f();
 
     static {
         moveKeyMap.put(MoveDirection.LEFT, GLFW_KEY_A);
@@ -60,8 +61,9 @@ public class FreeCameraController {
 
         MessageBus.register(LifeCycle.UPDATE.eventID(), () -> {
             // TODO don't move if we are there
-            camera.getPosition().lerp(moveTarget, Time.deltaTime * ACCELERATION);
-            camera.forceUpdate();
+            REUSABLE_VECTOR.set(camera.getPosition());
+            REUSABLE_VECTOR.lerp(moveTarget, Time.deltaTime * ACCELERATION);
+            camera.setPosition(REUSABLE_VECTOR);
         });
     }
 

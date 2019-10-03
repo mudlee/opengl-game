@@ -13,8 +13,6 @@ public interface Camera {
 
     Rayf getRay();
 
-    void move(Vector3f moveVector);
-
     Vector3f getPosition();
 
     Vector3f getRotation();

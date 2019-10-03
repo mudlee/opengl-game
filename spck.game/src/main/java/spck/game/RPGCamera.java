@@ -23,30 +23,6 @@ public class RPGCamera extends PerspectiveCamera implements Camera {
     }
 
     @Override
-    public void move(Vector3f moveVector) {
-        if (moveVector.x != 0) {
-            REUSABLE_3D_VECTOR.set(REUSABLE_FRONT_VECTOR);
-            position.add(REUSABLE_3D_VECTOR.cross(REUSABLE_UP_VECTOR).normalize().mul(moveVector.x));
-            positionChanged = true;
-        }
-
-        if (moveVector.z != 0) {
-            REUSABLE_3D_VECTOR.set(REUSABLE_FRONT_VECTOR);
-            position.add(REUSABLE_3D_VECTOR.mul(moveVector.z));
-            positionChanged = true;
-        }
-
-        if (moveVector.y != 0) {
-            position.y += moveVector.y;
-            positionChanged = true;
-        }
-
-        if (positionChanged) {
-            updateViewMatrix();
-        }
-    }
-
-    @Override
     public void forceUpdate() {
         positionChanged = true;
         viewMatrixChanged = true;

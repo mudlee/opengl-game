@@ -18,7 +18,7 @@ public class AbstractCamera {
     // (due to how Eular angles work) so we initially rotate a bit to the left.
     protected final Vector3f rotation = new Vector3f(0, -90, 0);
     protected final Matrix4f projectionMatrix = new Matrix4f();
-    protected final Vector3f camFrontVector = new Vector3f(0, 0, -1);
+    protected final Vector3f camFrontVector = new Vector3f(0, 0, -1); // RIGHT HANDED
     protected boolean projectionMatrixChanged = true;
     protected boolean positionChanged = true;
     protected Runnable projectionMatrixUpdater;
@@ -53,29 +53,6 @@ public class AbstractCamera {
         viewMatrixChanged = true;
         projectionMatrixChanged = true;
         positionChanged = true;
-    }
-
-    public void move(Vector3f moveVector) {
-        if (moveVector.x != 0) {
-            REUSABLE_3D_VECTOR.set(camFrontVector);
-            position.add(REUSABLE_3D_VECTOR.cross(REUSABLE_UP_VECTOR).normalize().mul(moveVector.x));
-            positionChanged = true;
-        }
-
-        if (moveVector.z != 0) {
-            REUSABLE_3D_VECTOR.set(camFrontVector);
-            position.add(REUSABLE_3D_VECTOR.mul(moveVector.z));
-            positionChanged = true;
-        }
-
-        if (moveVector.y != 0) {
-            position.y += moveVector.y;
-            positionChanged = true;
-        }
-
-        if (positionChanged) {
-            updateViewMatrix();
-        }
     }
 
     public Vector3f getPosition() {

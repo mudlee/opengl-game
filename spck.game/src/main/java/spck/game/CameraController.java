@@ -19,14 +19,15 @@ public class CameraController {
     private static final float ACCELERATION = 3f;
     private static final float MOVE_SPEED = 1f;
     private static final float SCROLL_SPEED = 2f;
+    private static final Vector3f REUSABLE_VECTOR = new Vector3f();
+    // TODO dont forget
+    private static final Vector3f FIXED_FRONT_VECTOR = new Vector3f(0, 0, -1);
 
     static {
         moveKeyMap.put(MoveDirection.LEFT, GLFW_KEY_A);
         moveKeyMap.put(MoveDirection.RIGHT, GLFW_KEY_D);
         moveKeyMap.put(MoveDirection.FORWARD, GLFW_KEY_W);
         moveKeyMap.put(MoveDirection.BACKWARD, GLFW_KEY_S);
-        moveKeyMap.put(MoveDirection.UPWARD, GLFW_KEY_SPACE);
-        moveKeyMap.put(MoveDirection.DOWNWARD, GLFW_KEY_LEFT_CONTROL);
     }
 
     private final Camera camera;
@@ -52,12 +53,26 @@ public class CameraController {
 
         MessageBus.register(LifeCycle.UPDATE.eventID(), () -> {
             // TODO don't move if we are there
-            camera.getPosition().lerp(moveTarget, Time.deltaTime * ACCELERATION);
-            camera.forceUpdate();
+            REUSABLE_VECTOR.set(camera.getPosition());
+            REUSABLE_VECTOR.lerp(moveTarget, Time.deltaTime * ACCELERATION);
+            camera.setPosition(REUSABLE_VECTOR);
         });
     }
 
     private void move(MoveDirection direction) {
+        /*if (moveVector.x != 0) {
+            REUSABLE_3D_VECTOR.set(FIXED_FRONT_VECTOR);
+            position.add(REUSABLE_3D_VECTOR.cross(REUSABLE_UP_VECTOR).normalize().mul(moveVector.x));
+            positionChanged = true;
+        }
+
+        if (moveVector.z != 0) {
+            REUSABLE_3D_VECTOR.set(FIXED_FRONT_VECTOR);
+            position.add(REUSABLE_3D_VECTOR.mul(moveVector.z));
+            positionChanged = true;
+        }*/
+
+
         switch (direction) {
             case FORWARD:
                 moveTarget.set(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z + MOVE_SPEED);

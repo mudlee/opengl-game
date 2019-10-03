@@ -8,6 +8,7 @@ import spck.engine.bus.KeyEvent;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.DebugInputListener;
+import spck.engine.debug.FreeCameraController;
 import spck.engine.ecs.Entity;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.framework.Window;
@@ -16,13 +17,15 @@ import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.render.camera.Camera;
+import spck.engine.render.camera.PerspectiveCamera;
 
 import java.util.Random;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 
 public class Main {
-    private final static Camera CAMERA = new RPGCamera(60.0f, 01f, 10000f);
+    //private final static Camera CAMERA = new RPGCamera(60.0f, 01f, 10000f);
+    private final static Camera CAMERA = new PerspectiveCamera(60.0f, 01f, 10000f);
     private final static Window.Preferences WINDOW_PREFERENCES = new Window.Preferences(
             true,
             Antialiasing.ANTIALISING_2X,
@@ -48,9 +51,12 @@ public class Main {
         new DebugInputListener(CAMERA);
 
 
-        CAMERA.setPosition(new Vector3f(-3, 11, 3));
-        CAMERA.setRotation(new Vector3f(-50, -45, 0));
-        new CameraController(CAMERA);
+        //CAMERA.setPosition(new Vector3f(-3, 11, 3));
+        //CAMERA.setRotation(new Vector3f(-50, -45, 0));
+        CAMERA.setPosition(new Vector3f(-10, 5, 3));
+        CAMERA.setRotation(new Vector3f(0, 0, 0));
+        //new CameraController(CAMERA);
+        new FreeCameraController(CAMERA);
 
         LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.9f));
         LightSystem.addLight(new DirectionalLight(
