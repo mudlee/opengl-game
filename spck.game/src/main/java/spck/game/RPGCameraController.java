@@ -14,14 +14,13 @@ import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class CameraController {
+public class RPGCameraController {
     private static final Map<MoveDirection, Integer> moveKeyMap = new HashMap<>();
     private static final float ACCELERATION = 3f;
     private static final float MOVE_SPEED = 1f;
-    private static final float SCROLL_SPEED = 2f;
+    private static final float SCROLL_SPEED = 3f;
     private static final Vector3f REUSABLE_VECTOR = new Vector3f();
-    // TODO dont forget
-    private static final Vector3f FIXED_FRONT_VECTOR = new Vector3f(0, 0, -1);
+    private final Vector3f REUSABLE_UP_VECTOR = new Vector3f(0, 1, 0);
 
     static {
         moveKeyMap.put(MoveDirection.LEFT, GLFW_KEY_A);
@@ -33,7 +32,7 @@ public class CameraController {
     private final Camera camera;
     private final Vector3f moveTarget;
 
-    public CameraController(Camera camera) {
+    public RPGCameraController(Camera camera) {
         this.camera = camera;
         moveTarget = new Vector3f(camera.getPosition());
 
@@ -52,39 +51,33 @@ public class CameraController {
         });
 
         MessageBus.register(LifeCycle.UPDATE.eventID(), () -> {
-            // TODO don't move if we are there
-            REUSABLE_VECTOR.set(camera.getPosition());
-            REUSABLE_VECTOR.lerp(moveTarget, Time.deltaTime * ACCELERATION);
-            camera.setPosition(REUSABLE_VECTOR);
+            if (moveTarget.distance(camera.getPosition()) > 0.01f) {
+                REUSABLE_VECTOR.set(camera.getPosition());
+                REUSABLE_VECTOR.lerp(moveTarget, Time.deltaTime * ACCELERATION);
+                camera.setPosition(REUSABLE_VECTOR);
+            }
         });
     }
 
     private void move(MoveDirection direction) {
-        /*if (moveVector.x != 0) {
-            REUSABLE_3D_VECTOR.set(FIXED_FRONT_VECTOR);
-            position.add(REUSABLE_3D_VECTOR.cross(REUSABLE_UP_VECTOR).normalize().mul(moveVector.x));
-            positionChanged = true;
-        }
-
-        if (moveVector.z != 0) {
-            REUSABLE_3D_VECTOR.set(FIXED_FRONT_VECTOR);
-            position.add(REUSABLE_3D_VECTOR.mul(moveVector.z));
-            positionChanged = true;
-        }*/
-
-
         switch (direction) {
             case FORWARD:
-                moveTarget.set(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z + MOVE_SPEED);
+                REUSABLE_VECTOR.set(camera.getFrontVector());
+                REUSABLE_VECTOR.y = 0;
+                moveTarget.set(camera.getPosition()).add(REUSABLE_VECTOR.mul(MOVE_SPEED));
                 break;
             case BACKWARD:
-                moveTarget.set(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z - MOVE_SPEED);
+                REUSABLE_VECTOR.set(camera.getFrontVector());
+                REUSABLE_VECTOR.y = 0;
+                moveTarget.set(camera.getPosition()).add(REUSABLE_VECTOR.mul(-MOVE_SPEED));
                 break;
             case LEFT:
-                moveTarget.set(camera.getPosition().x - MOVE_SPEED, camera.getPosition().y, camera.getPosition().z);
+                REUSABLE_VECTOR.set(camera.getFrontVector());
+                moveTarget.set(camera.getPosition()).add(REUSABLE_VECTOR.cross(REUSABLE_UP_VECTOR).normalize().mul(-MOVE_SPEED));
                 break;
             case RIGHT:
-                moveTarget.set(camera.getPosition().x + MOVE_SPEED, camera.getPosition().y, camera.getPosition().z);
+                REUSABLE_VECTOR.set(camera.getFrontVector());
+                moveTarget.set(camera.getPosition()).add(REUSABLE_VECTOR.cross(REUSABLE_UP_VECTOR).normalize().mul(MOVE_SPEED));
                 break;
             case UPWARD:
                 moveTarget.set(camera.getPosition().x, camera.getPosition().y + SCROLL_SPEED, camera.getPosition().z);

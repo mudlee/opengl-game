@@ -11,6 +11,8 @@ public interface Camera {
 
     void forceUpdate();
 
+    Vector3f getFrontVector();
+
     Rayf getRay();
 
     Vector3f getPosition();

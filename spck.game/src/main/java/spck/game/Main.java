@@ -8,7 +8,6 @@ import spck.engine.bus.KeyEvent;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.DebugInputListener;
-import spck.engine.debug.FreeCameraController;
 import spck.engine.ecs.Entity;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.framework.Window;
@@ -53,10 +52,10 @@ public class Main {
 
         //CAMERA.setPosition(new Vector3f(-3, 11, 3));
         //CAMERA.setRotation(new Vector3f(-50, -45, 0));
-        CAMERA.setPosition(new Vector3f(-10, 5, 3));
-        CAMERA.setRotation(new Vector3f(0, 0, 0));
-        //new CameraController(CAMERA);
-        new FreeCameraController(CAMERA);
+        CAMERA.setPosition(new Vector3f(-3, 11, 3));
+        CAMERA.setRotation(new Vector3f(-50, 45, 0));
+        new RPGCameraController(CAMERA);
+        //new FreeCameraController(CAMERA);
 
         LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.9f));
         LightSystem.addLight(new DirectionalLight(
