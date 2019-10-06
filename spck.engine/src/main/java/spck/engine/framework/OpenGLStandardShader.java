@@ -10,6 +10,9 @@ import spck.engine.render.ShaderUniform;
 import spck.engine.render.camera.Camera;
 import spck.engine.util.KeyValueTool;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class OpenGLStandardShader extends AbstractShader implements Shader {
     private final static Logger LOGGER = LoggerFactory.getLogger(OpenGLStandardShader.class);
     private final static String vertexShader = "/shaders/standard/vertex.glsl";
@@ -48,30 +51,33 @@ public class OpenGLStandardShader extends AbstractShader implements Shader {
         createUniform(fragmentID, ShaderUniform.ILLUMINATION.AMBIENT_LIGHT_COLOR.getUniformName());
         createUniform(fragmentID, ShaderUniform.ILLUMINATION.AMBIENT_LIGHT_STRENGTH.getUniformName());
 
+        List<ShaderUniform.ILLUMINATION> uniforms = Arrays.asList(
+                ShaderUniform.ILLUMINATION.LIGHT_TYPE,
+                // directional
+                ShaderUniform.ILLUMINATION.LIGHT_DIRECTIONAL_COLOR,
+                ShaderUniform.ILLUMINATION.LIGHT_DIRECTIONAL_STRENGTH,
+                ShaderUniform.ILLUMINATION.LIGHT_DIRECTIONAL_DIRECTION,
+                // point
+                ShaderUniform.ILLUMINATION.LIGHT_POINT_COLOR,
+                ShaderUniform.ILLUMINATION.LIGHT_POINT_STRENGTH,
+                ShaderUniform.ILLUMINATION.LIGHT_POINT_POSITION,
+                ShaderUniform.ILLUMINATION.LIGHT_POINT_ATTENUATION_CONSTANT,
+                ShaderUniform.ILLUMINATION.LIGHT_POINT_ATTENUATION_LINEAR,
+                // spot
+                ShaderUniform.ILLUMINATION.LIGHT_SPOT_COLOR,
+                ShaderUniform.ILLUMINATION.LIGHT_SPOT_STRENGTH,
+                ShaderUniform.ILLUMINATION.LIGHT_SPOT_POSITION,
+                ShaderUniform.ILLUMINATION.LIGHT_SPOT_CONE_DIRECTION,
+                ShaderUniform.ILLUMINATION.LIGHT_SPOT_CUTOFF,
+                ShaderUniform.ILLUMINATION.LIGHT_SPOT_ATTENUATION_CONSTANT,
+                ShaderUniform.ILLUMINATION.LIGHT_SPOT_ATTENUATION_LINEAR,
+                ShaderUniform.ILLUMINATION.LIGHT_SPOT_ATTENUATION_QUADRATIC
+        );
+
         for (int i = 0; i < LightSystem.MAX_NUM_LIGHTS; i++) {
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_TYPE.getUniformName());
-            // directional
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_DIRECTIONAL_COLOR.getUniformName());
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_DIRECTIONAL_STRENGTH.getUniformName());
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_DIRECTIONAL_DIRECTION.getUniformName());
-
-            // point
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_POINT_COLOR.getUniformName());
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_POINT_STRENGTH.getUniformName());
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_POINT_POSITION.getUniformName());
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_POINT_ATTENUATION_CONSTANT.getUniformName());
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_POINT_ATTENUATION_LINEAR.getUniformName());
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_POINT_ATTENUATION_QUADRATIC.getUniformName());
-
-            // spot
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_SPOT_COLOR.getUniformName());
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_SPOT_STRENGTH.getUniformName());
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_SPOT_POSITION.getUniformName());
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_SPOT_CONE_DIRECTION.getUniformName());
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_SPOT_CUTOFF.getUniformName());
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_SPOT_ATTENUATION_CONSTANT.getUniformName());
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_SPOT_ATTENUATION_LINEAR.getUniformName());
-            createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + ShaderUniform.ILLUMINATION.LIGHT_SPOT_ATTENUATION_QUADRATIC.getUniformName());
+            for (ShaderUniform.ILLUMINATION uniform : uniforms) {
+                createUniform(fragmentID, ShaderUniform.ILLUMINATION.LIGHTS_ARRAY.getUniformName() + "[" + i + "]" + uniform.getUniformName());
+            }
         }
     }
 
