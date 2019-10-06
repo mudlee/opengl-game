@@ -26,6 +26,8 @@ public class PolygonShader extends AbstractShader implements Shader {
 
         createUniform(vertexID, ShaderUniform.CAMERA_PROJECTION_MATRIX);
         createUniform(vertexID, ShaderUniform.CAMERA_VIEW_MATRIX);
+        setUniform(vertexID, ShaderUniform.CAMERA_VIEW_MATRIX, camera.getViewMatrix());
+        setUniform(vertexID, ShaderUniform.CAMERA_PROJECTION_MATRIX, camera.getProjectionMatrix());
     }
 
     @Override
