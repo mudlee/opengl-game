@@ -63,7 +63,7 @@ public abstract class UICanvasRendererSystemCore extends BaseEntitySystem {
 
     private void updateScreenScaleFactorIfNeeded(UIElement component) {
         if (component.screenScaleFactor != Engine.window.getPreferences().getScreenScaleFactor()) {
-            component.updateScreenCoords(Engine.window.getPreferences().getScreenScaleFactor());
+            component.setScreenScaleFactor(Engine.window.getPreferences().getScreenScaleFactor());
         }
     }
 }

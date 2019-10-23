@@ -23,21 +23,16 @@ public abstract class UIElement {
         return position;
     }
 
-    public Vector2i getScreenOffset() {
-        return screenOffset;
-    }
-
     public Vector2f getScreenCoords() {
         return screenCoords;
     }
 
-    public int getScreenScaleFactor() {
-        return screenScaleFactor;
+    public void setScreenScaleFactor(int screenScaleFactor) {
+        this.screenScaleFactor = screenScaleFactor;
+        updateScreenCoords();
     }
 
-    void updateScreenCoords(int screenScaleFactor) {
-        this.screenScaleFactor = screenScaleFactor;
-
+    public void updateScreenCoords() {
         switch (position.getAlign()) {
             case TOP_LEFT:
                 screenCoords.x = position.getLeft();

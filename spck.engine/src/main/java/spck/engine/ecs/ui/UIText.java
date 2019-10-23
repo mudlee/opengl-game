@@ -20,7 +20,7 @@ public class UIText extends UIElement {
         uiText.text = text;
         uiText.position = position;
         uiText.screenOffset.set(0, (int) uiText.size);
-        uiText.updateScreenCoords(Engine.window.getPreferences().getScreenScaleFactor());
+        uiText.setScreenScaleFactor(Engine.window.getPreferences().getScreenScaleFactor());
         return uiText;
     }
 

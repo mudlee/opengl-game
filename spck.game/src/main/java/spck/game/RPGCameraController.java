@@ -17,7 +17,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class RPGCameraController {
     private static final Map<MoveDirection, Integer> moveKeyMap = new HashMap<>();
     private static final float ACCELERATION = 3f;
-    private static final float MOVE_SPEED = 1f;
+    private static final float MOVE_SPEED = 3f;
     private static final float SCROLL_SPEED = 3f;
     private static final Vector3f REUSABLE_VECTOR = new Vector3f();
     private final Vector3f REUSABLE_UP_VECTOR = new Vector3f(0, 1, 0);

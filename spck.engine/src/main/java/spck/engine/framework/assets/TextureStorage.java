@@ -3,11 +3,7 @@ package spck.engine.framework.assets;
 
 import org.lwjgl.opengl.GL41;
 import spck.engine.framework.GL;
-import spck.engine.render.textures.Texture;
-import spck.engine.render.textures.Texture2D;
-import spck.engine.render.textures.TextureCubeMap;
-import spck.engine.render.textures.TextureData;
-import spck.engine.render.textures.TextureRegistryID;
+import spck.engine.render.textures.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,7 +72,7 @@ public class TextureStorage {
         return texture;
     }
 
-    public static Texture2D loadFromTextureData(TextureData textureData, String file, String shaderSampler, TextureRegistryID textureRegistryID) {
+    public static Texture2D loadFromTextureData(TextureData textureData, String shaderSampler, TextureRegistryID textureRegistryID) {
         if (CACHE.containsKey(textureRegistryID)) {
             return (Texture2D) CACHE.get(textureRegistryID);
         }

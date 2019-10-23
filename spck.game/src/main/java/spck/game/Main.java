@@ -1,5 +1,6 @@
 package spck.game;
 
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import spck.engine.Antialiasing;
@@ -8,15 +9,16 @@ import spck.engine.bus.KeyEvent;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.DebugInputListener;
-import spck.engine.debug.FreeCameraController;
 import spck.engine.ecs.Entity;
 import spck.engine.ecs.render.components.RenderComponent;
+import spck.engine.ecs.ui.UICanvasScaler;
 import spck.engine.framework.Window;
 import spck.engine.lights.AmbientLight;
 import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.render.camera.Camera;
+import spck.game.cursor.CursorCanvasEntity;
 
 import java.util.Random;
 
@@ -53,9 +55,9 @@ public class Main {
         //CAMERA.setRotation(new Vector3f(-50, -45, 0));
         CAMERA.setPosition(new Vector3f(-3, 11, 3));
         CAMERA.setRotation(new Vector3f(-50, 45, 0));
-        //new RPGCameraController(CAMERA);
-        new FreeCameraController(CAMERA);
-        Engine.window.captureMouse();
+        new RPGCameraController(CAMERA);
+        //new FreeCameraController(CAMERA);
+        //
 
         LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.9f));
         LightSystem.addLight(new DirectionalLight(
@@ -75,6 +77,10 @@ public class Main {
 
         //Entity.create(new Terrain());
         //createCubes();
+
+        //Engine.window.captureMouse();
+        CursorCanvasEntity entity = new CursorCanvasEntity(UICanvasScaler.scaleWithPixel(new Vector2f(1024, 768), 0.5f));
+        Entity.create(entity);
     }
 
     private void createCubes() {

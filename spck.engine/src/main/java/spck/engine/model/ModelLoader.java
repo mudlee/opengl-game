@@ -177,7 +177,6 @@ public class ModelLoader {
             ByteBuffer buffer = ResourceLoader.loadToByteBuffer(textPath);
             Texture2D texture = (Texture2D) TextureRegistry.register(TextureStorage.loadFromTextureData(
                     TextureLoader.loadFromByteBuffer(buffer),
-                    textPath,
                     ShaderUniform.Material.DIFFUSE_TEXTURE_SAMPLER.getUniformName(),
                     new ModelTextureRegistryID(textPath)
             ));

@@ -2,6 +2,8 @@ package spck.engine.model;
 
 import spck.engine.render.textures.TextureRegistryID;
 
+import java.util.Objects;
+
 public class ModelTextureRegistryID implements TextureRegistryID {
     private final String texturePath;
 
@@ -16,7 +18,7 @@ public class ModelTextureRegistryID implements TextureRegistryID {
 
         ModelTextureRegistryID that = (ModelTextureRegistryID) o;
 
-        return texturePath != null ? texturePath.equals(that.texturePath) : that.texturePath == null;
+        return Objects.equals(texturePath, that.texturePath);
     }
 
     @Override

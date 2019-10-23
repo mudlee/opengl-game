@@ -74,8 +74,10 @@ public class UIRenderer {
 
         int width = (int) canvasScaler.apply(image.getWidth());
         int height = (int) canvasScaler.apply(image.getHeight());
-        float x = canvasScaler.apply(image.getScreenCoords().x);
-        float y = canvasScaler.apply(image.getScreenCoords().y);
+        //float x = canvasScaler.apply(image.getScreenCoords().x);
+        //float y = canvasScaler.apply(image.getScreenCoords().y);
+        float x = image.getScreenCoords().x;
+        float y = image.getScreenCoords().y;
 
         int imageID = nvglCreateImageFromHandle(pointer, image.getTextureId(), width, height, 0);
         NVGPaint paint = NVGPaint.create();
