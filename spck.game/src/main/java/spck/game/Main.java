@@ -16,7 +16,7 @@ import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.render.camera.Camera;
-import spck.game.cursor.CursorCanvasEntity;
+import spck.game.cursor.CursorEntity;
 
 import java.util.Random;
 
@@ -38,8 +38,8 @@ public class Main {
     }
 
     private void run() {
-        //WINDOW_PREFERENCES.setWidth(2560);
-        //WINDOW_PREFERENCES.setHeight(1440);
+        WINDOW_PREFERENCES.setWidth(2560);
+        WINDOW_PREFERENCES.setHeight(1440);
         Engine engine = new Engine(CAMERA, WINDOW_PREFERENCES);
         MessageBus.register(LifeCycle.GAME_START.eventID(), this::start);
 
@@ -77,8 +77,8 @@ public class Main {
         //Entity.create(new Terrain());
         //createCubes();
 
-        //Engine.window.captureMouse();
-        CursorCanvasEntity entity = new CursorCanvasEntity();
+        //
+        CursorEntity entity = new CursorEntity();
         Entity.create(entity);
     }
 

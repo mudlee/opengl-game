@@ -28,7 +28,7 @@ public class Window {
         private final boolean fullscreenEnabled;
         private final boolean limitFPS;
         private String title = "SPCK";
-        private Integer screenScaleFactor;
+        private Integer devicePixelRatio;
         private int width = 1280;
         private int height = 720;
 
@@ -51,8 +51,8 @@ public class Window {
             this.height = height;
         }
 
-        public void setScreenScaleFactor(int screenScaleFactor) {
-            this.screenScaleFactor = screenScaleFactor;
+        public void setDevicePixelRatio(int devicePixelRatio) {
+            this.devicePixelRatio = devicePixelRatio;
         }
 
         public boolean isvSyncEnabled() {
@@ -71,8 +71,8 @@ public class Window {
             return title;
         }
 
-        public Optional<Integer> getScreenScaleFactor() {
-            return Optional.ofNullable(screenScaleFactor);
+        public Optional<Integer> getDevicePixelRatio() {
+            return Optional.ofNullable(devicePixelRatio);
         }
 
         public int getWidth() {
@@ -94,7 +94,7 @@ public class Window {
                     ", antialiasing=" + antialiasing +
                     ", fullscreenEnabled=" + fullscreenEnabled +
                     ", title='" + title + '\'' +
-                    ", screenScaleFactor=" + screenScaleFactor +
+                    ", devicePixelRatio=" + devicePixelRatio +
                     ", width=" + width +
                     ", height=" + height +
                     '}';
@@ -251,7 +251,7 @@ public class Window {
         calculateScreenScaleFactor();
         GL.createCapabilities();
 
-        int screenScaleFactor = preferences.getScreenScaleFactor().orElseThrow();
+        int screenScaleFactor = preferences.getDevicePixelRatio().orElseThrow();
 
         // window resize setup
         preferences.setWidth((preferences.fullscreenEnabled ? vidMode.width() : preferences.getWidth()) * screenScaleFactor);
@@ -292,7 +292,7 @@ public class Window {
         if (resized) {
             glViewport(0, 0, preferences.getWidth(), preferences.getHeight());
             resized = false;
-            LOGGER.debug("Window resized to {}x{}, scale factor {}", preferences.getWidth(), preferences.getHeight(), preferences.getScreenScaleFactor());
+            LOGGER.debug("Window resized to {}x{}, scale factor {}", preferences.getWidth(), preferences.getHeight(), preferences.getDevicePixelRatio());
         }
     }
 
@@ -313,6 +313,19 @@ public class Window {
     }
 
     private void calculateScreenScaleFactor() {
+        // https://en.wikipedia.org/wiki/4K_resolution
+        int uhdMinWidth = 3840;
+        int uhdMinHeight = 1716;
+        boolean UHD = vidMode.width() >= uhdMinWidth && vidMode.height() >= uhdMinHeight;
+        LOGGER.debug("Screen is {}x{}, UHD: {}", vidMode.width(), vidMode.height(), UHD);
+
+        // Check if the monitor is 4K
+        if (UHD) {
+            preferences.setDevicePixelRatio(2);
+            LOGGER.debug("Device pixel ratio has been set to: {}", preferences.getDevicePixelRatio().get());
+            return;
+        }
+
         IntBuffer widthScreenCoordBuf = MemoryUtil.memAllocInt(1);
         IntBuffer heightScreenCoordBuf = MemoryUtil.memAllocInt(1);
         IntBuffer widthPixelsBuf = MemoryUtil.memAllocInt(1);
@@ -321,8 +334,8 @@ public class Window {
         glfwGetWindowSize(ID, widthScreenCoordBuf, heightScreenCoordBuf);
         glfwGetFramebufferSize(ID, widthPixelsBuf, heightPixelsBuf);
 
-        preferences.setScreenScaleFactor((int) Math.floor(widthPixelsBuf.get() / widthScreenCoordBuf.get()));
-        LOGGER.debug("Screen scale factor has been set to: {}", preferences.getScreenScaleFactor());
+        preferences.setDevicePixelRatio((int) Math.floor(widthPixelsBuf.get() / widthScreenCoordBuf.get()));
+        LOGGER.debug("Device pixel ratio has been set to: {}", preferences.getDevicePixelRatio().get());
 
         MemoryUtil.memFree(widthScreenCoordBuf);
         MemoryUtil.memFree(heightScreenCoordBuf);

@@ -94,7 +94,7 @@ public class UIRenderer {
             nvgFontFace(pointer, text.getFont());
         }
 
-        float textSize = text.getSize();
+        int textSize = text.getSize();
         float x = text.getScreenCoords().x;
         float y = text.getScreenCoords().y;
 

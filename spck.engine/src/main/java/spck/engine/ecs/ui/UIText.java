@@ -7,7 +7,7 @@ import spck.engine.ui.UIObjectPosition;
 
 public class UIText extends UIElement {
     private String text;
-    private float size = 15;
+    private int size = 15;
     private RGBAColor color = RGBAColor.white();
     private String font = Engine.preferences.defaultFont;
     private int align = UIRenderer.Align.LEFT.getValue() | UIRenderer.Align.TOP.getValue();
@@ -19,14 +19,14 @@ public class UIText extends UIElement {
         UIText uiText = new UIText();
         uiText.text = text;
         uiText.position = position;
-        uiText.screenOffset.set(0, (int) uiText.size * Engine.window.getPreferences().getScreenScaleFactor().orElseThrow());
-        uiText.size *= Engine.window.getPreferences().getScreenScaleFactor().orElseThrow();
+        uiText.screenOffset.set(0, (int) uiText.size);
+        uiText.size *= Engine.window.getPreferences().getDevicePixelRatio().orElseThrow();
         uiText.updateScreenCoords();
         return uiText;
     }
 
-    public UIText size(float size) {
-        this.size = size * Engine.window.getPreferences().getScreenScaleFactor().orElseThrow();
+    public UIText size(int size) {
+        this.size = size * Engine.window.getPreferences().getDevicePixelRatio().orElseThrow();
         return this;
     }
 
@@ -59,7 +59,7 @@ public class UIText extends UIElement {
         return text;
     }
 
-    public float getSize() {
+    public int getSize() {
         return size;
     }
 

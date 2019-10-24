@@ -60,7 +60,7 @@ public abstract class UIElement {
                 break;
         }
 
-        screenCoords.x *= Engine.window.getPreferences().getScreenScaleFactor().orElseThrow();
-        screenCoords.y *= Engine.window.getPreferences().getScreenScaleFactor().orElseThrow();
+        screenCoords.x *= Engine.window.getPreferences().getDevicePixelRatio().orElseThrow();
+        screenCoords.y *= Engine.window.getPreferences().getDevicePixelRatio().orElseThrow();
     }
 }

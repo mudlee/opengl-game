@@ -1,5 +1,6 @@
 package spck.game.cursor;
 
+import spck.engine.Engine;
 import spck.engine.bus.MessageBus;
 import spck.engine.bus.MouseEvent;
 import spck.engine.ecs.ui.UICanvasEntity;
@@ -9,7 +10,7 @@ import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureRegistry;
 import spck.engine.render.textures.TextureRegistryID;
 
-public class CursorCanvasEntity extends UICanvasEntity {
+public class CursorEntity extends UICanvasEntity {
     private enum CursorTextureRegistryID implements TextureRegistryID {
         CURSOR
     }
@@ -17,6 +18,8 @@ public class CursorCanvasEntity extends UICanvasEntity {
     @Override
     public void onEntityCreated() {
         super.onEntityCreated();
+
+        Engine.window.captureMouse();
 
         Texture2D texture2D = TextureStorage.loadFromResource("/textures/pointer.png", CursorTextureRegistryID.CURSOR);
         TextureRegistry.register(texture2D);

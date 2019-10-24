@@ -40,7 +40,7 @@ public abstract class UICanvasRendererSystemCore extends BaseEntitySystem {
         uiRenderer.beginFrame(
                 Engine.window.getPreferences().getWidth(),
                 Engine.window.getPreferences().getHeight(),
-                Engine.window.getPreferences().getScreenScaleFactor().orElseThrow()
+                Engine.window.getPreferences().getDevicePixelRatio().orElseThrow()
         );
 
         for (int i = 0, s = actives.size(); s > i; i++) {
