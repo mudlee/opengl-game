@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class MessageBus<T> {
+public class MessageBus {
     private static final List<Consumer> CONSUMER_EMPTY_LIST = new ArrayList<>();
     private static final List<Runnable> RUNNABLE_EMPTY_LIST = new ArrayList<>();
     private static final Map<String, List<Consumer>> consumers = new HashMap<>();

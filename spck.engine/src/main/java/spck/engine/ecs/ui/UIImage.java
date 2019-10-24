@@ -13,9 +13,8 @@ public class UIImage extends UIElement {
     public static UIImage build(int textureId, int width, int height) {
         UIImage image = new UIImage();
         image.textureId = textureId;
-        image.width = width;
-        image.height = height;
-        image.setScreenScaleFactor(Engine.window.getPreferences().getScreenScaleFactor());
+        image.width = width * Engine.window.getPreferences().getScreenScaleFactor().orElseThrow();
+        image.height = height * Engine.window.getPreferences().getScreenScaleFactor().orElseThrow();
         return image;
     }
 

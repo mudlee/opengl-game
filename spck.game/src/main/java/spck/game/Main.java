@@ -1,6 +1,5 @@
 package spck.game;
 
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import spck.engine.Antialiasing;
@@ -11,7 +10,6 @@ import spck.engine.bus.MessageBus;
 import spck.engine.debug.DebugInputListener;
 import spck.engine.ecs.Entity;
 import spck.engine.ecs.render.components.RenderComponent;
-import spck.engine.ecs.ui.UICanvasScaler;
 import spck.engine.framework.Window;
 import spck.engine.lights.AmbientLight;
 import spck.engine.lights.DirectionalLight;
@@ -30,7 +28,8 @@ public class Main {
             true,
             Antialiasing.ANTIALISING_2X,
             false,
-            false);
+            false
+    );
     private static final int CUBES = 10000;
     private Cube[] cubes = new Cube[CUBES];
 
@@ -39,8 +38,8 @@ public class Main {
     }
 
     private void run() {
-        WINDOW_PREFERENCES.setWidth(2560);
-        WINDOW_PREFERENCES.setHeight(1440);
+        //WINDOW_PREFERENCES.setWidth(2560);
+        //WINDOW_PREFERENCES.setHeight(1440);
         Engine engine = new Engine(CAMERA, WINDOW_PREFERENCES);
         MessageBus.register(LifeCycle.GAME_START.eventID(), this::start);
 
@@ -79,7 +78,7 @@ public class Main {
         //createCubes();
 
         //Engine.window.captureMouse();
-        CursorCanvasEntity entity = new CursorCanvasEntity(UICanvasScaler.scaleWithPixel(new Vector2f(1024, 768), 0.5f));
+        CursorCanvasEntity entity = new CursorCanvasEntity();
         Entity.create(entity);
     }
 

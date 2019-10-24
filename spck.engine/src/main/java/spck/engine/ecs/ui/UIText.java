@@ -19,13 +19,14 @@ public class UIText extends UIElement {
         UIText uiText = new UIText();
         uiText.text = text;
         uiText.position = position;
-        uiText.screenOffset.set(0, (int) uiText.size);
-        uiText.setScreenScaleFactor(Engine.window.getPreferences().getScreenScaleFactor());
+        uiText.screenOffset.set(0, (int) uiText.size * Engine.window.getPreferences().getScreenScaleFactor().orElseThrow());
+        uiText.size *= Engine.window.getPreferences().getScreenScaleFactor().orElseThrow();
+        uiText.updateScreenCoords();
         return uiText;
     }
 
     public UIText size(float size) {
-        this.size = size;
+        this.size = size * Engine.window.getPreferences().getScreenScaleFactor().orElseThrow();
         return this;
     }
 

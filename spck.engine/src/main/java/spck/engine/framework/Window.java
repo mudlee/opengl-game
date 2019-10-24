@@ -14,6 +14,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -27,7 +28,7 @@ public class Window {
         private final boolean fullscreenEnabled;
         private final boolean limitFPS;
         private String title = "SPCK";
-        private int screenScaleFactor = 1;
+        private Integer screenScaleFactor;
         private int width = 1280;
         private int height = 720;
 
@@ -70,8 +71,8 @@ public class Window {
             return title;
         }
 
-        public int getScreenScaleFactor() {
-            return screenScaleFactor;
+        public Optional<Integer> getScreenScaleFactor() {
+            return Optional.ofNullable(screenScaleFactor);
         }
 
         public int getWidth() {
@@ -250,9 +251,11 @@ public class Window {
         calculateScreenScaleFactor();
         GL.createCapabilities();
 
+        int screenScaleFactor = preferences.getScreenScaleFactor().orElseThrow();
+
         // window resize setup
-        preferences.setWidth((preferences.fullscreenEnabled ? vidMode.width() : preferences.getWidth()) * preferences.getScreenScaleFactor());
-        preferences.setHeight((preferences.fullscreenEnabled ? vidMode.height() : preferences.getHeight()) * preferences.getScreenScaleFactor());
+        preferences.setWidth((preferences.fullscreenEnabled ? vidMode.width() : preferences.getWidth()) * screenScaleFactor);
+        preferences.setHeight((preferences.fullscreenEnabled ? vidMode.height() : preferences.getHeight()) * screenScaleFactor);
 
         // misc
         // NOTE: UI might touch the state, use UI.restoreGLState to restore state

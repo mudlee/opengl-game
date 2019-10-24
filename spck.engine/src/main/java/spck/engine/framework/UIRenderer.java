@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
-import spck.engine.ecs.ui.UICanvasScaler;
 import spck.engine.ecs.ui.UIImage;
 import spck.engine.ecs.ui.UIText;
 import spck.engine.util.ResourceLoader;
@@ -69,13 +68,11 @@ public class UIRenderer {
         restoreGLState();
     }
 
-    public void renderImage(UIImage image, UICanvasScaler canvasScaler) {
+    public void renderImage(UIImage image) {
         checkIfInitialised();
 
-        int width = (int) canvasScaler.apply(image.getWidth());
-        int height = (int) canvasScaler.apply(image.getHeight());
-        //float x = canvasScaler.apply(image.getScreenCoords().x);
-        //float y = canvasScaler.apply(image.getScreenCoords().y);
+        int width = image.getWidth();
+        int height = image.getHeight();
         float x = image.getScreenCoords().x;
         float y = image.getScreenCoords().y;
 
@@ -88,7 +85,7 @@ public class UIRenderer {
         nvgFill(pointer);
     }
 
-    public void renderText(UIText text, UICanvasScaler canvasScaler) {
+    public void renderText(UIText text) {
         checkIfInitialised();
 
         // setting fontFace is a slow operation, so we suppose that all the texts are using the default font
@@ -97,10 +94,14 @@ public class UIRenderer {
             nvgFontFace(pointer, text.getFont());
         }
 
-        nvgFontSize(pointer, canvasScaler.apply(text.getSize()));
+        float textSize = text.getSize();
+        float x = text.getScreenCoords().x;
+        float y = text.getScreenCoords().y;
+
+        nvgFontSize(pointer, textSize);
         nvgTextAlign(pointer, text.getAlign());
         nvgFillColor(pointer, text.getColor().getColor());
-        nvgText(pointer, canvasScaler.apply(text.getScreenCoords().x), canvasScaler.apply(text.getScreenCoords().y), text.getText());
+        nvgText(pointer, x, y, text.getText());
 
         if (!text.getFont().equals(defaultFont)) {
             nvgFontFace(pointer, defaultFont);

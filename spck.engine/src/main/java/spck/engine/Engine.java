@@ -8,8 +8,8 @@ import spck.engine.bus.MessageBus;
 import spck.engine.debug.Measure;
 import spck.engine.ecs.ECS;
 import spck.engine.ecs.EntityBatchStore;
-import spck.engine.ecs.debug.StatUIEntitiesBuilder;
 import spck.engine.ecs.debug.StatUITextSystem;
+import spck.engine.ecs.debug.StatusUI;
 import spck.engine.ecs.debug.StatusUICanvasRendererSystem;
 import spck.engine.ecs.render.PreRenderSystem;
 import spck.engine.ecs.render.RenderSystem;
@@ -67,6 +67,7 @@ public class Engine implements Runnable{
         this.GAME_LOOP_THREAD=new Thread(this,"GAME_LOOP_THREAD");
 
         window = new Window(windowPreferences);
+        new StatusUI();
         LOGGER.debug("Window preferences: {}", window.getPreferences());
 
         EntityBatchStore batchStore = new EntityBatchStore();
@@ -79,8 +80,6 @@ public class Engine implements Runnable{
                 new UICanvasRendererSystem(uiRenderer),
                 new StatusUICanvasRendererSystem(uiRenderer)
         ));
-
-        new StatUIEntitiesBuilder().build();
 
         gameLoop = new GameLoop(window);
     }

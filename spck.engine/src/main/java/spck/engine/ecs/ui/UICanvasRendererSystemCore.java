@@ -37,19 +37,21 @@ public abstract class UICanvasRendererSystemCore extends BaseEntitySystem {
             Graphics.setPolygonMode(Graphics.PolygonMode.FILL);
         }
 
-        uiRenderer.beginFrame(Engine.window.getPreferences().getWidth(), Engine.window.getPreferences().getHeight(), Engine.window.getPreferences().getScreenScaleFactor());
+        uiRenderer.beginFrame(
+                Engine.window.getPreferences().getWidth(),
+                Engine.window.getPreferences().getHeight(),
+                Engine.window.getPreferences().getScreenScaleFactor().orElseThrow()
+        );
 
         for (int i = 0, s = actives.size(); s > i; i++) {
             if (canvasComponents.has(ids[i])) {
                 UICanvasComponent canvas = canvasComponents.get(ids[i]);
                 for (UIText text : canvas.getTexts()) {
-                    updateScreenScaleFactorIfNeeded(text);
-                    uiRenderer.renderText(text, canvas.getCanvasScaler());
+                    uiRenderer.renderText(text);
                 }
 
                 for (UIImage image : canvas.getImages()) {
-                    updateScreenScaleFactorIfNeeded(image);
-                    uiRenderer.renderImage(image, canvas.getCanvasScaler());
+                    uiRenderer.renderImage(image);
                 }
             }
         }
@@ -58,12 +60,6 @@ public abstract class UICanvasRendererSystemCore extends BaseEntitySystem {
 
         if (Engine.preferences.polygonRenderMode) {
             Graphics.setPolygonMode(Graphics.PolygonMode.LINE);
-        }
-    }
-
-    private void updateScreenScaleFactorIfNeeded(UIElement component) {
-        if (component.screenScaleFactor != Engine.window.getPreferences().getScreenScaleFactor()) {
-            component.setScreenScaleFactor(Engine.window.getPreferences().getScreenScaleFactor());
         }
     }
 }
