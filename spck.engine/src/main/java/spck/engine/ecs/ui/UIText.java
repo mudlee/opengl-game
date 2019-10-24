@@ -19,7 +19,7 @@ public class UIText extends UIElement {
         UIText uiText = new UIText();
         uiText.text = text;
         uiText.position = position;
-        uiText.screenOffset.set(0, (int) uiText.size);
+        uiText.screenOffset.set(0, uiText.size);
         uiText.size *= Engine.window.getPreferences().getDevicePixelRatio().orElseThrow();
         uiText.updateScreenCoords();
         return uiText;
