@@ -7,7 +7,7 @@ import spck.engine.ui.UIObjectPosition;
 
 public class UIText extends UIElement {
     private String text;
-    private int size = 15;
+    private int size = 30;
     private RGBAColor color = RGBAColor.white();
     private String font = Engine.preferences.defaultFont;
     private int align = UIRenderer.Align.LEFT.getValue() | UIRenderer.Align.TOP.getValue();
