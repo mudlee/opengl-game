@@ -14,7 +14,6 @@ public class MouseEvent {
     private boolean mouseFirstMove = true;
 
     // SCROLL
-    private final Vector2d mouseScroll = new Vector2d().zero();
     private final Vector2d mouseScrollOffsetVector = new Vector2d().zero();
 
     public void calculateMovement(double xOffset, double yOffset) {

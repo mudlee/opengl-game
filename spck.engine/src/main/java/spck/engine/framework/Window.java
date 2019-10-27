@@ -1,5 +1,6 @@
 package spck.engine.framework;
 
+import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
@@ -10,6 +11,7 @@ import spck.engine.Antialiasing;
 import spck.engine.Engine;
 import spck.engine.bus.*;
 
+import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -251,11 +253,9 @@ public class Window {
         calculateScreenScaleFactor();
         GL.createCapabilities();
 
-        int screenScaleFactor = preferences.getDevicePixelRatio().orElseThrow();
-
         // window resize setup
-        preferences.setWidth((preferences.fullscreenEnabled ? vidMode.width() : preferences.getWidth()) * screenScaleFactor);
-        preferences.setHeight((preferences.fullscreenEnabled ? vidMode.height() : preferences.getHeight()) * screenScaleFactor);
+        preferences.setWidth((preferences.fullscreenEnabled ? vidMode.width() : preferences.getWidth()));
+        preferences.setHeight((preferences.fullscreenEnabled ? vidMode.height() : preferences.getHeight()));
 
         // misc
         // NOTE: UI might touch the state, use UI.restoreGLState to restore state
@@ -272,6 +272,16 @@ public class Window {
         MessageBus.register(KeyEvent.pressed(GLFW_KEY_Q), (event) -> {
             glfwSetWindowShouldClose(ID, true);
         });
+    }
+
+    public Vector2d getMousePosition() {
+        DoubleBuffer x = MemoryUtil.memAllocDouble(1);
+        DoubleBuffer y = MemoryUtil.memAllocDouble(1);
+        glfwGetCursorPos(ID, x, y);
+        Vector2d pos = new Vector2d(x.get(), y.get());
+        MemoryUtil.memFree(x);
+        MemoryUtil.memFree(y);
+        return pos;
     }
 
     public void captureMouse() {

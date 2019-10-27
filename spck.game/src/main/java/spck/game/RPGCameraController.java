@@ -1,26 +1,39 @@
 package spck.game;
 
+import org.joml.Vector2d;
 import org.joml.Vector3f;
+import spck.engine.Engine;
 import spck.engine.MoveDirection;
 import spck.engine.Time;
 import spck.engine.bus.KeyEvent;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.bus.MouseEvent;
+import spck.engine.ecs.ui.UICanvasEntity;
+import spck.engine.ecs.ui.UIImage;
+import spck.engine.framework.assets.TextureStorage;
 import spck.engine.render.camera.Camera;
+import spck.engine.render.textures.Texture2D;
+import spck.engine.render.textures.TextureRegistry;
+import spck.engine.render.textures.TextureRegistryID;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class RPGCameraController {
+public class RPGCameraController extends UICanvasEntity {
     private static final Map<MoveDirection, Integer> moveKeyMap = new HashMap<>();
     private static final float ACCELERATION = 3f;
     private static final float MOVE_SPEED = 3f;
     private static final float SCROLL_SPEED = 3f;
     private static final Vector3f REUSABLE_VECTOR = new Vector3f();
+    private static final double MOUSE_SENSITIVITY = 30f;
     private final Vector3f REUSABLE_UP_VECTOR = new Vector3f(0, 1, 0);
+
+    private enum CursorTextureRegistryID implements TextureRegistryID {
+        CURSOR
+    }
 
     static {
         moveKeyMap.put(MoveDirection.LEFT, GLFW_KEY_A);
@@ -56,6 +69,50 @@ public class RPGCameraController {
                 REUSABLE_VECTOR.lerp(moveTarget, Time.deltaTime * ACCELERATION);
                 camera.setPosition(REUSABLE_VECTOR);
             }
+        });
+
+        MessageBus.register(MouseEvent.MOVE, event -> {
+
+        });
+    }
+
+    @Override
+    public void onEntityCreated() {
+        super.onEntityCreated();
+
+        Engine.window.captureMouse();
+
+        Texture2D texture2D = TextureStorage.loadFromResource("/textures/pointer.png", CursorTextureRegistryID.CURSOR);
+        TextureRegistry.register(texture2D);
+        UIImage image = UIImage.build(texture2D.getId(), 30, 30);
+        canvasComponent.addImage(image);
+
+        Vector2d mousePos = Engine.window.getMousePosition();
+        image.setPosition((int) mousePos.x, (int) mousePos.y);
+
+        MessageBus.register(MouseEvent.MOVE, event -> {
+            MouseEvent m = (MouseEvent) event;
+
+            int newX = (int) ((double) image.getPosition().get().x + m.getMouseMoveOffsetVector().x * MOUSE_SENSITIVITY);
+            int newY = (int) ((double) image.getPosition().get().y - m.getMouseMoveOffsetVector().y * MOUSE_SENSITIVITY);
+
+            if (newX < 0) {
+                newX = image.getPosition().get().x;
+                move(MoveDirection.LEFT);
+            } else if (newX > (Engine.window.getPreferences().getWidth() - 50)) {
+                newX = image.getPosition().get().x;
+                move(MoveDirection.RIGHT);
+            }
+
+            if (newY < 0) {
+                newY = image.getPosition().get().y;
+                move(MoveDirection.FORWARD);
+            } else if (newY > (Engine.window.getPreferences().getHeight() - 50)) {
+                newY = image.getPosition().get().y;
+                move(MoveDirection.BACKWARD);
+            }
+
+            image.setPosition(newX, newY);
         });
     }
 

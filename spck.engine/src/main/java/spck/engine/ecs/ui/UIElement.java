@@ -59,8 +59,5 @@ public abstract class UIElement {
                 screenCoords.y = (float) Engine.window.getPreferences().getHeight() / 2 - (float) screenOffset.y / 2;
                 break;
         }
-
-        screenCoords.x *= Engine.window.getPreferences().getDevicePixelRatio().orElseThrow();
-        screenCoords.y *= Engine.window.getPreferences().getDevicePixelRatio().orElseThrow();
     }
 }
