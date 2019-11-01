@@ -1,9 +1,11 @@
 package spck.game;
 
+import org.joml.Vector2d;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import spck.engine.Antialiasing;
 import spck.engine.Engine;
+import spck.engine.Input.Input;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.DebugInputListener;
@@ -23,8 +25,6 @@ public class Main {
             false,
             false
     );
-    private static final int CUBES = 10000;
-
     public static void main(String[] args) {
         new Main().run();
     }
@@ -41,9 +41,12 @@ public class Main {
     private void start() {
         new DebugInputListener(CAMERA);
 
-
         CAMERA.setPosition(new Vector3f(-3, 11, 3));
         CAMERA.setRotation(new Vector3f(-50, 45, 0));
+        Input.setMousePosition(new Vector2d(
+                (double) Engine.window.getPreferences().getWidth() / 2,
+                (double) Engine.window.getPreferences().getHeight() / 2
+        ));
         Entity.create(new RPGCameraController(CAMERA));
 
         LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.9f));

@@ -2,9 +2,12 @@ package spck.engine.Input;
 
 import org.joml.Vector2d;
 import org.lwjgl.glfw.*;
+import org.lwjgl.system.MemoryUtil;
+import spck.engine.Engine;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 
+import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +42,10 @@ public class Input {
     private static final KeyEvent keyHeldDownEvent = new KeyEvent();
     private static final KeyEvent keyPressedEvent = new KeyEvent();
     private static final KeyEvent keyReleasedEvent = new KeyEvent();
-
+    // MOUSE CURSOR POSITION
+    private static DoubleBuffer mouseCursorPositionX = MemoryUtil.memAllocDouble(1);
+    private static DoubleBuffer mouseCursorPositionY = MemoryUtil.memAllocDouble(1);
+    private static final Vector2d mouseCursorPosition = new Vector2d();
 
     public static void initialize() {
         MessageBus.register(LifeCycle.UPDATE.eventID(), () -> {
@@ -65,6 +71,26 @@ public class Input {
                 }
             }
         });
+        MessageBus.register(LifeCycle.CLEANUP.eventID(), () -> {
+            MemoryUtil.memFree(mouseCursorPositionX);
+            MemoryUtil.memFree(mouseCursorPositionY);
+        });
+    }
+
+    public static void setMousePosition(Vector2d position) {
+        glfwSetCursorPos(Engine.window.getID(), position.x, position.y);
+        mouseCursorPosition.set(position.x, position.y);
+    }
+
+    public static Vector2d getMousePosition() {
+        mouseCursorPositionX.clear();
+        mouseCursorPositionY.clear();
+        glfwGetCursorPos(Engine.window.getID(), mouseCursorPositionX, mouseCursorPositionY);
+        mouseCursorPosition.set(
+                mouseCursorPositionX.get(),
+                mouseCursorPositionY.get()
+        );
+        return mouseCursorPosition;
     }
 
     public static void onMouseMove(Consumer<MouseMoveEvent> handler) {
@@ -183,20 +209,20 @@ public class Input {
         };
     }
 
-    private static void calculateMovement(double xOffset, double yOffset) {
-        mouseMoveEvent.position.set(xOffset, yOffset);
+    private static void calculateMovement(double x, double y) {
+        mouseMoveEvent.position.set(x, y);
 
         if (mouseFirstMove) {
-            previousMousePosition.set(xOffset, yOffset);
+            previousMousePosition.set(x, y);
             mouseFirstMove = false;
         }
 
         mouseMoveEvent.offset.set(
-                xOffset - previousMousePosition.x,
-                previousMousePosition.y - yOffset // Reversed since y-coordinates range from bottom to top
+                x - previousMousePosition.x,
+                previousMousePosition.y - y // Reversed since y-coordinates range from bottom to top
         );
 
-        previousMousePosition.set(xOffset, yOffset);
+        previousMousePosition.set(x, y);
         mouseMoveEvent.offset.mul(MOVE_SENSITIVITY);
     }
 }

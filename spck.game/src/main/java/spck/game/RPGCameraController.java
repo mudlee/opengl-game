@@ -80,7 +80,7 @@ public class RPGCameraController extends UICanvasEntity {
         UIImage image = UIImage.build(texture2D.getId(), 30, 30);
         canvasComponent.addImage(image);
 
-        Vector2d mousePos = Engine.window.getMousePosition();
+        Vector2d mousePos = Input.getMousePosition();
         image.setPosition((int) mousePos.x, (int) mousePos.y);
 
         Input.onMouseMove(event -> {

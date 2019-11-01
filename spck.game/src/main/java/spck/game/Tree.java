@@ -20,7 +20,7 @@ public class Tree extends Entity {
         component.transform = new Transform();
 
         Input.onMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT, event -> {
-            System.out.println(Math.random());
+            System.out.println(Input.getMousePosition().x);
         });
     }
 }
