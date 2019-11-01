@@ -3,12 +3,11 @@ package spck.game;
 import org.joml.Vector2d;
 import org.joml.Vector3f;
 import spck.engine.Engine;
+import spck.engine.Input.Input;
 import spck.engine.MoveDirection;
 import spck.engine.Time;
-import spck.engine.bus.KeyEvent;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
-import spck.engine.bus.MouseEvent;
 import spck.engine.ecs.ui.UICanvasEntity;
 import spck.engine.ecs.ui.UIImage;
 import spck.engine.framework.assets.TextureStorage;
@@ -50,13 +49,11 @@ public class RPGCameraController extends UICanvasEntity {
         moveTarget = new Vector3f(camera.getPosition());
 
         for (Map.Entry<MoveDirection, Integer> entry : moveKeyMap.entrySet()) {
-            MessageBus.register(KeyEvent.keyHeldDown(entry.getValue()), () -> {
-                move(entry.getKey());
-            });
+            Input.onKeyHeldDown(entry.getValue(), event -> move(entry.getKey()));
         }
 
-        MessageBus.register(MouseEvent.SCROLL, event -> {
-            if (((MouseEvent) event).getMouseScrollOffsetVector().y > 0) {
+        Input.onMouseScroll(event -> {
+            if (event.offset.y > 0) {
                 move(MoveDirection.UPWARD);
             } else {
                 move(MoveDirection.DOWNWARD);
@@ -69,10 +66,6 @@ public class RPGCameraController extends UICanvasEntity {
                 REUSABLE_VECTOR.lerp(moveTarget, Time.deltaTime * ACCELERATION);
                 camera.setPosition(REUSABLE_VECTOR);
             }
-        });
-
-        MessageBus.register(MouseEvent.MOVE, event -> {
-
         });
     }
 
@@ -90,11 +83,9 @@ public class RPGCameraController extends UICanvasEntity {
         Vector2d mousePos = Engine.window.getMousePosition();
         image.setPosition((int) mousePos.x, (int) mousePos.y);
 
-        MessageBus.register(MouseEvent.MOVE, event -> {
-            MouseEvent m = (MouseEvent) event;
-
-            int newX = (int) ((double) image.getPosition().get().x + m.getMouseMoveOffsetVector().x * MOUSE_SENSITIVITY);
-            int newY = (int) ((double) image.getPosition().get().y - m.getMouseMoveOffsetVector().y * MOUSE_SENSITIVITY);
+        Input.onMouseMove(event -> {
+            int newX = (int) ((double) image.getPosition().get().x + event.offset.x * MOUSE_SENSITIVITY);
+            int newY = (int) ((double) image.getPosition().get().y - event.offset.y * MOUSE_SENSITIVITY);
 
             if (newX < 0) {
                 newX = image.getPosition().get().x;

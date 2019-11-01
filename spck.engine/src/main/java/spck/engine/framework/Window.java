@@ -2,19 +2,22 @@ package spck.engine.framework;
 
 import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.*;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spck.engine.Antialiasing;
 import spck.engine.Engine;
-import spck.engine.bus.*;
+import spck.engine.Input.Input;
+import spck.engine.bus.LifeCycle;
+import spck.engine.bus.MessageBus;
+import spck.engine.bus.WindowResizedEvent;
 
 import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -104,7 +107,6 @@ public class Window {
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Window.class);
-    private static final List<Integer> keysDown = new ArrayList<>();
     private GLFWVidMode vidMode;
     private boolean resized;
     private final Preferences preferences;
@@ -185,45 +187,11 @@ public class Window {
             }
         });
 
-        // initializing inputs
-        final KeyEvent keyEvent = new KeyEvent();
-        final MouseEvent mouseEvent = new MouseEvent();
-
-        glfwSetKeyCallback(ID, new GLFWKeyCallback() {
-            @Override
-            public void invoke(long window, int key, int scancode, int action, int mods) {
-                if (GLFW_KEY_LAST + 1 < key || key < 0) {
-                    return;
-                }
-
-                keyEvent.set(key, scancode, action, mods);
-
-                if (action == GLFW_PRESS) {
-                    MessageBus.broadcast(KeyEvent.pressed(key), keyEvent);
-                    keysDown.add(key);
-                } else if (action == GLFW_RELEASE) {
-                    MessageBus.broadcast(KeyEvent.released(key), keyEvent);
-                    keysDown.remove(Integer.valueOf(key));
-                }
-            }
-        });
-
-        glfwSetCursorPosCallback(ID, new GLFWCursorPosCallback() {
-            @Override
-            public void invoke(long window, double x, double y) {
-                mouseEvent.calculateMovement(x, y);
-                MessageBus.broadcast(MouseEvent.MOVE, mouseEvent);
-            }
-        });
-
-        glfwSetScrollCallback(ID, new GLFWScrollCallback() {
-            @Override
-            public void invoke(long window, double xOffset, double yOffset) {
-                mouseEvent.calculateScroll(xOffset, yOffset);
-                MessageBus.broadcast(MouseEvent.SCROLL, mouseEvent);
-            }
-        });
-
+        // INPUT HANDLING
+        glfwSetKeyCallback(ID, Input.keyCallback());
+        glfwSetCursorPosCallback(ID, Input.mouseCursorCallback());
+        glfwSetScrollCallback(ID, Input.mouseScrollCallback());
+        glfwSetMouseButtonCallback(ID, Input.mouseButtonCallback());
 
         // VSYNC
         if (preferences.vSyncEnabled) {
@@ -269,9 +237,7 @@ public class Window {
         LOGGER.debug("Window has been intialised");
         LOGGER.debug("OpenGL version " + glGetString(GL_VERSION));
 
-        MessageBus.register(KeyEvent.pressed(GLFW_KEY_Q), (event) -> {
-            glfwSetWindowShouldClose(ID, true);
-        });
+        Input.onKeyPressed(GLFW_KEY_Q, event -> glfwSetWindowShouldClose(ID, true));
     }
 
     public Vector2d getMousePosition() {
@@ -293,12 +259,6 @@ public class Window {
     }
 
     private void onUpdate() {
-        if (!keysDown.isEmpty()) {
-            for (Integer keyCode : keysDown) {
-                MessageBus.broadcast(KeyEvent.keyHeldDown(keyCode));
-            }
-        }
-
         if (resized) {
             glViewport(0, 0, preferences.getWidth(), preferences.getHeight());
             resized = false;

@@ -3,8 +3,7 @@ package spck.engine.debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spck.engine.Engine;
-import spck.engine.bus.KeyEvent;
-import spck.engine.bus.MessageBus;
+import spck.engine.Input.Input;
 import spck.engine.framework.Graphics;
 import spck.engine.render.camera.Camera;
 
@@ -14,7 +13,7 @@ public class DebugInputListener {
     private final static Logger LOGGER = LoggerFactory.getLogger(DebugInputListener.class);
 
     public DebugInputListener(Camera camera) {
-        MessageBus.register(KeyEvent.pressed(GLFW_KEY_F12), (event) -> {
+        Input.onKeyPressed(GLFW_KEY_F12, event -> {
             camera.forceUpdate();
 
             Engine.preferences.polygonRenderMode = !Engine.preferences.polygonRenderMode;

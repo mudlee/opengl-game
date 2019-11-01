@@ -3,6 +3,7 @@ package spck.engine;
 import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spck.engine.Input.Input;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.Measure;
@@ -67,6 +68,7 @@ public class Engine implements Runnable{
         this.GAME_LOOP_THREAD=new Thread(this,"GAME_LOOP_THREAD");
 
         window = new Window(windowPreferences);
+        Input.initialize();
         new StatusUI();
         LOGGER.debug("Window preferences: {}", window.getPreferences());
 
