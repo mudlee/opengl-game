@@ -27,7 +27,6 @@ public class RPGCameraController extends UICanvasEntity {
     private static final float MOVE_SPEED = 3f;
     private static final float SCROLL_SPEED = 3f;
     private static final Vector3f REUSABLE_VECTOR = new Vector3f();
-    private static final double MOUSE_SENSITIVITY = 30f;
     private final Vector3f REUSABLE_UP_VECTOR = new Vector3f(0, 1, 0);
 
     private enum CursorTextureRegistryID implements TextureRegistryID {
@@ -80,30 +79,12 @@ public class RPGCameraController extends UICanvasEntity {
         UIImage image = UIImage.build(texture2D.getId(), 30, 30);
         canvasComponent.addImage(image);
 
-        Vector2d mousePos = Input.getMousePosition();
+        Vector2d mousePos = Input.getMouseAbsolutePosition();
         image.setPosition((int) mousePos.x, (int) mousePos.y);
 
         Input.onMouseMove(event -> {
-            int newX = (int) ((double) image.getPosition().get().x + event.offset.x * MOUSE_SENSITIVITY);
-            int newY = (int) ((double) image.getPosition().get().y - event.offset.y * MOUSE_SENSITIVITY);
-
-            if (newX < 0) {
-                newX = image.getPosition().get().x;
-                move(MoveDirection.LEFT);
-            } else if (newX > (Engine.window.getPreferences().getWidth() - 50)) {
-                newX = image.getPosition().get().x;
-                move(MoveDirection.RIGHT);
-            }
-
-            if (newY < 0) {
-                newY = image.getPosition().get().y;
-                move(MoveDirection.FORWARD);
-            } else if (newY > (Engine.window.getPreferences().getHeight() - 50)) {
-                newY = image.getPosition().get().y;
-                move(MoveDirection.BACKWARD);
-            }
-
-            image.setPosition(newX, newY);
+            move(event.direction);
+            image.setPosition((int) event.relativePosition.x, (int) event.relativePosition.y);
         });
     }
 

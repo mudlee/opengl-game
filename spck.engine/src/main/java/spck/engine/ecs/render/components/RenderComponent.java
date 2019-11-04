@@ -6,5 +6,5 @@ import spck.engine.render.Transform;
 
 public class RenderComponent extends StateAwareComponent {
     public MeshMaterialCollection meshMaterialCollection;
-    public Transform transform;
+    public Transform transform = new Transform();
 }

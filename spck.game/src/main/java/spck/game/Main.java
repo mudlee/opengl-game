@@ -17,6 +17,8 @@ import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.render.camera.Camera;
 
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
+
 public class Main {
     private final static Camera CAMERA = new RPGCamera(60.0f, 0.1f, 10000f);
     private final static Window.Preferences WINDOW_PREFERENCES = new Window.Preferences(
@@ -67,6 +69,15 @@ public class Main {
         Entity castle = Entity.create(new Castle());
         castle.getComponent(RenderComponent.class).ifPresent(castleRender -> {
             castleRender.transform.setPosition(new Vector3f(0, 1, 0));
+        });
+
+        Input.onMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT, event -> {
+            Tree t = new Tree();
+            Entity.create(t);
+            t.getComponent(RenderComponent.class).ifPresent(c -> {
+                c.transform.setPosition(new Vector3f(5, 3, 5));
+                c.transform.setScale(new Vector3f(0.3f, 0.3f, 0.3f));
+            });
         });
     }
 }

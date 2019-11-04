@@ -4,6 +4,7 @@ import org.joml.Vector2d;
 import org.lwjgl.glfw.*;
 import org.lwjgl.system.MemoryUtil;
 import spck.engine.Engine;
+import spck.engine.MoveDirection;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 
@@ -43,9 +44,12 @@ public class Input {
     private static final KeyEvent keyPressedEvent = new KeyEvent();
     private static final KeyEvent keyReleasedEvent = new KeyEvent();
     // MOUSE CURSOR POSITION
-    private static DoubleBuffer mouseCursorPositionX = MemoryUtil.memAllocDouble(1);
-    private static DoubleBuffer mouseCursorPositionY = MemoryUtil.memAllocDouble(1);
-    private static final Vector2d mouseCursorPosition = new Vector2d();
+    private static final double MOUSE_SENSITIVITY = 30f;
+    private static DoubleBuffer mouseCursorAbsolutePositionX = MemoryUtil.memAllocDouble(1);
+    private static DoubleBuffer mouseCursorAbsolutePositionY = MemoryUtil.memAllocDouble(1);
+    private static final Vector2d MOUSE_CURSOR_POSITION_REUSABLE = new Vector2d();
+    private static final Vector2d mouseCursorRelativePosition = new Vector2d();
+    private static boolean mouseCursorRelativePositionInitalized = false;
 
     public static void initialize() {
         MessageBus.register(LifeCycle.UPDATE.eventID(), () -> {
@@ -72,25 +76,41 @@ public class Input {
             }
         });
         MessageBus.register(LifeCycle.CLEANUP.eventID(), () -> {
-            MemoryUtil.memFree(mouseCursorPositionX);
-            MemoryUtil.memFree(mouseCursorPositionY);
+            MemoryUtil.memFree(mouseCursorAbsolutePositionX);
+            MemoryUtil.memFree(mouseCursorAbsolutePositionY);
         });
     }
 
     public static void setMousePosition(Vector2d position) {
         glfwSetCursorPos(Engine.window.getID(), position.x, position.y);
-        mouseCursorPosition.set(position.x, position.y);
     }
 
-    public static Vector2d getMousePosition() {
-        mouseCursorPositionX.clear();
-        mouseCursorPositionY.clear();
-        glfwGetCursorPos(Engine.window.getID(), mouseCursorPositionX, mouseCursorPositionY);
-        mouseCursorPosition.set(
-                mouseCursorPositionX.get(),
-                mouseCursorPositionY.get()
+    /**
+     * Returns the mouse's relative position which means if the application is running in windowed mode or
+     * the cursor is hidden, then the mouse position cannot be less than 0 or greater than the window's width/height.
+     */
+    public static Vector2d getMouseRelativePosition() {
+        if (!mouseCursorRelativePositionInitalized) {
+            Vector2d mouseAbsPos = getMouseAbsolutePosition();
+            calculateMovement(mouseAbsPos.x, mouseAbsPos.y);
+        }
+        return mouseCursorRelativePosition;
+    }
+
+    /**
+     * Returns the mouse's absolute position which means if the application is running in windowed mode or
+     * the cursor is hidden, then if the mouse is outside the window, the values can be negative or greater than the
+     * window's width/height.
+     */
+    public static Vector2d getMouseAbsolutePosition() {
+        mouseCursorAbsolutePositionX.clear();
+        mouseCursorAbsolutePositionY.clear();
+        glfwGetCursorPos(Engine.window.getID(), mouseCursorAbsolutePositionX, mouseCursorAbsolutePositionY);
+        MOUSE_CURSOR_POSITION_REUSABLE.set(
+                mouseCursorAbsolutePositionX.get(),
+                mouseCursorAbsolutePositionY.get()
         );
-        return mouseCursorPosition;
+        return MOUSE_CURSOR_POSITION_REUSABLE;
     }
 
     public static void onMouseMove(Consumer<MouseMoveEvent> handler) {
@@ -224,5 +244,38 @@ public class Input {
 
         previousMousePosition.set(x, y);
         mouseMoveEvent.offset.mul(MOVE_SENSITIVITY);
+
+        double newX = mouseCursorRelativePosition.x + mouseMoveEvent.offset.x * MOUSE_SENSITIVITY;
+        double newY = mouseCursorRelativePosition.y - mouseMoveEvent.offset.y * MOUSE_SENSITIVITY;
+
+        boolean xMoved = false;
+        boolean yMoved = false;
+
+        if (newX < 0) {
+            newX = 0;
+            mouseMoveEvent.direction = MoveDirection.LEFT;
+            xMoved = true;
+        } else if (newX > Engine.window.getPreferences().getWidth()) {
+            newX = Engine.window.getPreferences().getWidth();
+            mouseMoveEvent.direction = MoveDirection.RIGHT;
+            xMoved = true;
+        }
+
+        if (newY < 0) {
+            newY = 0;
+            mouseMoveEvent.direction = MoveDirection.FORWARD;
+            yMoved = true;
+        } else if (newY > Engine.window.getPreferences().getHeight()) {
+            newY = Engine.window.getPreferences().getHeight();
+            mouseMoveEvent.direction = MoveDirection.BACKWARD;
+            yMoved = true;
+        }
+
+        if (!xMoved && !yMoved) {
+            mouseMoveEvent.direction = MoveDirection.STILL;
+        }
+
+        mouseCursorRelativePosition.set(newX, newY);
+        mouseMoveEvent.relativePosition.set(newX, newY);
     }
 }
