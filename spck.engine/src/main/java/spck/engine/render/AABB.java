@@ -12,13 +12,6 @@ public class AABB {
     private final Vector3f max;
 
     public AABB(Vector3f min, Vector3f max) {
-        min.x -= 0.2f;
-        min.y -= 0.2f;
-        min.z -= 0.2f;
-        max.x += 0.2f;
-        max.y += 0.2f;
-        max.z += 0.2f;
-
         this.min = min;
         this.max = max;
         vertices = new float[]{
