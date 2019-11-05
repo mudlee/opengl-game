@@ -9,7 +9,7 @@ import spck.engine.ecs.ComponentState;
 import spck.engine.ecs.EntityBatchStore;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.render.MeshMaterialPair;
-import spck.engine.render.Shader;
+import spck.engine.render.shader.Shader;
 
 import java.util.ArrayList;
 import java.util.List;

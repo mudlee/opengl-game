@@ -75,6 +75,9 @@ public class StatUITextSystem extends IteratingSystem {
                         Runtime r4 = Runtime.getRuntime();
                         text.text("JVM mem total free: " + NumberFormatter.formatBinaryUnit(r4.freeMemory() + (r4.maxMemory() - r4.totalMemory())));
                         break;
+                    case AABB_RENDERING:
+                        text.text("Showing AABB: " + Engine.preferences.renderAABB);
+                        break;
                 }
             }
         }

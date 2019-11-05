@@ -24,5 +24,6 @@ public class StatusUICanvasEntity extends UICanvasEntity {
         canvasComponent.addText(UIText.build("?", UIObjectPosition.build(10, 430, Align.TOP_LEFT)).id(StatusType.JVM_MEMORY_ALLOCATED.name()));
         canvasComponent.addText(UIText.build("?", UIObjectPosition.build(10, 465, Align.TOP_LEFT)).id(StatusType.JVM_MEMORY_MAX.name()));
         canvasComponent.addText(UIText.build("?", UIObjectPosition.build(10, 500, Align.TOP_LEFT)).id(StatusType.JVM_MEMORY_TOTAL_FREE.name()));
+        canvasComponent.addText(UIText.build("?", UIObjectPosition.build(10, 570, Align.TOP_LEFT)).id(StatusType.AABB_RENDERING.name()));
     }
 }

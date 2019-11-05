@@ -1,5 +1,7 @@
 package spck.engine.render;
 
+import spck.engine.render.shader.Shader;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

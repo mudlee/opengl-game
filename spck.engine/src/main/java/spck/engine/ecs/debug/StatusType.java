@@ -16,4 +16,5 @@ public enum StatusType {
     JVM_MEMORY_ALLOCATED,
     JVM_MEMORY_MAX,
     JVM_MEMORY_TOTAL_FREE,
+    AABB_RENDERING,
 }

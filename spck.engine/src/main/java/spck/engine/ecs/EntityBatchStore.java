@@ -139,14 +139,14 @@ public class EntityBatchStore {
     private void processGPUDataChanges() {
         if (!newBatchDataQueue.isEmpty()) {
             LOGGER.trace("Processing new Batches' data...");
-            newBatchDataQueue.forEach(batch -> batch.getMaterial().getRenderer().uploadBatchDataToGPU(batch));
+            newBatchDataQueue.forEach(batch -> batch.getMaterial().getGpuDataStore().uploadBatchDataToGPU(batch));
             newBatchDataQueue.clear();
             LOGGER.trace("New Batches' data processed");
         }
 
         if (!changedBatchDataQueue.isEmpty()) {
             LOGGER.trace("Processing changed Batches' data...");
-            changedBatchDataQueue.forEach(batch -> batch.getMaterial().getRenderer().updateBatchDataInGPU(batch));
+            changedBatchDataQueue.forEach(batch -> batch.getMaterial().getGpuDataStore().updateBatchDataInGPU(batch));
             changedBatchDataQueue.clear();
             LOGGER.trace("Changed Batches' data processed");
         }
@@ -161,7 +161,7 @@ public class EntityBatchStore {
             while (batchIterator.hasNext()) {
                 Map.Entry<Integer, MeshMaterialBatch> batchEntry = batchIterator.next();
                 if (batchEntry.getValue().getNumOfEntities() == 0) {
-                    batchEntry.getValue().getMaterial().getRenderer().updateBatchDataInGPU(batchEntry.getValue());
+                    batchEntry.getValue().getMaterial().getGpuDataStore().updateBatchDataInGPU(batchEntry.getValue());
                     LOGGER.trace("Batch {} is empty, removing...", batchEntry.getValue().getID());
                     LOGGER.trace("Batch {} removed from newBatchDataQueue: {}", batchEntry.getValue().getID(), newBatchDataQueue.remove(batchEntry.getValue()));
                     LOGGER.trace("Batch {} removed from changedBatchDataQueue: {}", batchEntry.getValue().getID(), changedBatchDataQueue.remove(batchEntry.getValue()));

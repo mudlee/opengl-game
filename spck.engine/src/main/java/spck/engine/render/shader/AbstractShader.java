@@ -1,10 +1,6 @@
-package spck.engine.render;
+package spck.engine.render.shader;
 
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.joml.Vector3i;
-import org.joml.Vector4f;
+import org.joml.*;
 import org.lwjgl.opengl.GL41;
 import org.lwjgl.system.MemoryStack;
 import org.slf4j.Logger;

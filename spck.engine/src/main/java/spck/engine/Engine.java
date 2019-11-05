@@ -15,25 +15,23 @@ import spck.engine.ecs.debug.StatusUICanvasRendererSystem;
 import spck.engine.ecs.render.PreRenderSystem;
 import spck.engine.ecs.render.RenderSystem;
 import spck.engine.ecs.ui.UICanvasRendererSystem;
-import spck.engine.framework.OpenGLStandardRenderer;
-import spck.engine.framework.OpenGLStandardShader;
-import spck.engine.framework.UIRenderer;
-import spck.engine.framework.Window;
+import spck.engine.framework.*;
 import spck.engine.render.camera.Camera;
 import spck.engine.util.OSNameParser;
 
 import java.util.Arrays;
 
 public class Engine implements Runnable{
-    public static final String ID = "SPCK";
     public static final Preferences preferences = new Preferences();
     public static Window window;
-    public static OpenGLStandardRenderer renderer;
+    public static OpenGLDefaultGPUDataStore gpuDataStore;
     public static OpenGLStandardShader shader;
+    public static Renderer renderer;
 
     public static class Preferences {
         public String defaultFont = "GeosansLight";
         public boolean polygonRenderMode;
+        public boolean renderAABB = true;
         public OS os;
         public Vector4f clearColor = new Vector4f(0f, 0f, 0f, 0f);
 
@@ -55,8 +53,9 @@ public class Engine implements Runnable{
         String osName = System.getProperty("os.name");
         preferences.os = OSNameParser.parse(osName);
 
-        renderer = new OpenGLStandardRenderer();
+        gpuDataStore = new OpenGLDefaultGPUDataStore();
         shader = new OpenGLStandardShader(camera);
+        renderer = new OpenGLDefaultMaterialRenderer();
 
         LOGGER.debug("OS name: {}", osName);
         LOGGER.debug("OS version: {}", System.getProperty("os.version"));

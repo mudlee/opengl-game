@@ -1,6 +1,8 @@
 package spck.engine.render;
 
 import org.joml.Vector3f;
+import spck.engine.framework.Renderer;
+import spck.engine.render.shader.Shader;
 import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureUVModifier;
 
@@ -30,6 +32,8 @@ public interface Material {
     Optional<TextureUVModifier> getDiffuseTextureUVModifier();
 
     Shader getShader();
+
+    GPUDataStore getGpuDataStore();
 
     Renderer getRenderer();
 

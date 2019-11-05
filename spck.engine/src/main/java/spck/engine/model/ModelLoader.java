@@ -12,6 +12,7 @@ import spck.engine.bus.MessageBus;
 import spck.engine.framework.assets.TextureLoader;
 import spck.engine.framework.assets.TextureStorage;
 import spck.engine.render.*;
+import spck.engine.render.shader.ShaderUniform;
 import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureRegistry;
 import spck.engine.util.ResourceLoader;

@@ -1,4 +1,4 @@
-package spck.engine.render;
+package spck.engine.render.shader;
 
 public enum ShaderUniform {
     CAMERA_VIEW_MATRIX,

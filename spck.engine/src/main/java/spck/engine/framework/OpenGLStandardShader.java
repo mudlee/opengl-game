@@ -3,11 +3,11 @@ package spck.engine.framework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spck.engine.lights.*;
-import spck.engine.render.AbstractShader;
 import spck.engine.render.Material;
-import spck.engine.render.Shader;
-import spck.engine.render.ShaderUniform;
 import spck.engine.render.camera.Camera;
+import spck.engine.render.shader.AbstractShader;
+import spck.engine.render.shader.Shader;
+import spck.engine.render.shader.ShaderUniform;
 import spck.engine.util.KeyValueTool;
 
 import java.util.Arrays;

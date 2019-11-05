@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import spck.engine.Engine;
-import spck.engine.framework.OpenGLStandardRenderer;
+import spck.engine.framework.OpenGLDefaultGPUDataStore;
 import spck.engine.render.*;
 
 import java.util.ArrayList;
@@ -274,9 +274,7 @@ class EntityBatchStoreTest {
     }
 
     private void mockStandardRenderer() {
-        OpenGLStandardRenderer standardRenderer = Mockito.mock(OpenGLStandardRenderer.class);
-        Engine.renderer = standardRenderer;
-        Mockito.doNothing().when(standardRenderer).render(Mockito.any());
+        Engine.gpuDataStore = Mockito.mock(OpenGLDefaultGPUDataStore.class);
     }
 
     private Mesh createEmptyMesh() {

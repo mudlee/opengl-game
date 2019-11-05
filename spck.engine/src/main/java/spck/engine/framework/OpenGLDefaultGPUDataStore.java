@@ -9,10 +9,10 @@ import spck.engine.bus.MessageBus;
 import spck.engine.debug.Stats;
 import spck.engine.ecs.ECS;
 import spck.engine.ecs.render.components.RenderComponent;
+import spck.engine.render.GPUDataStore;
 import spck.engine.render.LayoutQualifier;
 import spck.engine.render.Material;
 import spck.engine.render.MeshMaterialBatch;
-import spck.engine.render.Renderer;
 import spck.engine.render.textures.TextureUVModifier;
 
 import java.nio.Buffer;
@@ -22,13 +22,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class OpenGLStandardRenderer implements Renderer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenGLStandardRenderer.class);
+public class OpenGLDefaultGPUDataStore implements GPUDataStore {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenGLDefaultGPUDataStore.class);
     private static final int INSTANCED_DATA_SIZE_IN_BYTES = 19; // transformationMatrixInstanced + uv scale + uv offset
     private static final List<Integer> vaos = new ArrayList<>();
     private static final List<Integer> vbos = new ArrayList<>();
 
-    public OpenGLStandardRenderer() {
+    public OpenGLDefaultGPUDataStore() {
         MessageBus.register(LifeCycle.CLEANUP.eventID(), this::onCleanUp);
     }
 
@@ -81,49 +81,6 @@ public class OpenGLStandardRenderer implements Renderer {
         });
 
         batch.dataUpdated();
-    }
-
-    @Override
-    public void render(MeshMaterialBatch batch) {
-        Stats.numOfVerts += batch.getMesh().getIndices().length;
-        Stats.numOfTotalVerts += batch.getMesh().getIndices().length * batch.getNumOfEntities();
-
-        GL.vaoContext(batch.getVaoID(), () -> {
-            GL41.glEnableVertexAttribArray(LayoutQualifier.VX_POSITION.location);
-            GL41.glEnableVertexAttribArray(LayoutQualifier.VX_NORMAL.location);
-
-            if (batch.getMaterial().hasDiffuseTexture()) {
-                GL41.glEnableVertexAttribArray(LayoutQualifier.VX_UV_COORDS.location);
-                GL41.glEnableVertexAttribArray(LayoutQualifier.INS_UV_SCALE.location);
-                GL41.glEnableVertexAttribArray(LayoutQualifier.INS_UV_OFFSET.location);
-                GL41.glActiveTexture(batch.getMaterial().getDiffuseTexture().getGlTextureSlot());
-                GL41.glBindTexture(GL41.GL_TEXTURE_2D, batch.getMaterial().getDiffuseTexture().getId());
-            }
-
-            // 4 slot for the transformation matrix, one for each column
-            GL41.glEnableVertexAttribArray(LayoutQualifier.INS_TRANSFORMATION_MATRIX_COL1.location);
-            GL41.glEnableVertexAttribArray(LayoutQualifier.INS_TRANSFORMATION_MATRIX_COL2.location);
-            GL41.glEnableVertexAttribArray(LayoutQualifier.INS_TRANSFORMATION_MATRIX_COL3.location);
-            GL41.glEnableVertexAttribArray(LayoutQualifier.INS_TRANSFORMATION_MATRIX_COL4.location);
-
-            GL41.glDrawElementsInstanced(GL41.GL_TRIANGLES, batch.getMesh().getIndices().length, GL41.GL_UNSIGNED_INT, 0, batch.getNumOfEntities());
-
-            GL41.glDisableVertexAttribArray(LayoutQualifier.VX_POSITION.location);
-            GL41.glDisableVertexAttribArray(LayoutQualifier.VX_NORMAL.location);
-
-            if (batch.getMaterial().hasDiffuseTexture()) {
-                GL41.glDisableVertexAttribArray(LayoutQualifier.VX_UV_COORDS.location);
-                GL41.glDisableVertexAttribArray(LayoutQualifier.INS_UV_SCALE.location);
-                GL41.glDisableVertexAttribArray(LayoutQualifier.INS_UV_OFFSET.location);
-                GL41.glBindTexture(GL41.GL_TEXTURE_2D, 0);
-            }
-
-            // 4 slot for the transformation matrix, one for each column
-            GL41.glDisableVertexAttribArray(LayoutQualifier.INS_TRANSFORMATION_MATRIX_COL1.location);
-            GL41.glDisableVertexAttribArray(LayoutQualifier.INS_TRANSFORMATION_MATRIX_COL2.location);
-            GL41.glDisableVertexAttribArray(LayoutQualifier.INS_TRANSFORMATION_MATRIX_COL3.location);
-            GL41.glDisableVertexAttribArray(LayoutQualifier.INS_TRANSFORMATION_MATRIX_COL4.location);
-        });
     }
 
     private void removeBatchDataFromGPU(MeshMaterialBatch batch) {

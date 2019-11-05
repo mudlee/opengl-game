@@ -1,5 +1,8 @@
 package spck.engine.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.Buffer;
@@ -12,7 +15,10 @@ import java.util.Scanner;
 
 // @see: https://github.com/casid/jusecase-ui-opengl/blob/master/src/main/java/org/jusecase/ui/opengl/util/ByteBufferUtils.java
 public class ResourceLoader {
+    private final static Logger LOGGER = LoggerFactory.getLogger(ResourceLoader.class);
+
     public static String load(String filePath) {
+        LOGGER.debug("Loading resource {}", filePath);
         InputStream in = ResourceLoader.class.getResourceAsStream(filePath);
         Scanner scanner = new Scanner(in, StandardCharsets.UTF_8);
         return scanner.useDelimiter("\\A").next();

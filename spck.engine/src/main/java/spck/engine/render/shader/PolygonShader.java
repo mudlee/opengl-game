@@ -1,7 +1,8 @@
-package spck.engine.render;
+package spck.engine.render.shader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spck.engine.render.Material;
 import spck.engine.render.camera.Camera;
 
 public class PolygonShader extends AbstractShader implements Shader {
