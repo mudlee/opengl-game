@@ -140,7 +140,7 @@ public class ModelLoader {
                     getIndicesFromMesh(aiMesh),
                     getNormalsFromMesh(aiMesh),
                     getUVCoordsFromMesh(aiMesh),
-                    convertAABB(aiMesh.mAABB())
+                    calculateAABB(aiMesh)
             );
 
             if (!fromCache)
@@ -152,9 +152,41 @@ public class ModelLoader {
         return parts;
     }
 
-    private static AABB convertAABB(AIAABB mAABB) {
-        Vector3f min = new Vector3f(mAABB.mMin().x(), mAABB.mMin().y(), mAABB.mMin().z());
-        Vector3f max = new Vector3f(mAABB.mMax().x(), mAABB.mMax().y(), mAABB.mMax().z());
+    private static AABB calculateAABB(AIMesh aiMesh) {
+        boolean initiated = false;
+        Vector3f min = new Vector3f();
+        Vector3f max = new Vector3f();
+
+        AIVector3D.Buffer aiVertices = aiMesh.mVertices();
+        while (aiVertices.remaining() > 0) {
+            AIVector3D aiVertex = aiVertices.get();
+
+            if (!initiated) {
+                min.set(aiVertex.x(), aiVertex.y(), aiVertex.z());
+                max.set(aiVertex.x(), aiVertex.y(), aiVertex.z());
+                initiated = true;
+                continue;
+            }
+
+            if (aiVertex.x() < min.x) {
+                min.x = aiVertex.x();
+            } else if (aiVertex.x() > max.x) {
+                max.x = aiVertex.x();
+            }
+
+            if (aiVertex.y() < min.y) {
+                min.y = aiVertex.y();
+            } else if (aiVertex.y() > max.y) {
+                max.y = aiVertex.y();
+            }
+
+            if (aiVertex.z() < min.z) {
+                min.z = aiVertex.z();
+            } else if (aiVertex.z() > max.z) {
+                max.z = aiVertex.z();
+            }
+        }
+
         return new AABB(min, max);
     }
 

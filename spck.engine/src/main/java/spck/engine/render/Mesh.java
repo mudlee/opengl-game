@@ -96,6 +96,10 @@ public class Mesh {
         return normals;
     }
 
+    public AABB getAabb() {
+        return aabb;
+    }
+
     public void recalculateNormals() {
         for (int i = 0; i < vertices.length; i += 3 * 3) { // <- 3*3 = one triangle/face per iteration
             REUSABLE_3D_VECTOR_A.set(vertices[i], vertices[i + 1], vertices[i + 2]);
