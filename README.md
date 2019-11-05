@@ -1,45 +1,60 @@
-## TODO
+# Spck
 
-- base scene
-- easier material/shader handling
-- vulkan renderer
-- remove todos
-- input handling
-- shadows
+This is a WIP project. I'm working on it at nights, when I have time. Usually I don't have. 
 
-# SPCK Framework
+It will be a RPG game somewhere in the far future.
 
-It's a lightweight OpenGL/Vulkan framework, using LWJGL3.
+## Technology
 
-## Running from IntelliJ IDEA
+The "engine" or rather the "framework" is written by me in Java. I use LWJGL as a wrapper and OpenGL as a renderer.
+
+Currentl I implemented the following features:
+- It's a standalone, Java11 application, hence I'll be able to ship it without expecting the gamer having Java installed
+- ECS with Artemis
+- Blinn-Phong lightning (directional, point, spot)
+- Model loading from OBJ files with Assimp
+- A free and an RPG camera controller
+- AABB for future raycasting (it also has an AABB renderer layer. You can turn it off and on with F11)
+- Polygon debug rendering (it can be turned on and off with F12)
+
+### TODOs
+
+- Shadows
+- Remove all TODOs from the code (including this :))
+- If I have more time (haha), implement a Vulkan renderer
+
+## Running
+
+### Running from IntelliJ IDEA
 
 Run with VM parameters:
 
-```
+```bash
+# On OSX
 -XstartOnFirstThread -Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true -Dorg.lwjgl.opengl.Display.enableOSXFullscreenModeAPI=true
+# On Linux/Windows
+-Dorg.lwjgl.util.DebugLoader=true -Dorg.lwjgl.util.Debug=true -Dorg.lwjgl.opengl.Display.enableHighDPI=true
 ```
 
-Note: ```-XstartOnFirstThread``` is needed only on MacOS.
-
-## Building
+### Building
 
 - Windows: TODO
 - Linux: ```./buildLinux.sh```
 - MacOS: ```./buildMacOS.sh```
 
-## Running
+#### Run the Built Game
 
 ```bash
 ./build/release/bin/APP
 ```
 
-## Using Automatic Modules
+### Using Automatic Modules
 
-### Step 1 - Patch Your not Modularised Jar
+#### Step 1 - Patch not Modularised Jar(s)
 
-TODO: https://examples.javacodegeeks.com/core-java/java-9-jdeps-example/
+Follow this article: https://examples.javacodegeeks.com/core-java/java-9-jdeps-example/
 
-### Step 2 - Extend Your pom.xml
+#### Step 2 - Extend pom.xml
 ```xml
 <plugin>
     <artifactId>maven-resources-plugin</artifactId>
@@ -65,3 +80,7 @@ TODO: https://examples.javacodegeeks.com/core-java/java-9-jdeps-example/
     </executions>
 </plugin>
 ```
+
+## License
+
+MIT
