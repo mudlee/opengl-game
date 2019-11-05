@@ -3,8 +3,6 @@ package spck.engine.render;
 import org.joml.Vector3f;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 
 public class Mesh {
     private static final Vector3f REUSABLE_3D_VECTOR_A = new Vector3f().zero();
@@ -15,15 +13,15 @@ public class Mesh {
     private int[] indices;
     private float[] normals;
     private float[] uvCoords;
-    private List<MeshTriangle> triangles;
+    private AABB aabb;
     private boolean changed;
 
-    public Mesh(float[] vertices, int[] indices, float[] normals, float[] uvCoords, List<MeshTriangle> triangles) {
+    public Mesh(float[] vertices, int[] indices, float[] normals, float[] uvCoords, AABB aabb) {
         this.vertices = vertices;
         this.indices = indices;
         this.normals = normals;
         this.uvCoords = uvCoords;
-        this.triangles = triangles;
+        this.aabb = aabb;
     }
 
     @Override
@@ -33,8 +31,7 @@ public class Mesh {
         Mesh mesh = (Mesh) o;
         return Arrays.equals(vertices, mesh.vertices) &&
                 Arrays.equals(indices, mesh.indices) &&
-                Arrays.equals(normals, mesh.normals) &&
-                Objects.equals(triangles, mesh.triangles);
+                Arrays.equals(normals, mesh.normals);
     }
 
     @Override
@@ -42,7 +39,6 @@ public class Mesh {
         int result = Arrays.hashCode(vertices);
         result = 31 * result + Arrays.hashCode(indices);
         result = 31 * result + Arrays.hashCode(normals);
-        result = 31 * result + (triangles != null ? triangles.hashCode() : 0);
         return result;
     }
 
@@ -51,7 +47,6 @@ public class Mesh {
         indices = mesh.indices;
         normals = mesh.normals;
         uvCoords = mesh.uvCoords;
-        triangles = mesh.triangles;
         changed = true;
     }
 
@@ -85,11 +80,6 @@ public class Mesh {
         changed = true;
     }
 
-    public void setTriangles(List<MeshTriangle> triangles) {
-        this.triangles = triangles;
-        changed = true;
-    }
-
     public float[] getUVCoords() {
         return uvCoords;
     }
@@ -104,10 +94,6 @@ public class Mesh {
 
     public float[] getNormals() {
         return normals;
-    }
-
-    public List<MeshTriangle> getTriangles() {
-        return triangles;
     }
 
     public void recalculateNormals() {

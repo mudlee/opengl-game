@@ -21,7 +21,6 @@ public class Terrain extends Entity {
     private Mesh createMesh() {
         int size = 300;
         List<Vector3f> vertices = new ArrayList<>();
-        List<MeshTriangle> tris = new ArrayList<>();
         List<Integer> indices = new ArrayList<>();
         float[][] noiseMap = noiseMap(size + 1, size + 1);
 
@@ -42,7 +41,6 @@ public class Terrain extends Entity {
                 vertices.add(vert1); // top left
                 vertices.add(vert2); // top right
                 vertices.add(vert3); // bottom left
-                tris.add(new MeshTriangle(vert1, vert2, vert3));
 
                 Vector3f vert4 = new Vector3f(x + 1, vertex4Height, z + 1);
                 Vector3f vert5 = new Vector3f(x + 1, vertex5Height, z);
@@ -50,7 +48,6 @@ public class Terrain extends Entity {
                 vertices.add(vert4); // top right
                 vertices.add(vert5); // bottom right
                 vertices.add(vert6); // bottom left
-                tris.add(new MeshTriangle(vert4, vert5, vert6));
 
                 indices.add(indicesIndex++);
                 indices.add(indicesIndex++);
@@ -80,7 +77,7 @@ public class Terrain extends Entity {
                 objIndices,
                 new float[objVertices.length],
                 new float[]{},
-                tris
+                null
         );
 
         mesh.recalculateNormals();

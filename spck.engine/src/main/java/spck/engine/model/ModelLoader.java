@@ -140,7 +140,7 @@ public class ModelLoader {
                     getIndicesFromMesh(aiMesh),
                     getNormalsFromMesh(aiMesh),
                     getUVCoordsFromMesh(aiMesh),
-                    new ArrayList<>()
+                    convertAABB(aiMesh.mAABB())
             );
 
             if (!fromCache)
@@ -150,6 +150,12 @@ public class ModelLoader {
         }
 
         return parts;
+    }
+
+    private static AABB convertAABB(AIAABB mAABB) {
+        Vector3f min = new Vector3f(mAABB.mMin().x(), mAABB.mMin().y(), mAABB.mMin().z());
+        Vector3f max = new Vector3f(mAABB.mMax().x(), mAABB.mMax().y(), mAABB.mMax().z());
+        return new AABB(min, max);
     }
 
     private static Material processMaterial(AIMaterial aiMaterial, String modelPath, String extension, boolean fromCache) {

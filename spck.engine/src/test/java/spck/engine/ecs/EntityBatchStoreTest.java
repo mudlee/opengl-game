@@ -280,7 +280,7 @@ class EntityBatchStoreTest {
     }
 
     private Mesh createEmptyMesh() {
-        return new Mesh(new float[]{}, new int[]{}, new float[]{}, new float[]{}, new ArrayList<>());
+        return new Mesh(new float[]{}, new int[]{}, new float[]{}, new float[]{}, null);
     }
 }
 
