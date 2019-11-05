@@ -9,7 +9,8 @@ public enum LayoutQualifier {
     INS_TRANSFORMATION_MATRIX_COL3(5),
     INS_TRANSFORMATION_MATRIX_COL4(6),
     INS_UV_SCALE(7),
-    INS_UV_OFFSET(8);
+    INS_UV_OFFSET(8),
+    AABB_VX_POSITION(9);
 
     public int location;
 

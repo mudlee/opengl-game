@@ -9,6 +9,7 @@ import spck.engine.Input.Input;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.DebugInputListener;
+import spck.engine.debug.FreeCameraController;
 import spck.engine.ecs.Entity;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.framework.Window;
@@ -16,8 +17,6 @@ import spck.engine.lights.AmbientLight;
 import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.render.camera.Camera;
-
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class Main {
     private final static Camera CAMERA = new RPGCamera(60.0f, 0.1f, 10000f);
@@ -49,7 +48,7 @@ public class Main {
                 (double) Engine.window.getPreferences().getWidth() / 2,
                 (double) Engine.window.getPreferences().getHeight() / 2
         ));
-        Entity.create(new RPGCameraController(CAMERA));
+        new FreeCameraController(CAMERA);
 
         LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.9f));
         LightSystem.addLight(new DirectionalLight(
@@ -58,7 +57,10 @@ public class Main {
                 new Vector3f(40, 20, 10)
         ));
 
-        Entity.create(new Ground());
+        Entity.create(new Tree()).getComponent(RenderComponent.class).ifPresent(comp -> {
+            comp.transform.setPosition(new Vector3f(0f, 5f, 0f));
+        });
+        /*Entity.create(new Ground());
         Tree tree = new Tree();
         Entity.create(tree);
         tree.getComponent(RenderComponent.class).ifPresent(renderer -> {
@@ -78,6 +80,6 @@ public class Main {
                 c.transform.setPosition(new Vector3f(5, 3, 5));
                 c.transform.setScale(new Vector3f(0.3f, 0.3f, 0.3f));
             });
-        });
+        });*/
     }
 }

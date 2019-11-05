@@ -135,17 +135,24 @@ public class ModelLoader {
             AIMesh aiMesh = AIMesh.create(aiMeshes.get(i));
 
             int materialIndex = aiMesh.mMaterialIndex();
+            AABB aabb = calculateAABB(aiMesh);
 
             Mesh mesh = new Mesh(
                     getVerticesFromMesh(aiMesh),
                     getIndicesFromMesh(aiMesh),
                     getNormalsFromMesh(aiMesh),
                     getUVCoordsFromMesh(aiMesh),
-                    calculateAABB(aiMesh)
+                    aabb
             );
 
-            if (!fromCache)
+            LOGGER.debug("{}", mesh.getVertices());
+            LOGGER.debug("length: {}", mesh.getVertices().length);
+            LOGGER.debug("Indices {}", mesh.getIndices());
+            LOGGER.debug("{}", aabb.getVertices());
+
+            if (!fromCache) {
                 LOGGER.debug("    Mesh has been loaded. Verts: {}, normals: {}, mat idx: {}", mesh.getIndices().length, mesh.getNormals().length / 3, materialIndex);
+            }
             Material material = materials.isEmpty() ? new DefaultMaterial() : materials.get(materialIndex);
             parts.add(new ModelPart(mesh, material));
         }

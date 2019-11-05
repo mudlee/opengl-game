@@ -22,6 +22,8 @@ public class MeshMaterialBatch {
     private int currentSize;
     private int oldSize;
     private int entityMemoryUsage = 0;
+    private int aabbVerticesVboID;
+    private int aabbIndicesVboID;
 
     public MeshMaterialBatch(Mesh mesh, Material material) {
         this.mesh = mesh;
@@ -101,6 +103,14 @@ public class MeshMaterialBatch {
         this.uvVBOId = textureVBOId;
     }
 
+    public void setAABBVboID(int aabbVboID) {
+        this.aabbVerticesVboID = aabbVboID;
+    }
+
+    public void setAABBIndicesVboID(int aabbIndicesVboID) {
+        this.aabbIndicesVboID = aabbIndicesVboID;
+    }
+
     public void storeEntityMemoryUsage(int bytes) {
         entityMemoryUsage = bytes;
     }
@@ -155,5 +165,13 @@ public class MeshMaterialBatch {
 
     public int getEntityMemoryUsage() {
         return entityMemoryUsage;
+    }
+
+    public int getAABBVerticesVboID() {
+        return aabbVerticesVboID;
+    }
+
+    public int getAABBIndicesVboID() {
+        return aabbIndicesVboID;
     }
 }

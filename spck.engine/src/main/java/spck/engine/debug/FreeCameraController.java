@@ -1,6 +1,7 @@
 package spck.engine.debug;
 
 import org.joml.Vector3f;
+import spck.engine.Engine;
 import spck.engine.Input.Input;
 import spck.engine.MoveDirection;
 import spck.engine.Time;
@@ -38,6 +39,7 @@ public class FreeCameraController {
         this.camera = camera;
         moveTarget = new Vector3f(camera.getPosition());
         rotation = new Vector3f(camera.getRotation());
+        Engine.window.captureMouse();
 
         for (Map.Entry<MoveDirection, Integer> entry : moveKeyMap.entrySet()) {
             Input.onKeyHeldDown(entry.getValue(), event -> move(entry.getKey()));

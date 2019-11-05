@@ -13,7 +13,7 @@ public class Mesh {
     private int[] indices;
     private float[] normals;
     private float[] uvCoords;
-    private AABB aabb;
+    private final AABB aabb;
     private boolean changed;
 
     public Mesh(float[] vertices, int[] indices, float[] normals, float[] uvCoords, AABB aabb) {
@@ -96,8 +96,12 @@ public class Mesh {
         return normals;
     }
 
-    public AABB getAabb() {
-        return aabb;
+    public float[] getAABBVertices() {
+        return aabb.getVertices();
+    }
+
+    public float[] getAABBIndices() {
+        return aabb.getIndices();
     }
 
     public void recalculateNormals() {

@@ -24,7 +24,8 @@ import java.util.function.Supplier;
 
 public class OpenGLDefaultGPUDataStore implements GPUDataStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenGLDefaultGPUDataStore.class);
-    private static final int INSTANCED_DATA_SIZE_IN_BYTES = 19; // transformationMatrixInstanced + uv scale + uv offset
+    // transformationMatrixInstanced(4x4) + uv scale(1) + uv offset(2)
+    private static final int INSTANCED_DATA_SIZE_IN_BYTES = 19;
     private static final List<Integer> vaos = new ArrayList<>();
     private static final List<Integer> vbos = new ArrayList<>();
 
@@ -91,10 +92,14 @@ public class OpenGLDefaultGPUDataStore implements GPUDataStore {
         GL41.glDeleteBuffers(batch.getNormalsVBOId());
         GL41.glDeleteBuffers(batch.getVerticesVBOId());
         GL41.glDeleteBuffers(batch.getInstancedVboID());
+        GL41.glDeleteBuffers(batch.getAABBVerticesVboID());
+        GL41.glDeleteBuffers(batch.getAABBIndicesVboID());
         vbos.remove(batch.getIndicesVBOId());
         vbos.remove(batch.getNormalsVBOId());
         vbos.remove(batch.getVerticesVBOId());
         vbos.remove(batch.getInstancedVboID());
+        vbos.remove(batch.getAABBVerticesVboID());
+        vbos.remove(batch.getAABBIndicesVboID());
 
         if (batch.getUvVBOId() != null) {
             GL41.glDeleteBuffers(batch.getUvVBOId());
@@ -210,6 +215,19 @@ public class OpenGLDefaultGPUDataStore implements GPUDataStore {
             addVAOAttribute(uvVboId, LayoutQualifier.VX_UV_COORDS.location, 2);
             batch.setUVVBOId(uvVboId);
         }
+
+        // AABB vertices
+        int aabbVboID = createAndStoreDataInVBO(batch.getMesh().getAABBVertices());
+        vbos.add(aabbVboID);
+        LOGGER.trace("    AABB-VBO:{}", aabbVboID);
+        addVAOAttribute(aabbVboID, LayoutQualifier.AABB_VX_POSITION.location, 3);
+        batch.setAABBVboID(aabbVboID);
+
+        // AABB indices
+        int aabbIndicesVboID = createAndStoreDataInVBO(batch.getMesh().getAABBIndices());
+        vbos.add(aabbIndicesVboID);
+        LOGGER.trace("    AABB_INDICES-VBO:{}", aabbIndicesVboID);
+        batch.setAABBIndicesVboID(aabbIndicesVboID);
     }
 
     private static void addVAOAttribute(int vboId, int attributeIndex, int size) {
