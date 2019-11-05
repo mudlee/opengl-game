@@ -18,6 +18,8 @@ import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.render.camera.Camera;
 
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
+
 public class Main {
     private final static Camera CAMERA = new RPGCamera(60.0f, 0.1f, 10000f);
     private final static Window.Preferences WINDOW_PREFERENCES = new Window.Preferences(
@@ -57,10 +59,7 @@ public class Main {
                 new Vector3f(40, 20, 10)
         ));
 
-        Entity.create(new Tree()).getComponent(RenderComponent.class).ifPresent(comp -> {
-            comp.transform.setPosition(new Vector3f(0f, 5f, 0f));
-        });
-        /*Entity.create(new Ground());
+        Entity.create(new Ground());
         Tree tree = new Tree();
         Entity.create(tree);
         tree.getComponent(RenderComponent.class).ifPresent(renderer -> {
@@ -80,6 +79,6 @@ public class Main {
                 c.transform.setPosition(new Vector3f(5, 3, 5));
                 c.transform.setScale(new Vector3f(0.3f, 0.3f, 0.3f));
             });
-        });*/
+        });
     }
 }

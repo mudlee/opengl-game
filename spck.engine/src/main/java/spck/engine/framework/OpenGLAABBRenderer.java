@@ -7,7 +7,7 @@ import spck.engine.render.MeshMaterialBatch;
 public class OpenGLAABBRenderer implements Renderer {
     @Override
     public void render(MeshMaterialBatch batch) {
-        GL.vaoContext(batch.getVaoID(), () -> {
+        GL.vaoContext(batch.getAABBVaoID(), () -> {
             GL41.glEnableVertexAttribArray(LayoutQualifier.AABB_VX_POSITION.location);
 
             // 4 slot for the transformation matrix, one for each column

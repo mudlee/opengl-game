@@ -14,16 +14,18 @@ public class MeshMaterialBatch {
     private final Set<Integer> entities = new HashSet<>();
     private int vaoID;
     private Integer instancedVboID;
-    private Integer verticesVBOId;
-    private Integer indicesVBOId;
-    private Integer normalsVBOId;
+    private Integer verticesVBOID;
+    private Integer indicesVBOID;
+    private Integer normalsVBOID;
     private Integer uvVBOId;
     private boolean batchSizeChanged = false;
     private int currentSize;
     private int oldSize;
     private int entityMemoryUsage = 0;
+    private int aabbVaoID;
     private int aabbVerticesVboID;
     private int aabbIndicesVboID;
+    private int aabbInstancedDataVboID;
 
     public MeshMaterialBatch(Mesh mesh, Material material) {
         this.mesh = mesh;
@@ -88,27 +90,35 @@ public class MeshMaterialBatch {
     }
 
     public void setVerticesVBOId(Integer verticesVBOId) {
-        this.verticesVBOId = verticesVBOId;
+        this.verticesVBOID = verticesVBOId;
     }
 
-    public void setIndicesVBOId(Integer indicesVBOId) {
-        this.indicesVBOId = indicesVBOId;
+    public void setIndicesVBOID(Integer indicesVBOID) {
+        this.indicesVBOID = indicesVBOID;
     }
 
     public void setNormalsVBOId(Integer normalsVBOId) {
-        this.normalsVBOId = normalsVBOId;
+        this.normalsVBOID = normalsVBOId;
     }
 
     public void setUVVBOId(Integer textureVBOId) {
         this.uvVBOId = textureVBOId;
     }
 
-    public void setAABBVboID(int aabbVboID) {
+    public void setAABBVaoID(int vaoId) {
+        this.aabbVaoID = vaoId;
+    }
+
+    public void setAABBVBOID(int aabbVboID) {
         this.aabbVerticesVboID = aabbVboID;
     }
 
-    public void setAABBIndicesVboID(int aabbIndicesVboID) {
+    public void setAABBIndicesVBOID(int aabbIndicesVboID) {
         this.aabbIndicesVboID = aabbIndicesVboID;
+    }
+
+    public void setAABBInstancedVboID(int instancedDataVboId) {
+        this.aabbInstancedDataVboID = instancedDataVboId;
     }
 
     public void storeEntityMemoryUsage(int bytes) {
@@ -139,20 +149,20 @@ public class MeshMaterialBatch {
         return instancedVboID;
     }
 
-    public Integer getNormalsVBOId() {
-        return normalsVBOId;
+    public Integer getNormalsVBOID() {
+        return normalsVBOID;
     }
 
     public Mesh getMesh() {
         return mesh;
     }
 
-    public Integer getVerticesVBOId() {
-        return verticesVBOId;
+    public Integer getVerticesVBOID() {
+        return verticesVBOID;
     }
 
-    public Integer getIndicesVBOId() {
-        return indicesVBOId;
+    public Integer getIndicesVBOID() {
+        return indicesVBOID;
     }
 
     public Integer getUvVBOId() {
@@ -167,11 +177,19 @@ public class MeshMaterialBatch {
         return entityMemoryUsage;
     }
 
+    public int getAABBVaoID() {
+        return aabbVaoID;
+    }
+
     public int getAABBVerticesVboID() {
         return aabbVerticesVboID;
     }
 
     public int getAABBIndicesVboID() {
         return aabbIndicesVboID;
+    }
+
+    public int getAABBInstancedDataVboID() {
+        return aabbInstancedDataVboID;
     }
 }

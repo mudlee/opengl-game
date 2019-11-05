@@ -145,11 +145,6 @@ public class ModelLoader {
                     aabb
             );
 
-            LOGGER.debug("{}", mesh.getVertices());
-            LOGGER.debug("length: {}", mesh.getVertices().length);
-            LOGGER.debug("Indices {}", mesh.getIndices());
-            LOGGER.debug("{}", aabb.getVertices());
-
             if (!fromCache) {
                 LOGGER.debug("    Mesh has been loaded. Verts: {}, normals: {}, mat idx: {}", mesh.getIndices().length, mesh.getNormals().length / 3, materialIndex);
             }
@@ -195,6 +190,10 @@ public class ModelLoader {
             }
         }
 
+        LOGGER.debug(
+                "    AABB: min(x:{}, y:{}, z:{}) max(x:{}, y:{}, z:{})",
+                min.x, min.y, min.z, max.x, max.y, max.z
+        );
         return new AABB(min, max);
     }
 

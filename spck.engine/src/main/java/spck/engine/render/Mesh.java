@@ -100,7 +100,7 @@ public class Mesh {
         return aabb.getVertices();
     }
 
-    public float[] getAABBIndices() {
+    public int[] getAABBIndices() {
         return aabb.getIndices();
     }
 

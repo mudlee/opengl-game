@@ -48,9 +48,14 @@ public class GL {
         GL41.glBindFramebuffer(GL41.GL_FRAMEBUFFER, 0);
     }
 
-    public static void genVaoContext(Consumer<Integer> consumer) {
+    public static void genVaoContext(Consumer<Integer> consumer, Runnable vaoUnbindedCallback) {
         int vaoId = GL41.glGenVertexArrays();
-        GL.vaoContext(vaoId, () -> consumer.accept(vaoId));
+        GL.vaoContext(vaoId, () -> consumer.accept(vaoId), vaoUnbindedCallback);
+    }
+
+    public static void vaoContext(int vaoId, Runnable runnable, Runnable vaoUnbindedCallback) {
+        GL.vaoContext(vaoId, runnable);
+        vaoUnbindedCallback.run();
     }
 
     public static void vaoContext(int vaoId, Runnable runnable) {
