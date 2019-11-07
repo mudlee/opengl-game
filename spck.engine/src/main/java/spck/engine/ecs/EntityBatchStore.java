@@ -2,6 +2,7 @@ package spck.engine.ecs;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spck.engine.Engine;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.render.*;
 
@@ -9,9 +10,18 @@ import java.util.*;
 import java.util.function.Supplier;
 
 public class EntityBatchStore {
+    private static class BatchGroupBatchTouple {
+        int batchGroupID;
+        int batchID;
+
+        BatchGroupBatchTouple(int batchGroupID, int batchID) {
+            this.batchGroupID = batchGroupID;
+            this.batchID = batchID;
+        }
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityBatchStore.class);
-    private final Map<Integer, Integer> entityBatchGroupIDMap = new HashMap<>();
-    private final Map<Integer, Integer> entityBatchIDMap = new HashMap<>();
+    private final Map<Integer, List<BatchGroupBatchTouple>> entityBatchGroupBatchIDMap = new HashMap<>();
     private final Map<Integer, MaterialBatchGroup> groups = new HashMap<>();
     private final Set<Integer> entities = new HashSet<>();
     /**
@@ -39,8 +49,9 @@ public class EntityBatchStore {
         int meshID = mesh.hashCode();
 
 
-        entityBatchGroupIDMap.put(entityId, materialID);
-        entityBatchIDMap.put(entityId, meshID);
+        entityBatchGroupBatchIDMap.putIfAbsent(entityId, new ArrayList<>());
+        entityBatchGroupBatchIDMap.get(entityId).add(new BatchGroupBatchTouple(materialID, meshID));
+
         LOGGER.trace("{} entity {} to BatchGroup {} Batch {}", addingEntityAsNew ? "Adding" : "Updating", entityId, materialID, meshID);
 
         if (!groups.containsKey(materialID)) {
@@ -112,24 +123,25 @@ public class EntityBatchStore {
         processGPUDataChanges();
     }
 
-    public void destroyEntity(int id) {
-        LOGGER.trace("Removing entity {}", id);
-        ECS.world.delete(id);
-        entities.remove(id);
+    public void destroyEntity(int entityId) {
+        LOGGER.trace("Removing entity {}", entityId);
+        ECS.world.delete(entityId);
+        entities.remove(entityId);
 
-        int batchGroupID = getEntityBatchGroupID(id).orElseThrow(() -> new RuntimeException(String.format("Entity's %s was marked for deletion, but it's not in the batching system", id)));
-        int batchID = getEntityBatchID(id).orElseThrow(() -> new RuntimeException(String.format("Entity's %s was marked for deletion, but it's not in the batching system", id)));
+        Supplier<RuntimeException> exceptionSupplier = () -> new RuntimeException(String.format("Entity's %s was marked for deletion, but it's not in the batching system", entityId));
+        List<BatchGroupBatchTouple> touples = getEntityBatchGroupBatchTouples(entityId).orElseThrow(exceptionSupplier);
 
-        groups.get(batchGroupID)
-                .getBatch(batchID)
-                .orElseThrow(() -> new RuntimeException(String.format("Batch %d was not found in BatchGroup %d", batchID, batchGroupID)))
-                .removeEntity(id);
+        for (BatchGroupBatchTouple touple : touples) {
+            groups.get(touple.batchGroupID)
+                    .getBatch(touple.batchID)
+                    .orElseThrow(() -> new RuntimeException(String.format("Batch %d was not found in BatchGroup %d", touple.batchID, touple.batchGroupID)))
+                    .removeEntity(entityId);
+        }
 
-        entityBatchGroupIDMap.remove(id);
-        entityBatchIDMap.remove(id);
-        materialChanges.remove(id);
-        meshChanges.remove(id);
-        transformationChanges.remove(id);
+        entityBatchGroupBatchIDMap.remove(entityId);
+        materialChanges.remove(entityId);
+        meshChanges.remove(entityId);
+        transformationChanges.remove(entityId);
     }
 
     public Map<Integer, MaterialBatchGroup> getGroups() {
@@ -139,14 +151,21 @@ public class EntityBatchStore {
     private void processGPUDataChanges() {
         if (!newBatchDataQueue.isEmpty()) {
             LOGGER.trace("Processing new Batches' data...");
-            newBatchDataQueue.forEach(batch -> batch.getMaterial().getGpuDataStore().uploadBatchDataToGPU(batch));
+            for (MeshMaterialBatch batch : newBatchDataQueue) {
+                Engine.gpuDataStore.uploadBatchDataToGPU(batch);
+                Engine.aabbGpuDataStore.uploadBatchDataToGPU(batch);
+            }
             newBatchDataQueue.clear();
             LOGGER.trace("New Batches' data processed");
         }
 
         if (!changedBatchDataQueue.isEmpty()) {
             LOGGER.trace("Processing changed Batches' data...");
-            changedBatchDataQueue.forEach(batch -> batch.getMaterial().getGpuDataStore().updateBatchDataInGPU(batch));
+            for (MeshMaterialBatch batch : changedBatchDataQueue) {
+                Engine.gpuDataStore.updateBatchDataInGPU(batch);
+                Engine.aabbGpuDataStore.updateBatchDataInGPU(batch);
+                batch.dataUpdated();
+            }
             changedBatchDataQueue.clear();
             LOGGER.trace("Changed Batches' data processed");
         }
@@ -161,7 +180,9 @@ public class EntityBatchStore {
             while (batchIterator.hasNext()) {
                 Map.Entry<Integer, MeshMaterialBatch> batchEntry = batchIterator.next();
                 if (batchEntry.getValue().getNumOfEntities() == 0) {
-                    batchEntry.getValue().getMaterial().getGpuDataStore().updateBatchDataInGPU(batchEntry.getValue());
+                    Engine.gpuDataStore.updateBatchDataInGPU(batchEntry.getValue());
+                    Engine.aabbGpuDataStore.updateBatchDataInGPU(batchEntry.getValue());
+                    batchEntry.getValue().dataUpdated();
                     LOGGER.trace("Batch {} is empty, removing...", batchEntry.getValue().getID());
                     LOGGER.trace("Batch {} removed from newBatchDataQueue: {}", batchEntry.getValue().getID(), newBatchDataQueue.remove(batchEntry.getValue()));
                     LOGGER.trace("Batch {} removed from changedBatchDataQueue: {}", batchEntry.getValue().getID(), changedBatchDataQueue.remove(batchEntry.getValue()));
@@ -182,24 +203,26 @@ public class EntityBatchStore {
         }
 
         LOGGER.trace("Processing transformation changes...");
-        transformationChanges.forEach((entityId, component) -> {
-            int batchGroupID = getEntityBatchGroupID(entityId).orElseThrow(() -> new RuntimeException(String.format("Entity's %s transform was changed, but it's not in the batching system", entityId)));
-            int batchID = getEntityBatchID(entityId).orElseThrow(() -> new RuntimeException(String.format("Entity's %s transform was changed, but it's not in the batching system", entityId)));
+        for (Integer entityId : transformationChanges.keySet()) {
+            Supplier<RuntimeException> exceptionSupplier = () -> new RuntimeException(String.format("Entity's %s transform was changed, but it's not in the batching system", entityId));
+            List<BatchGroupBatchTouple> touples = getEntityBatchGroupBatchTouples(entityId).orElseThrow(exceptionSupplier);
 
-            MeshMaterialBatch batch = groups.get(batchGroupID)
-                    .getBatch(batchID)
-                    .orElseThrow(() -> new RuntimeException(String.format("Batch %d was not found in BatchGroup %d", batchID, batchGroupID)));
+            for (BatchGroupBatchTouple touple : touples) {
+                MeshMaterialBatch batch = groups.get(touple.batchGroupID)
+                        .getBatch(touple.batchID)
+                        .orElseThrow(() -> new RuntimeException(String.format("Batch %d was not found in BatchGroup %d", touple.batchID, touple.batchGroupID)));
 
-            if (newBatchDataQueue.contains(batch)) {
-                LOGGER.trace(
-                        "BatchGroup {} Batch {} data won't be updated as it's still waiting for data uploading",
-                        batchGroupID,
-                        batchID
-                );
-            } else {
-                changedBatchDataQueue.add(batch);
+                if (newBatchDataQueue.contains(batch)) {
+                    LOGGER.trace(
+                            "BatchGroup {} Batch {} data won't be updated as it's still waiting for data uploading",
+                            touple.batchGroupID,
+                            touple.batchID
+                    );
+                } else {
+                    changedBatchDataQueue.add(batch);
+                }
             }
-        });
+        }
         transformationChanges.clear();
         LOGGER.trace("Transformation changes are applied");
     }
@@ -210,20 +233,23 @@ public class EntityBatchStore {
         }
 
         LOGGER.trace("Processing mesh changes...");
-        meshChanges.forEach((entityId, meshMaterialPair) -> {
+        for (Map.Entry<Integer, MeshMaterialPair> entry : materialChanges.entrySet()) {
+            int entityId = entry.getKey();
+            MeshMaterialPair meshMaterialPair = entry.getValue();
             LOGGER.trace("{}'s mesh has changed", entityId);
 
             Supplier<RuntimeException> exceptionSupplier = () -> new RuntimeException(String.format("Entity %s mesh was changed, but it's not in the batching system", entityId));
-            int batchGroupID = getEntityBatchGroupID(entityId).orElseThrow(exceptionSupplier);
-            int batchID = getEntityBatchID(entityId).orElseThrow(exceptionSupplier);
+            List<BatchGroupBatchTouple> touples = getEntityBatchGroupBatchTouples(entityId).orElseThrow(exceptionSupplier);
+            entityBatchGroupBatchIDMap.get(entityId).clear();
+            for (BatchGroupBatchTouple touple : touples) {
+                groups.get(touple.batchGroupID)
+                        .getBatch(touple.batchID)
+                        .orElseThrow(() -> new RuntimeException(String.format("Batch %d was not found in BatchGroup %d", touple.batchID, touple.batchGroupID)))
+                        .removeEntity(entityId);
 
-            groups.get(batchGroupID)
-                    .getBatch(batchID)
-                    .orElseThrow(() -> new RuntimeException(String.format("Batch %d was not found in BatchGroup %d", batchID, batchGroupID)))
-                    .removeEntity(entityId);
-
-            add(entityId, meshMaterialPair);
-        });
+                add(entityId, meshMaterialPair);
+            }
+        }
 
         LOGGER.trace("Mesh changes are applied");
         meshChanges.clear();
@@ -235,30 +261,31 @@ public class EntityBatchStore {
         }
 
         LOGGER.trace("Processing material changes...");
-        materialChanges.forEach((entityId, meshMaterialPair) -> {
+        for (Map.Entry<Integer, MeshMaterialPair> entry : materialChanges.entrySet()) {
+            int entityId = entry.getKey();
+            MeshMaterialPair meshMaterialPair = entry.getValue();
+
             Supplier<RuntimeException> exceptionSupplier = () -> new RuntimeException(String.format("Entity's %s material was changed, but it's not in the batching system", entityId));
+            List<BatchGroupBatchTouple> touples = getEntityBatchGroupBatchTouples(entityId).orElseThrow(exceptionSupplier);
+            entityBatchGroupBatchIDMap.get(entityId).clear();
 
-            int batchGroupID = getEntityBatchGroupID(entityId).orElseThrow(exceptionSupplier);
-            int batchID = getEntityBatchID(entityId).orElseThrow(exceptionSupplier);
-            LOGGER.trace("{}'s material has changed, removing from BatchGroup {} Batch {}, and adding to BatchGroup {} Batch {}", entityId, batchGroupID, batchID, meshMaterialPair.getMaterial().hashCode(), meshMaterialPair.getMesh().hashCode());
+            for (BatchGroupBatchTouple touple : touples) {
+                LOGGER.trace("{}'s material has changed, removing from BatchGroup {} Batch {}, and adding to BatchGroup {} Batch {}", entityId, touple.batchGroupID, touple.batchID, meshMaterialPair.getMaterial().hashCode(), meshMaterialPair.getMesh().hashCode());
 
-            groups.get(batchGroupID)
-                    .getBatch(batchID)
-                    .orElseThrow(() -> new RuntimeException(String.format("Batch %d was not found in BatchGroup %d", batchID, batchGroupID)))
-                    .removeEntity(entityId);
+                groups.get(touple.batchGroupID)
+                        .getBatch(touple.batchID)
+                        .orElseThrow(() -> new RuntimeException(String.format("Batch %d was not found in BatchGroup %d", touple.batchID, touple.batchGroupID)))
+                        .removeEntity(entityId);
 
-            add(entityId, meshMaterialPair);
-        });
+                add(entityId, meshMaterialPair);
+            }
+        }
 
         materialChanges.clear();
         LOGGER.trace("Material changes are applied");
     }
 
-    private Optional<Integer> getEntityBatchGroupID(int entityId) {
-        return Optional.ofNullable(entityBatchGroupIDMap.getOrDefault(entityId, null));
-    }
-
-    private Optional<Integer> getEntityBatchID(int entityId) {
-        return Optional.ofNullable(entityBatchIDMap.getOrDefault(entityId, null));
+    private Optional<List<BatchGroupBatchTouple>> getEntityBatchGroupBatchTouples(int entityId) {
+        return Optional.ofNullable(entityBatchGroupBatchIDMap.getOrDefault(entityId, null));
     }
 }

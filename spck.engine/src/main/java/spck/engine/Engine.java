@@ -25,6 +25,7 @@ public class Engine implements Runnable{
     public static final Preferences preferences = new Preferences();
     public static Window window;
     public static OpenGLDefaultGPUDataStore gpuDataStore;
+    public static OpenGLAABBGPUDataStore aabbGpuDataStore;
     public static OpenGLStandardShader shader;
     public static Renderer renderer;
 
@@ -54,6 +55,7 @@ public class Engine implements Runnable{
         preferences.os = OSNameParser.parse(osName);
 
         gpuDataStore = new OpenGLDefaultGPUDataStore();
+        aabbGpuDataStore = new OpenGLAABBGPUDataStore();
         shader = new OpenGLStandardShader(camera);
         renderer = new OpenGLDefaultMaterialRenderer();
 

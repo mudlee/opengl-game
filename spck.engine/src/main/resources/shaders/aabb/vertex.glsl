@@ -1,7 +1,7 @@
 #version 410 core
 
 layout (location = 0) in vec3 aabbVxPosition;
-layout (location = 3) in mat4 transformationMatrixInstanced;
+layout (location = 1) in mat4 transformationMatrixInstanced;
 
 uniform mat4 CAMERA_PROJECTION_MATRIX;
 uniform mat4 CAMERA_VIEW_MATRIX;

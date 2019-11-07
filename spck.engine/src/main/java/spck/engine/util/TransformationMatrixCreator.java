@@ -19,4 +19,12 @@ public class TransformationMatrixCreator {
                 scale(scale);
         return reusable;
     }
+
+    public static Matrix4f create(Vector3f translation, Vector3f scale) {
+        reusable.identity();
+        reusable.
+                translate(translation).
+                scale(scale);
+        return reusable;
+    }
 }

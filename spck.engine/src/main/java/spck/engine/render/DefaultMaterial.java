@@ -2,7 +2,6 @@ package spck.engine.render;
 
 import org.joml.Vector3f;
 import spck.engine.Engine;
-import spck.engine.framework.Renderer;
 import spck.engine.render.shader.Shader;
 import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureUVModifier;
@@ -11,8 +10,6 @@ import java.util.Optional;
 
 public class DefaultMaterial implements Material {
     private final Shader shader;
-    private final GPUDataStore gpuDataStore;
-    private final Renderer renderer;
     private float shininess = 1.0f;
     private Vector3f specularColor = new Vector3f(0.5f, 0.5f, 0.5f);
     private Vector3f diffuseColor = new Vector3f(0.5f, 0.5f, 0.5f);
@@ -23,8 +20,6 @@ public class DefaultMaterial implements Material {
 
     public DefaultMaterial() {
         shader = Engine.shader;
-        gpuDataStore = Engine.gpuDataStore;
-        renderer = Engine.renderer;
     }
 
     /*
@@ -116,16 +111,6 @@ public class DefaultMaterial implements Material {
     @Override
     public Shader getShader() {
         return shader;
-    }
-
-    @Override
-    public GPUDataStore getGpuDataStore() {
-        return gpuDataStore;
-    }
-
-    @Override
-    public Renderer getRenderer() {
-        return renderer;
     }
 
     @Override

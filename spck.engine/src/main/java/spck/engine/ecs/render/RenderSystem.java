@@ -92,7 +92,7 @@ public class RenderSystem extends BaseSystem {
         for (MaterialBatchGroup batchGroup : batchStore.getGroups().values()) {
             batchGroup.getMaterial().getShader().startShader(batchGroup.getMaterial());
 
-            batchGroup.getBatches().values().forEach(batch -> batchGroup.getMaterial().getRenderer().render(batch));
+            batchGroup.getBatches().values().forEach(Engine.renderer::render);
             batchGroup.getMaterial().getShader().stopShader();
         }
     }

@@ -7,6 +7,7 @@ import spck.engine.util.TransformationMatrixCreator;
 
 public class Transform {
     private final Matrix4f transformationMatrixReusable = new Matrix4f();
+    private final Matrix4f transformationMatrixWithoutRotationReusable = new Matrix4f();
     private Vector3f position = new Vector3f().zero();
     private Vector3f rotation = new Vector3f().zero();
     private Vector3f scale = new Vector3f(1, 1, 1);
@@ -86,9 +87,15 @@ public class Transform {
         return transformationMatrixReusable;
     }
 
+    // TODO: I think I also have to exclude scale
+    public Matrix4f getTransformationMatrixWithoutRotation() {
+        return transformationMatrixWithoutRotationReusable;
+    }
+
     public void processChanges(Runnable callback) {
         if (changed) {
             transformationMatrixReusable.set(TransformationMatrixCreator.create(position, rotation, scale));
+            transformationMatrixWithoutRotationReusable.set(TransformationMatrixCreator.create(position, scale));
             changed = false;
             callback.run();
         }
