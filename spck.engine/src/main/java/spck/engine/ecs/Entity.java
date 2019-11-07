@@ -5,10 +5,14 @@ import com.artemis.utils.Bag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public abstract class Entity {
     private final static Logger LOGGER = LoggerFactory.getLogger(Entity.class);
+    private final static Map<Integer, Entity> entities = new HashMap<>();
     private final Bag<Component> componentBag = new Bag<>();
     private Integer id;
     private boolean destroyed;
@@ -17,6 +21,7 @@ public abstract class Entity {
 		entity.id = ECS.world.create();
         LOGGER.debug("Entity {} [{}] is created", entity.id, entity.getClass().getSimpleName());
         entity.onEntityCreated();
+        entities.put(entity.id, entity);
 		return entity;
     }
 
@@ -24,6 +29,10 @@ public abstract class Entity {
      * This method is called, when the entity is created, so components now can be added.
      */
     public abstract void onEntityCreated();
+
+    public static Collection<Entity> getAllCreated() {
+        return entities.values();
+    }
 
     public void destroy() {
         if (id == null || destroyed) {
@@ -42,6 +51,7 @@ public abstract class Entity {
             }
         }
         componentBag.clear();
+        entities.remove(id);
     }
 
     @SuppressWarnings("unchecked")

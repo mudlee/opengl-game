@@ -37,4 +37,5 @@ module spck.engine {
     exports spck.engine.ecs.ui;
     exports spck.engine.ui;
     exports spck.engine.Input;
+    exports spck.engine.physics;
 }

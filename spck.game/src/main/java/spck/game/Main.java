@@ -16,6 +16,7 @@ import spck.engine.framework.Window;
 import spck.engine.lights.AmbientLight;
 import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
+import spck.engine.physics.Physics;
 import spck.engine.render.camera.Camera;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
@@ -67,18 +68,25 @@ public class Main {
             renderer.transform.setPosition(new Vector3f(0, 2.5f, 0));
         });
 
-        Entity castle = Entity.create(new Castle());
-        castle.getComponent(RenderComponent.class).ifPresent(castleRender -> {
-            castleRender.transform.setPosition(new Vector3f(0, 1, 0));
+        Castle castle = new Castle();
+        Entity castleE = Entity.create(castle);
+        castleE.getComponent(RenderComponent.class).ifPresent(castleRender -> {
+            castleRender.transform.setPosition(new Vector3f(20, 1, 0));
         });
 
+
         Input.onMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT, event -> {
-            Tree t = new Tree();
+            Physics.raycast(CAMERA.getRay(), 20f).ifPresent(hit -> {
+                System.out.println(hit.getPosition().x);
+                System.out.println(hit.getPosition().y);
+            });
+
+            /*Tree t = new Tree();
             Entity.create(t);
             t.getComponent(RenderComponent.class).ifPresent(c -> {
                 c.transform.setPosition(new Vector3f(5, 3, 5));
                 c.transform.setScale(new Vector3f(0.3f, 0.3f, 0.3f));
-            });
+            });*/
         });
     }
 }

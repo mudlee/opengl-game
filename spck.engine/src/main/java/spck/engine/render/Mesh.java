@@ -1,5 +1,6 @@
 package spck.engine.render;
 
+import org.joml.AABBf;
 import org.joml.Vector3f;
 
 import java.util.Arrays;
@@ -102,6 +103,10 @@ public class Mesh {
 
     public int[] getAABBIndices() {
         return aabb.getIndices();
+    }
+
+    public AABBf getAABB() {
+        return aabb.get();
     }
 
     public void recalculateNormals() {

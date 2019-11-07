@@ -1,15 +1,14 @@
 package spck.engine.render;
 
+import org.joml.AABBf;
 import org.joml.Vector3f;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AABB {
-    private final static Logger LOGGER = LoggerFactory.getLogger(AABB.class);
     private final float[] vertices;
     private final int[] indices;
     private final Vector3f min;
     private final Vector3f max;
+    private final AABBf aabb;
 
     public AABB(Vector3f min, Vector3f max) {
         this.min = min;
@@ -26,8 +25,6 @@ public class AABB {
                 min.x, min.y, min.z, // back bottom right & left bottom left & bottom bottom left- 7
         };
 
-        LOGGER.debug("{}", vertices);
-
         indices = new int[]{
                 0, 1, 2, 1, 3, 2, // front
                 3, 1, 5, 3, 5, 4, // right
@@ -36,6 +33,8 @@ public class AABB {
                 0, 7, 5, 5, 1, 0, // bottom
                 2, 3, 4, 4, 6, 2, // top
         };
+
+        aabb = new AABBf(min.x, min.y, min.z, max.x, max.y, max.z);
     }
 
     @Override
@@ -53,5 +52,9 @@ public class AABB {
 
     public int[] getIndices() {
         return indices;
+    }
+
+    public AABBf get() {
+        return aabb;
     }
 }
