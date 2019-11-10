@@ -16,6 +16,7 @@ import spck.engine.framework.Window;
 import spck.engine.lights.AmbientLight;
 import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
+import spck.engine.model.primitives.Cube;
 import spck.engine.physics.Physics;
 import spck.engine.render.camera.Camera;
 
@@ -92,8 +93,12 @@ public class Main {
 
         Input.onMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT, event -> {
             Physics.raycast(CAMERA.getRay(), 20f).ifPresent(hit -> {
-                System.out.println(hit.getPosition().x);
-                System.out.println(hit.getPosition().y);
+                Cube cube = new Cube();
+                Entity.create(cube);
+                cube.getComponent(RenderComponent.class).ifPresent(comp -> {
+                    comp.transform.setScale(new Vector3f(0.01f, 0.01f, 0.01f));
+                    comp.transform.setPosition(hit.getPosition());
+                });
             });
 
             /*Tree t = new Tree();
@@ -103,5 +108,8 @@ public class Main {
                 c.transform.setScale(new Vector3f(0.3f, 0.3f, 0.3f));
             });*/
         });
+
+
+        Entity.create(new CrossHair());
     }
 }
