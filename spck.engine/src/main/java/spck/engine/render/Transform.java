@@ -7,7 +7,6 @@ import spck.engine.util.TransformationMatrixCreator;
 
 public class Transform {
     private final Matrix4f transformationMatrixReusable = new Matrix4f();
-    private final Matrix4f transformationMatrixOnlyTranslationReusable = new Matrix4f();
     private Vector3f position = new Vector3f().zero();
     private Vector3f rotation = new Vector3f().zero();
     private Vector3f scale = new Vector3f(1, 1, 1);
@@ -87,17 +86,9 @@ public class Transform {
         return transformationMatrixReusable;
     }
 
-    // TODO: I think I also have to exclude scale
-    // https://gamedev.stackexchange.com/questions/162819/how-do-axis-aligned-bounding-boxes-update-with-rotations
-    // https://www.gamedev.net/forums/topic/495016-aabb-rotation/
-    public Matrix4f getTransformationOnlyTranslation() {
-        return transformationMatrixOnlyTranslationReusable;
-    }
-
     public void processChanges(Runnable callback) {
         if (changed) {
             transformationMatrixReusable.set(TransformationMatrixCreator.create(position, rotation, scale));
-            transformationMatrixOnlyTranslationReusable.set(TransformationMatrixCreator.create(position));
             changed = false;
             callback.run();
         }

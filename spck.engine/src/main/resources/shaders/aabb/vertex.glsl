@@ -1,7 +1,6 @@
 #version 410 core
 
 layout (location = 0) in vec3 aabbVxPosition;
-layout (location = 1) in mat4 transformationMatrixInstanced;
 
 uniform mat4 CAMERA_PROJECTION_MATRIX;
 uniform mat4 CAMERA_VIEW_MATRIX;
@@ -11,6 +10,6 @@ out gl_PerVertex {
 };
 
 void main(){
-    vec4 vertexWorldPosition=transformationMatrixInstanced*vec4(aabbVxPosition, 1.0);
+    vec4 vertexWorldPosition = vec4(aabbVxPosition, 1.0);
     gl_Position = CAMERA_PROJECTION_MATRIX * CAMERA_VIEW_MATRIX * vertexWorldPosition;
 }

@@ -1,5 +1,7 @@
 package spck.engine.framework;
 
+import org.joml.AABBf;
+import org.joml.Matrix4fc;
 import org.lwjgl.opengl.GL41;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,11 +13,7 @@ import spck.engine.render.MeshMaterialBatch;
 
 public class OpenGLAABBGPUDataStore extends AbstractGPUDataStore implements GPUDataStore {
     public enum LayoutQualifier {
-        VX_POSITION(0),
-        INS_TRANSFORMATION_MATRIX_COL1(1),
-        INS_TRANSFORMATION_MATRIX_COL2(2),
-        INS_TRANSFORMATION_MATRIX_COL3(3),
-        INS_TRANSFORMATION_MATRIX_COL4(4);
+        VX_POSITION(0);
 
         public int location;
 
@@ -24,12 +22,21 @@ public class OpenGLAABBGPUDataStore extends AbstractGPUDataStore implements GPUD
         }
     }
 
+    public static final int NUMBER_OF_INDICES_PER_AABB = 36;
+    private static final int NUMBER_OF_VERTICES_PER_AABB = 24;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenGLAABBGPUDataStore.class);
-    // transformationMatrixInstanced(4x4)
-    private static final int INSTANCED_DATA_AABB_SIZE_IN_BYTES = 16;
+    private static final int[] BASE_INDICES = new int[]{
+            0, 1, 2, 1, 3, 2, // front
+            3, 1, 5, 3, 5, 4, // right
+            4, 5, 7, 7, 6, 4, // back
+            6, 7, 0, 0, 2, 6, // left
+            0, 7, 5, 5, 1, 0, // bottom
+            2, 3, 4, 4, 6, 2, // top
+    };
 
     public OpenGLAABBGPUDataStore() {
-        super(INSTANCED_DATA_AABB_SIZE_IN_BYTES);
+        super(-1);
     }
 
     @Override
@@ -39,9 +46,7 @@ public class OpenGLAABBGPUDataStore extends AbstractGPUDataStore implements GPUD
             vaos.add(vaoId);
             batch.setAABBVaoID(vaoId);
 
-            loadAABBBatchMeshDataIntoVAO(batch);
-            setupAABBInstancedRendering(batch);
-            loadAABBInstancedRenderingData(batch);
+            loadAABBDataIntoVao(batch);
         }, () -> GL41.glBindBuffer(GL41.GL_ELEMENT_ARRAY_BUFFER, 0));
         batch.dataUpdated();
     }
@@ -55,22 +60,18 @@ public class OpenGLAABBGPUDataStore extends AbstractGPUDataStore implements GPUD
             return;
         }
 
-        GL.bufferContext(batch.getAABBInstancedDataVboID(), () -> {
+        GL.bufferContext(batch.getAABBVerticesVboID(), () -> {
             LOGGER.trace("Updating batch {} AABB data in GPU. Size: {}->{}",
                     batch.getID(),
                     batch.getOldSize(),
                     batch.getNumOfEntities()
             );
-
+            float[] data = getVertices(batch);
             if (batch.wasSizeChanged()) {
                 // updating the storage size
-                GL41.glBufferData(GL41.GL_ARRAY_BUFFER, batch.getNumOfEntities() * INSTANCED_DATA_AABB_SIZE_IN_BYTES * Float.BYTES, GL41.GL_DYNAMIC_DRAW);
+                GL41.glBufferData(GL41.GL_ARRAY_BUFFER, batch.getNumOfEntities() * NUMBER_OF_VERTICES_PER_AABB * Float.BYTES, GL41.GL_DYNAMIC_DRAW);
             }
-
-            Stats.vboMemoryUsed -= batch.getOldSize() * batch.getEntityMemoryUsage();
-            float[] instancedVBOData = getAABBInstancedVBOData(batch);
-            // updating the data in the array buffer
-            GL41.glBufferSubData(GL41.GL_ARRAY_BUFFER, 0, instancedVBOData);
+            GL41.glBufferSubData(GL41.GL_ARRAY_BUFFER, 0, data);
             LOGGER.trace("    AABB Data has been updated for batch {}", batch.getID());
         });
     }
@@ -81,79 +82,103 @@ public class OpenGLAABBGPUDataStore extends AbstractGPUDataStore implements GPUD
         GL41.glDeleteVertexArrays(batch.getAABBVaoID());
         GL41.glDeleteBuffers(batch.getAABBVerticesVboID());
         GL41.glDeleteBuffers(batch.getAABBIndicesVboID());
-        GL41.glDeleteBuffers(batch.getAABBInstancedDataVboID());
         vbos.remove(batch.getAABBVerticesVboID());
         vbos.remove(batch.getAABBIndicesVboID());
-        vbos.remove(batch.getAABBInstancedDataVboID());
-
         vaos.remove(batch.getAABBVaoID());
         LOGGER.trace("Batch {} AABB data removed from GPU", batch.getID());
     }
 
-    private void setupAABBInstancedRendering(MeshMaterialBatch batch) {
-        LOGGER.trace("    Setting up AABB instanced rendering for {} in [VAO:{}]", batch.getMesh(), batch.getAABBVaoID());
-
-        // Create VBO for instanced attributes
-        int instancedDataVboId = GL41.glGenBuffers();
-        vbos.add(instancedDataVboId);
-        LOGGER.trace("    AABB_INSTANCED_DATA-VBO:{}", instancedDataVboId);
-        batch.setAABBInstancedVboID(instancedDataVboId);
-
-        GL.bufferContext(instancedDataVboId, () -> {
-            GL41.glBufferData(GL41.GL_ARRAY_BUFFER, batch.getNumOfEntities() * INSTANCED_DATA_AABB_SIZE_IN_BYTES * Float.BYTES, GL41.GL_DYNAMIC_DRAW);
-
-            // add transformationMatrix instanced attribute to VAO
-            addInstancedVAOAttributeRequiresBind(LayoutQualifier.INS_TRANSFORMATION_MATRIX_COL1.location, 4, GL41.GL_FLOAT, 0);
-            addInstancedVAOAttributeRequiresBind(LayoutQualifier.INS_TRANSFORMATION_MATRIX_COL2.location, 4, GL41.GL_FLOAT, 4);
-            addInstancedVAOAttributeRequiresBind(LayoutQualifier.INS_TRANSFORMATION_MATRIX_COL3.location, 4, GL41.GL_FLOAT, 8);
-            addInstancedVAOAttributeRequiresBind(LayoutQualifier.INS_TRANSFORMATION_MATRIX_COL4.location, 4, GL41.GL_FLOAT, 12);
-        });
-    }
-
-    private void loadAABBInstancedRenderingData(MeshMaterialBatch batch) {
-        GL.bufferContext(batch.getAABBInstancedDataVboID(), () -> {
-            float[] instancedVBOData = getAABBInstancedVBOData(batch);
-            GL41.glBufferData(batch.getAABBInstancedDataVboID(), instancedVBOData, GL41.GL_DYNAMIC_DRAW);
-            GL41.glBufferSubData(GL41.GL_ARRAY_BUFFER, 0, instancedVBOData);
-        });
-    }
-
-    private float[] getAABBInstancedVBOData(MeshMaterialBatch batch) {
-        float[] vboData = new float[batch.getNumOfEntities() * INSTANCED_DATA_AABB_SIZE_IN_BYTES];
-        int offset = 0;
+    private void loadAABBDataIntoVao(MeshMaterialBatch batch) {
+        float[] vertices = getVertices(batch);
 
         int index = 0;
-        for (int entityId : batch.getEntities()) {
+        for (Integer entityId : batch.getEntities()) {
             RenderComponent component = ECS.world.getEntity(entityId).getComponent(RenderComponent.class);
-            component.transform.getTransformationOnlyTranslation().get(vboData, offset);
-            offset += 16;
-
-            if (index == 0 && offset != INSTANCED_DATA_AABB_SIZE_IN_BYTES) {
-                Stats.vboMemoryMisused = true;
+            AABBf transformedAABB = transform(batch.getMesh().getAABB(), component.transform.getTransformationMatrix());
+            for (float vertex : calculateVertices(transformedAABB)) {
+                vertices[index++] = vertex;
             }
-
-            index++;
         }
 
-        batch.storeEntityMemoryUsage(batch.getEntityMemoryUsage() + offset / batch.getNumOfEntities());
-        Stats.vboMemoryUsed += offset;
-        return vboData;
-    }
-
-    private void loadAABBBatchMeshDataIntoVAO(MeshMaterialBatch batch) {
-        LOGGER.trace("    Loading AABB data {} into [VAO:{}]", batch.getMesh(), batch.getAABBVaoID());
-
         // AABB vertices
-        int aabbVboID = createAndStoreDataInVBO(batch.getMesh().getAABBVertices());
+        int aabbVboID = createAndStoreDataInVBO(vertices);
         vbos.add(aabbVboID);
         LOGGER.trace("    AABB-VBO:{}", aabbVboID);
         addVAOAttribute(aabbVboID, LayoutQualifier.VX_POSITION.location, 3);
         batch.setAABBVBOID(aabbVboID);
 
         // AABB indices
-        int aabbIndicesVboID = createAndStoreDataInVBO(batch.getMesh().getAABBIndices());
+        int aabbIndicesVboID = createAndStoreDataInVBO(calculateIndices(batch.getNumOfEntities()));
         vbos.add(aabbIndicesVboID);
         LOGGER.trace("    AABB_INDICES-VBO:{}", aabbIndicesVboID);
         batch.setAABBIndicesVBOID(aabbIndicesVboID);
+    }
+
+    private float[] getVertices(MeshMaterialBatch batch) {
+        float[] vertices = new float[batch.getNumOfEntities() * NUMBER_OF_VERTICES_PER_AABB];
+
+        int index = 0;
+        for (Integer entityId : batch.getEntities()) {
+            RenderComponent component = ECS.world.getEntity(entityId).getComponent(RenderComponent.class);
+            AABBf transformedAABB = transform(batch.getMesh().getAABB(), component.transform.getTransformationMatrix());
+            for (float vertex : calculateVertices(transformedAABB)) {
+                vertices[index++] = vertex;
+            }
+        }
+
+        return vertices;
+    }
+
+    private int[] calculateIndices(int numberOfEntities) {
+        int[] indices = new int[numberOfEntities * NUMBER_OF_INDICES_PER_AABB];
+        int index = 0;
+        for (int i = 0; i < numberOfEntities; i++) {
+            for (int j = 0; j < NUMBER_OF_INDICES_PER_AABB; j++) {
+                indices[index++] = BASE_INDICES[j] + i * 8;
+            }
+        }
+
+        return indices;
+    }
+
+    private float[] calculateVertices(AABBf aabb) {
+        return new float[]{
+                aabb.minX, aabb.minY, aabb.maxZ, // front bottom left & left bottom right- 0
+                aabb.maxX, aabb.minY, aabb.maxZ, // front bottom right & right bottom left & bottom top right - 1
+                aabb.minX, aabb.maxY, aabb.maxZ, // front top left & left top right & top bottom left- 2
+                aabb.maxX, aabb.maxY, aabb.maxZ, // front top right & right top left & top bottom right - 3
+
+                aabb.maxX, aabb.maxY, aabb.minZ, // right top right & back top left & top top right - 4
+                aabb.maxX, aabb.minY, aabb.minZ, // right bottom right & back bottom left & bottom bottom right - 5
+                aabb.minX, aabb.maxY, aabb.minZ, // back top right & left top left & top top left - 6
+                aabb.minX, aabb.minY, aabb.minZ, // back bottom right & left bottom left & bottom bottom left- 7
+        };
+    }
+
+    // TODO: remove this, when JOML 1.9.20 is out
+    public AABBf transform(AABBf source, Matrix4fc m) {
+        AABBf dest = new AABBf();
+        float dx = source.maxX - source.minX, dy = source.maxY - source.minY, dz = source.maxZ - source.minZ;
+        float minx = Float.POSITIVE_INFINITY, miny = Float.POSITIVE_INFINITY, minz = Float.POSITIVE_INFINITY;
+        float maxx = Float.NEGATIVE_INFINITY, maxy = Float.NEGATIVE_INFINITY, maxz = Float.NEGATIVE_INFINITY;
+        for (int i = 0; i < 8; i++) {
+            float x = source.minX + (i & 1) * dx, y = source.minY + (i >> 1 & 1) * dy, z = source.minZ + (i >> 2 & 1) * dz;
+            float tx = m.m00() * x + m.m10() * y + m.m20() * z + m.m30();
+            float ty = m.m01() * x + m.m11() * y + m.m21() * z + m.m31();
+            float tz = m.m02() * x + m.m12() * y + m.m22() * z + m.m32();
+            minx = Math.min(tx, minx);
+            miny = Math.min(ty, miny);
+            minz = Math.min(tz, minz);
+            maxx = Math.max(tx, maxx);
+            maxy = Math.max(ty, maxy);
+            maxz = Math.max(tz, maxz);
+        }
+        dest.minX = minx;
+        dest.minY = miny;
+        dest.minZ = minz;
+        dest.maxX = maxx;
+        dest.maxY = maxy;
+        dest.maxZ = maxz;
+        return dest;
     }
 }

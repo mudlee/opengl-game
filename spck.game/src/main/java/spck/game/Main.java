@@ -78,8 +78,7 @@ public class Main {
         Tree tree = new Tree();
         Entity.create(tree);
         tree.getComponent(RenderComponent.class).ifPresent(renderer -> {
-            renderer.transform.setPosition(new Vector3f(10, 5, 0));
-            renderer.transform.setScale(new Vector3f(0.1f, 0.1f, 0.1f));
+            renderer.transform.setPosition(new Vector3f(0, 5, 0));
         });
 
         Input.onKeyHeldDown(GLFW_KEY_R, event -> {

@@ -26,6 +26,7 @@ public class Physics {
             Optional<RenderComponent> renderComponentOpt = entity.getComponent(RenderComponent.class);
             if (renderComponentOpt.isPresent()) {
                 RenderComponent comp = renderComponentOpt.get();
+                // TODO take into account the entity's current transform changes (rotation, scale)
                 for (AABBf aabb : ((PhysicsEntity) entity).getAABBs()) {
                     REUSABLE_MIN.set(
                             comp.transform.getPosition().x,

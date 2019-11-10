@@ -15,8 +15,6 @@ public class Mesh {
     private float[] normals;
     private float[] uvCoords;
     private final AABBf aabb;
-    private final float[] aabbVertices;
-    private final int[] aabbIndices;
     private boolean changed;
 
     public Mesh(float[] vertices, int[] indices, float[] normals, float[] uvCoords, AABBf aabb) {
@@ -25,27 +23,6 @@ public class Mesh {
         this.normals = normals;
         this.uvCoords = uvCoords;
         this.aabb = aabb;
-
-        aabbVertices = new float[]{
-                aabb.minX, aabb.minY, aabb.maxZ, // front bottom left & left bottom right- 0
-                aabb.maxX, aabb.minY, aabb.maxZ, // front bottom right & right bottom left & bottom top right - 1
-                aabb.minX, aabb.maxY, aabb.maxZ, // front top left & left top right & top bottom left- 2
-                aabb.maxX, aabb.maxY, aabb.maxZ, // front top right & right top left & top bottom right - 3
-
-                aabb.maxX, aabb.maxY, aabb.minZ, // right top right & back top left & top top right - 4
-                aabb.maxX, aabb.minY, aabb.minZ, // right bottom right & back bottom left & bottom bottom right - 5
-                aabb.minX, aabb.maxY, aabb.minZ, // back top right & left top left & top top left - 6
-                aabb.minX, aabb.minY, aabb.minZ, // back bottom right & left bottom left & bottom bottom left- 7
-        };
-
-        aabbIndices = new int[]{
-                0, 1, 2, 1, 3, 2, // front
-                3, 1, 5, 3, 5, 4, // right
-                4, 5, 7, 7, 6, 4, // back
-                6, 7, 0, 0, 2, 6, // left
-                0, 7, 5, 5, 1, 0, // bottom
-                2, 3, 4, 4, 6, 2, // top
-        };
     }
 
     @Override
@@ -122,14 +99,6 @@ public class Mesh {
 
     public AABBf getAABB() {
         return aabb;
-    }
-
-    public float[] getAABBVertices() {
-        return aabbVertices;
-    }
-
-    public int[] getAABBIndices() {
-        return aabbIndices;
     }
 
     public void recalculateNormals() {
