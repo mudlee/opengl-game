@@ -20,7 +20,11 @@ public class CrossHair extends UICanvasEntity {
         Texture2D texture2D = TextureStorage.loadFromResource("/ui/crosshair.png", CrossHairTextureRegistryID.CROSSHAIR);
         TextureRegistry.register(texture2D);
         UIImage image = UIImage.build(texture2D.getId(), 50, 50);
-        image.setPosition(Engine.window.getPreferences().getWidth() / 2 - 25, Engine.window.getPreferences().getHeight() / 2 - 25);
+        int pixelRatio = Engine.window.getPreferences().getDevicePixelRatio().orElseThrow();
+        image.setPosition(
+                Engine.window.getPreferences().getWidth() / 2 - pixelRatio * 25,
+                Engine.window.getPreferences().getHeight() / 2 - pixelRatio * 25
+        );
         canvasComponent.addImage(image);
     }
 }

@@ -9,6 +9,9 @@ import java.util.Iterator;
 import java.util.Optional;
 
 public class Physics {
+    private static final Vector3f REUSABLE_1 = new Vector3f();
+    private static final Vector3f REUSABLE_2 = new Vector3f();
+
     public static Optional<RaycastHit> raycast(Rayf ray, float length) {
         Iterator<Entity> iterator = Entity.getAllCreated().iterator();
         Vector2f result = new Vector2f();
@@ -41,7 +44,11 @@ public class Physics {
         }
 
         if (closest != null) {
-            return Optional.of(new RaycastHit(new Vector3f(ray.oX, ray.oY, ray.oZ).add(new Vector3f(ray.dX, ray.dY, ray.dZ).mul(closestNearFar.x)), closest));
+            REUSABLE_1.set(ray.oX, ray.oY, ray.oZ);
+            REUSABLE_2.set(ray.dX, ray.dY, ray.dZ);
+            REUSABLE_2.mul(closestNearFar.x);
+            REUSABLE_1.add(REUSABLE_2);
+            return Optional.of(new RaycastHit(REUSABLE_1, closest));
         }
 
         return Optional.empty();
