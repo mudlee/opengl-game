@@ -20,11 +20,9 @@ public class TransformationMatrixCreator {
         return reusable;
     }
 
-    public static Matrix4f create(Vector3f translation, Vector3f scale) {
+    public static Matrix4f create(Vector3f translation) {
         reusable.identity();
-        reusable.
-                translate(translation).
-                scale(scale);
+        reusable.translate(translation);
         return reusable;
     }
 }

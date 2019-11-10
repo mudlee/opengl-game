@@ -125,7 +125,7 @@ public class OpenGLAABBGPUDataStore extends AbstractGPUDataStore implements GPUD
         int index = 0;
         for (int entityId : batch.getEntities()) {
             RenderComponent component = ECS.world.getEntity(entityId).getComponent(RenderComponent.class);
-            component.transform.getTransformationMatrixWithoutRotation().get(vboData, offset);
+            component.transform.getTransformationOnlyTranslation().get(vboData, offset);
             offset += 16;
 
             if (index == 0 && offset != INSTANCED_DATA_AABB_SIZE_IN_BYTES) {

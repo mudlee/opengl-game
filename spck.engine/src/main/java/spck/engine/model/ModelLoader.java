@@ -1,5 +1,6 @@
 package spck.engine.model;
 
+import org.joml.AABBf;
 import org.joml.Vector3f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
@@ -135,14 +136,13 @@ public class ModelLoader {
             AIMesh aiMesh = AIMesh.create(aiMeshes.get(i));
 
             int materialIndex = aiMesh.mMaterialIndex();
-            AABB aabb = calculateAABB(aiMesh);
 
             Mesh mesh = new Mesh(
                     getVerticesFromMesh(aiMesh),
                     getIndicesFromMesh(aiMesh),
                     getNormalsFromMesh(aiMesh),
                     getUVCoordsFromMesh(aiMesh),
-                    aabb
+                    calculateAABB(aiMesh)
             );
 
             if (!fromCache) {
@@ -155,46 +155,45 @@ public class ModelLoader {
         return parts;
     }
 
-    private static AABB calculateAABB(AIMesh aiMesh) {
+    private static AABBf calculateAABB(AIMesh aiMesh) {
         boolean initiated = false;
-        Vector3f min = new Vector3f();
-        Vector3f max = new Vector3f();
+        AABBf aabb = new AABBf();
 
         AIVector3D.Buffer aiVertices = aiMesh.mVertices();
         while (aiVertices.remaining() > 0) {
             AIVector3D aiVertex = aiVertices.get();
 
             if (!initiated) {
-                min.set(aiVertex.x(), aiVertex.y(), aiVertex.z());
-                max.set(aiVertex.x(), aiVertex.y(), aiVertex.z());
+                aabb.setMin(new Vector3f(aiVertex.x(), aiVertex.y(), aiVertex.z()));
+                aabb.setMax(new Vector3f(aiVertex.x(), aiVertex.y(), aiVertex.z()));
                 initiated = true;
                 continue;
             }
 
-            if (aiVertex.x() < min.x) {
-                min.x = aiVertex.x();
-            } else if (aiVertex.x() > max.x) {
-                max.x = aiVertex.x();
+            if (aiVertex.x() < aabb.minX) {
+                aabb.minX = aiVertex.x();
+            } else if (aiVertex.x() > aabb.maxX) {
+                aabb.maxX = aiVertex.x();
             }
 
-            if (aiVertex.y() < min.y) {
-                min.y = aiVertex.y();
-            } else if (aiVertex.y() > max.y) {
-                max.y = aiVertex.y();
+            if (aiVertex.y() < aabb.minY) {
+                aabb.minY = aiVertex.y();
+            } else if (aiVertex.y() > aabb.maxY) {
+                aabb.maxY = aiVertex.y();
             }
 
-            if (aiVertex.z() < min.z) {
-                min.z = aiVertex.z();
-            } else if (aiVertex.z() > max.z) {
-                max.z = aiVertex.z();
+            if (aiVertex.z() < aabb.minZ) {
+                aabb.minZ = aiVertex.z();
+            } else if (aiVertex.z() > aabb.maxZ) {
+                aabb.maxZ = aiVertex.z();
             }
         }
 
         LOGGER.debug(
                 "    AABB: min(x:{}, y:{}, z:{}) max(x:{}, y:{}, z:{})",
-                min.x, min.y, min.z, max.x, max.y, max.z
+                aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ
         );
-        return new AABB(min, max);
+        return aabb;
     }
 
     private static Material processMaterial(AIMaterial aiMaterial, String modelPath, String extension, boolean fromCache) {
