@@ -1,7 +1,6 @@
 package spck.engine.framework;
 
 import org.joml.AABBf;
-import org.joml.Matrix4fc;
 import org.lwjgl.opengl.GL41;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,7 @@ public class OpenGLAABBGPUDataStore extends AbstractGPUDataStore implements GPUD
 
     public static final int NUMBER_OF_INDICES_PER_AABB = 36;
     private static final int NUMBER_OF_VERTICES_PER_AABB = 24;
-
+    private static final AABBf REUSABLE_AABB = new AABBf();
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenGLAABBGPUDataStore.class);
     private static final int[] BASE_INDICES = new int[]{
             0, 1, 2, 1, 3, 2, // front
@@ -91,15 +90,6 @@ public class OpenGLAABBGPUDataStore extends AbstractGPUDataStore implements GPUD
     private void loadAABBDataIntoVao(MeshMaterialBatch batch) {
         float[] vertices = getVertices(batch);
 
-        int index = 0;
-        for (Integer entityId : batch.getEntities()) {
-            RenderComponent component = ECS.world.getEntity(entityId).getComponent(RenderComponent.class);
-            AABBf transformedAABB = transform(batch.getMesh().getAABB(), component.transform.getTransformationMatrix());
-            for (float vertex : calculateVertices(transformedAABB)) {
-                vertices[index++] = vertex;
-            }
-        }
-
         // AABB vertices
         int aabbVboID = createAndStoreDataInVBO(vertices);
         vbos.add(aabbVboID);
@@ -120,8 +110,8 @@ public class OpenGLAABBGPUDataStore extends AbstractGPUDataStore implements GPUD
         int index = 0;
         for (Integer entityId : batch.getEntities()) {
             RenderComponent component = ECS.world.getEntity(entityId).getComponent(RenderComponent.class);
-            AABBf transformedAABB = transform(batch.getMesh().getAABB(), component.transform.getTransformationMatrix());
-            for (float vertex : calculateVertices(transformedAABB)) {
+            batch.getMesh().getAABB().transform(component.transform.getTransformationMatrix(), REUSABLE_AABB);
+            for (float vertex : calculateVertices(REUSABLE_AABB)) {
                 vertices[index++] = vertex;
             }
         }
@@ -153,32 +143,5 @@ public class OpenGLAABBGPUDataStore extends AbstractGPUDataStore implements GPUD
                 aabb.minX, aabb.maxY, aabb.minZ, // back top right & left top left & top top left - 6
                 aabb.minX, aabb.minY, aabb.minZ, // back bottom right & left bottom left & bottom bottom left- 7
         };
-    }
-
-    // TODO: remove this, when JOML 1.9.20 is out
-    public AABBf transform(AABBf source, Matrix4fc m) {
-        AABBf dest = new AABBf();
-        float dx = source.maxX - source.minX, dy = source.maxY - source.minY, dz = source.maxZ - source.minZ;
-        float minx = Float.POSITIVE_INFINITY, miny = Float.POSITIVE_INFINITY, minz = Float.POSITIVE_INFINITY;
-        float maxx = Float.NEGATIVE_INFINITY, maxy = Float.NEGATIVE_INFINITY, maxz = Float.NEGATIVE_INFINITY;
-        for (int i = 0; i < 8; i++) {
-            float x = source.minX + (i & 1) * dx, y = source.minY + (i >> 1 & 1) * dy, z = source.minZ + (i >> 2 & 1) * dz;
-            float tx = m.m00() * x + m.m10() * y + m.m20() * z + m.m30();
-            float ty = m.m01() * x + m.m11() * y + m.m21() * z + m.m31();
-            float tz = m.m02() * x + m.m12() * y + m.m22() * z + m.m32();
-            minx = Math.min(tx, minx);
-            miny = Math.min(ty, miny);
-            minz = Math.min(tz, minz);
-            maxx = Math.max(tx, maxx);
-            maxy = Math.max(ty, maxy);
-            maxz = Math.max(tz, maxz);
-        }
-        dest.minX = minx;
-        dest.minY = miny;
-        dest.minZ = minz;
-        dest.maxX = maxx;
-        dest.maxY = maxy;
-        dest.maxZ = maxz;
-        return dest;
     }
 }
