@@ -54,7 +54,9 @@ public class RenderSystem extends BaseSystem {
         Graphics.setPolygonMode(Graphics.PolygonMode.LINE);
         aabbShader.startShader(null);
         for (MaterialBatchGroup batchGroup : batchStore.getGroups().values()) {
-            batchGroup.getBatches().values().forEach(aabbRenderer::render);
+            for (MeshMaterialBatch meshMaterialBatch : batchGroup.getBatches().values()) {
+                aabbRenderer.render(meshMaterialBatch);
+            }
         }
         aabbShader.stopShader();
         Graphics.setPolygonMode(Graphics.PolygonMode.FILL);
@@ -62,39 +64,39 @@ public class RenderSystem extends BaseSystem {
 
     private void polygonRender() {
         Graphics.setPolygonMode(Graphics.PolygonMode.LINE);
-        entityIdsStat.clear();
+        updateStats();
         polygonShader.startShader(null);
         for (MaterialBatchGroup batchGroup : batchStore.getGroups().values()) {
-            Stats.numOfBatchGroups++;
-            Stats.numOfBatches += batchGroup.getBatches().size();
-            batchGroup.getBatches().values().stream().map(MeshMaterialBatch::getEntityIDs).forEach(entityIdsStat::addAll);
-        }
-
-        Stats.numOfEntities += entityIdsStat.size();
-
-        for (MaterialBatchGroup batchGroup : batchStore.getGroups().values()) {
-            batchGroup.getBatches().values().forEach(polygonOpenGLRenderer::render);
+            for (MeshMaterialBatch meshMaterialBatch : batchGroup.getBatches().values()) {
+                polygonOpenGLRenderer.render(meshMaterialBatch);
+            }
         }
         polygonShader.stopShader();
         Graphics.setPolygonMode(Graphics.PolygonMode.FILL);
     }
 
     private void forwardRender() {
+        updateStats();
+
+        for (MaterialBatchGroup batchGroup : batchStore.getGroups().values()) {
+            batchGroup.getMaterial().getShader().startShader(batchGroup.getMaterial());
+            for (MeshMaterialBatch meshMaterialBatch : batchGroup.getBatches().values()) {
+                Engine.renderer.render(meshMaterialBatch);
+            }
+            batchGroup.getMaterial().getShader().stopShader();
+        }
+    }
+
+    private void updateStats() {
         entityIdsStat.clear();
         for (MaterialBatchGroup batchGroup : batchStore.getGroups().values()) {
             Stats.numOfBatchGroups++;
             Stats.numOfBatches += batchGroup.getBatches().size();
-            batchGroup.getBatches().values().stream().map(MeshMaterialBatch::getEntityIDs).forEach(entityIdsStat::addAll);
+            for (MeshMaterialBatch meshMaterialBatch : batchGroup.getBatches().values()) {
+                entityIdsStat.addAll(meshMaterialBatch.getEntityIDs());
+            }
         }
-
         Stats.numOfEntities += entityIdsStat.size();
-
-        for (MaterialBatchGroup batchGroup : batchStore.getGroups().values()) {
-            batchGroup.getMaterial().getShader().startShader(batchGroup.getMaterial());
-
-            batchGroup.getBatches().values().forEach(Engine.renderer::render);
-            batchGroup.getMaterial().getShader().stopShader();
-        }
     }
 }
 

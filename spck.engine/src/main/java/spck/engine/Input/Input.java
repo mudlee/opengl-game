@@ -93,6 +93,7 @@ public class Input {
         if (!mouseCursorRelativePositionInitalized) {
             Vector2d mouseAbsPos = getMouseAbsolutePosition();
             calculateMovement(mouseAbsPos.x, mouseAbsPos.y);
+            mouseCursorRelativePositionInitalized = true;
         }
         return mouseCursorRelativePosition;
     }
