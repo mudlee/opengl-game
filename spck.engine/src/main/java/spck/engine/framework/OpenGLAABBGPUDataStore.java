@@ -10,7 +10,7 @@ import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.render.GPUDataStore;
 import spck.engine.render.MeshMaterialBatch;
 
-public class OpenGLAABBGPUDataStore extends AbstractGPUDataStore implements GPUDataStore {
+public class OpenGLAABBGPUDataStore extends OpenGLAbstractGPUDataStore implements GPUDataStore {
     public enum LayoutQualifier {
         VX_POSITION(0);
 

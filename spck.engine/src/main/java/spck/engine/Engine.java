@@ -23,7 +23,7 @@ import java.util.Arrays;
 
 public class Engine implements Runnable{
     public static final Preferences preferences = new Preferences();
-    public static Window window;
+    public static OpenGLWindow window;
     public static OpenGLDefaultGPUDataStore gpuDataStore;
     public static OpenGLAABBGPUDataStore aabbGpuDataStore;
     public static OpenGLStandardShader shader;
@@ -50,7 +50,7 @@ public class Engine implements Runnable{
     private final Thread GAME_LOOP_THREAD;
     private final GameLoop gameLoop;
 
-    public Engine(Camera camera, Window.Preferences windowPreferences) {
+    public Engine(Camera camera, OpenGLWindow.Preferences windowPreferences) {
         String osName = System.getProperty("os.name");
         preferences.os = OSNameParser.parse(osName);
 
@@ -68,7 +68,7 @@ public class Engine implements Runnable{
         LOGGER.debug("Creating GAME_LOOP_THREAD...");
         this.GAME_LOOP_THREAD=new Thread(this,"GAME_LOOP_THREAD");
 
-        window = new Window(windowPreferences);
+        window = new OpenGLWindow(windowPreferences);
         Input.initialize();
         new StatusUI();
         LOGGER.debug("Window preferences: {}", window.getPreferences());

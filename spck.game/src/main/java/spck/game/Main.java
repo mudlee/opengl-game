@@ -12,7 +12,7 @@ import spck.engine.debug.DebugInputListener;
 import spck.engine.debug.FreeCameraController;
 import spck.engine.ecs.Entity;
 import spck.engine.ecs.render.components.RenderComponent;
-import spck.engine.framework.Window;
+import spck.engine.framework.OpenGLWindow;
 import spck.engine.lights.AmbientLight;
 import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
@@ -25,7 +25,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class Main {
     private final static Camera CAMERA = new RPGCamera(60.0f, 0.1f, 10000f);
-    private final static Window.Preferences WINDOW_PREFERENCES = new Window.Preferences(
+    private final static OpenGLWindow.Preferences WINDOW_PREFERENCES = new OpenGLWindow.Preferences(
             false,
             Antialiasing.ANTIALISING_2X,
             false,
