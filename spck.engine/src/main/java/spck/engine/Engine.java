@@ -34,7 +34,7 @@ public class Engine implements Runnable{
         public boolean polygonRenderMode;
         public boolean renderAABB = true;
         public OS os;
-        public Vector4f clearColor = new Vector4f(0f, 0f, 0f, 0f);
+        public Vector4f clearColor = new Vector4f(1f, 1f, 1f, 0f);
 
         @Override
         public String toString() {

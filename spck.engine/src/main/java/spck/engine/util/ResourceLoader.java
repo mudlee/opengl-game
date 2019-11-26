@@ -26,6 +26,7 @@ public class ResourceLoader {
 
     public static ByteBuffer loadToByteBuffer(String filePath) {
         ByteBuffer buffer = from(ResourceLoader.class.getResourceAsStream(filePath));
+        buffer.put((byte) 0);
         ((Buffer) buffer).flip(); // https://github.com/plasma-umass/doppio/issues/497#issuecomment-334740243
         return buffer;
     }

@@ -18,6 +18,9 @@ import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.physics.Physics;
 
+import java.nio.ByteBuffer;
+
+import static java.lang.Math.round;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
@@ -97,16 +100,23 @@ public class Main {
                     comp.transform.setPosition(hit.getPosition());
                 });
             });
-
-            /*Tree t = new Tree();
-            Entity.create(t);
-            t.getComponent(RenderComponent.class).ifPresent(c -> {
-                c.transform.setPosition(new Vector3f(5, 3, 5));
-                c.transform.setScale(new Vector3f(0.3f, 0.3f, 0.3f));
-            });*/
         });
 
 
+        Entity.create(new Map());
         Entity.create(new CrossHair());
+    }
+
+    private static void premultiplyAlpha(ByteBuffer image, int w, int h, int stride) {
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int i = y * stride + x * 4;
+
+                float alpha = (image.get(i + 3) & 0xFF) / 255.0f;
+                image.put(i + 0, (byte) round(((image.get(i + 0) & 0xFF) * alpha)));
+                image.put(i + 1, (byte) round(((image.get(i + 1) & 0xFF) * alpha)));
+                image.put(i + 2, (byte) round(((image.get(i + 2) & 0xFF) * alpha)));
+            }
+        }
     }
 }
