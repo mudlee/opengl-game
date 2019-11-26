@@ -263,11 +263,11 @@ public class Input {
 
         if (newY < 0) {
             newY = 0;
-            mouseMoveEvent.direction = MoveDirection.FORWARD;
+            mouseMoveEvent.direction = MoveDirection.UPWARD;
             yMoved = true;
         } else if (newY > Engine.window.getPreferences().getHeight()) {
             newY = Engine.window.getPreferences().getHeight();
-            mouseMoveEvent.direction = MoveDirection.BACKWARD;
+            mouseMoveEvent.direction = MoveDirection.DOWNWARD;
             yMoved = true;
         }
 

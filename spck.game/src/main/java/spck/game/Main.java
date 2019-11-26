@@ -9,7 +9,6 @@ import spck.engine.Input.Input;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.DebugInputListener;
-import spck.engine.debug.FreeCameraController;
 import spck.engine.ecs.Entity;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.framework.Window;
@@ -18,13 +17,12 @@ import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.physics.Physics;
-import spck.engine.render.camera.Camera;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class Main {
-    private final static Camera CAMERA = new RPGCamera(60.0f, 0.1f, 10000f);
+    private final static GameCamera CAMERA = new GameCamera(10, 0, 10000);
     private final static Window.Preferences WINDOW_PREFERENCES = new Window.Preferences(
             false,
             Antialiasing.ANTIALISING_2X,
@@ -47,13 +45,12 @@ public class Main {
     private void start() {
         new DebugInputListener(CAMERA);
 
-        CAMERA.setPosition(new Vector3f(-3, 11, 3));
-        CAMERA.setRotation(new Vector3f(-50, 45, 0));
+        CAMERA.setPosition(new Vector3f(-3, 11, 10));
         Input.setMousePosition(new Vector2d(
                 (double) Engine.window.getPreferences().getWidth() / 2,
                 (double) Engine.window.getPreferences().getHeight() / 2
         ));
-        new FreeCameraController(CAMERA);
+        Entity.create(new GameCameraController(CAMERA));
 
         LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.9f));
         LightSystem.addLight(new DirectionalLight(

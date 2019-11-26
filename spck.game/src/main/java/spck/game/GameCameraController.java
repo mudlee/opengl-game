@@ -1,6 +1,7 @@
 package spck.game;
 
 import org.joml.Vector2d;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import spck.engine.Engine;
 import spck.engine.Input.Input;
@@ -11,7 +12,6 @@ import spck.engine.bus.MessageBus;
 import spck.engine.ecs.ui.UICanvasEntity;
 import spck.engine.ecs.ui.UIImage;
 import spck.engine.framework.assets.TextureStorage;
-import spck.engine.render.camera.Camera;
 import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureRegistry;
 import spck.engine.render.textures.TextureRegistryID;
@@ -21,13 +21,13 @@ import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class RPGCameraController extends UICanvasEntity {
+public class GameCameraController extends UICanvasEntity {
     private static final Map<MoveDirection, Integer> moveKeyMap = new HashMap<>();
     private static final float ACCELERATION = 3f;
     private static final float MOVE_SPEED = 3f;
     private static final float SCROLL_SPEED = 3f;
-    private static final Vector3f REUSABLE_VECTOR = new Vector3f();
-    private final Vector3f REUSABLE_UP_VECTOR = new Vector3f(0, 1, 0);
+    private static final Vector3f REUSABLE_3D_VECTOR = new Vector3f();
+    private static final Vector2f REUSABLE_2D_VECTOR = new Vector2f();
 
     private enum CursorTextureRegistryID implements TextureRegistryID {
         CURSOR
@@ -36,16 +36,18 @@ public class RPGCameraController extends UICanvasEntity {
     static {
         moveKeyMap.put(MoveDirection.LEFT, GLFW_KEY_A);
         moveKeyMap.put(MoveDirection.RIGHT, GLFW_KEY_D);
-        moveKeyMap.put(MoveDirection.FORWARD, GLFW_KEY_W);
-        moveKeyMap.put(MoveDirection.BACKWARD, GLFW_KEY_S);
+        moveKeyMap.put(MoveDirection.UPWARD, GLFW_KEY_W);
+        moveKeyMap.put(MoveDirection.DOWNWARD, GLFW_KEY_S);
     }
 
-    private final Camera camera;
+    private final GameCamera camera;
     private final Vector3f moveTarget;
+    private final Vector2f zoomTarget;
 
-    public RPGCameraController(Camera camera) {
+    public GameCameraController(GameCamera camera) {
         this.camera = camera;
         moveTarget = new Vector3f(camera.getPosition());
+        zoomTarget = new Vector2f(camera.getSize(), 0);
 
         for (Map.Entry<MoveDirection, Integer> entry : moveKeyMap.entrySet()) {
             Input.onKeyHeldDown(entry.getValue(), event -> move(entry.getKey()));
@@ -53,17 +55,22 @@ public class RPGCameraController extends UICanvasEntity {
 
         Input.onMouseScroll(event -> {
             if (event.offset.y > 0) {
-                move(MoveDirection.UPWARD);
+                move(MoveDirection.FORWARD);
             } else {
-                move(MoveDirection.DOWNWARD);
+                move(MoveDirection.BACKWARD);
             }
         });
 
         MessageBus.register(LifeCycle.UPDATE.eventID(), () -> {
             if (moveTarget.distance(camera.getPosition()) > 0.01f) {
-                REUSABLE_VECTOR.set(camera.getPosition());
-                REUSABLE_VECTOR.lerp(moveTarget, Time.deltaTime * ACCELERATION);
-                camera.setPosition(REUSABLE_VECTOR);
+                REUSABLE_3D_VECTOR.set(camera.getPosition());
+                REUSABLE_3D_VECTOR.lerp(moveTarget, Time.deltaTime * ACCELERATION);
+                camera.setPosition(REUSABLE_3D_VECTOR);
+            }
+            if (Math.abs(zoomTarget.x - camera.getSize()) > 0.01f) {
+                REUSABLE_2D_VECTOR.set(camera.getSize(), 0);
+                REUSABLE_2D_VECTOR.lerp(zoomTarget, Time.deltaTime * ACCELERATION);
+                camera.setSize(REUSABLE_2D_VECTOR.x);
             }
         });
     }
@@ -91,28 +98,22 @@ public class RPGCameraController extends UICanvasEntity {
     private void move(MoveDirection direction) {
         switch (direction) {
             case FORWARD:
-                REUSABLE_VECTOR.set(camera.getFrontVector());
-                REUSABLE_VECTOR.y = 0;
-                moveTarget.set(camera.getPosition()).add(REUSABLE_VECTOR.mul(MOVE_SPEED));
+                zoomTarget.set(camera.getSize() + SCROLL_SPEED);
                 break;
             case BACKWARD:
-                REUSABLE_VECTOR.set(camera.getFrontVector());
-                REUSABLE_VECTOR.y = 0;
-                moveTarget.set(camera.getPosition()).add(REUSABLE_VECTOR.mul(-MOVE_SPEED));
+                zoomTarget.set(camera.getSize() - SCROLL_SPEED);
                 break;
             case LEFT:
-                REUSABLE_VECTOR.set(camera.getFrontVector());
-                moveTarget.set(camera.getPosition()).add(REUSABLE_VECTOR.cross(REUSABLE_UP_VECTOR).normalize().mul(-MOVE_SPEED));
+                moveTarget.set(camera.getPosition().x - MOVE_SPEED, camera.getPosition().y, camera.getPosition().z);
                 break;
             case RIGHT:
-                REUSABLE_VECTOR.set(camera.getFrontVector());
-                moveTarget.set(camera.getPosition()).add(REUSABLE_VECTOR.cross(REUSABLE_UP_VECTOR).normalize().mul(MOVE_SPEED));
+                moveTarget.set(camera.getPosition().x + MOVE_SPEED, camera.getPosition().y, camera.getPosition().z);
                 break;
             case UPWARD:
-                moveTarget.set(camera.getPosition().x, camera.getPosition().y + SCROLL_SPEED, camera.getPosition().z);
+                moveTarget.set(camera.getPosition().x, camera.getPosition().y + MOVE_SPEED, camera.getPosition().z);
                 break;
             case DOWNWARD:
-                moveTarget.set(camera.getPosition().x, camera.getPosition().y - SCROLL_SPEED, camera.getPosition().z);
+                moveTarget.set(camera.getPosition().x, camera.getPosition().y - MOVE_SPEED, camera.getPosition().z);
                 break;
         }
     }
