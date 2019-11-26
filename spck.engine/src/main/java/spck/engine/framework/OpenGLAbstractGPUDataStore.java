@@ -11,12 +11,12 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-class AbstractGPUDataStore {
+class OpenGLAbstractGPUDataStore {
     final List<Integer> vaos = new ArrayList<>();
     final List<Integer> vbos = new ArrayList<>();
     private final int instancedDataSize;
 
-    AbstractGPUDataStore(int instancedDataSize) {
+    OpenGLAbstractGPUDataStore(int instancedDataSize) {
         this.instancedDataSize = instancedDataSize;
         MessageBus.register(LifeCycle.CLEANUP.eventID(), this::onCleanUp);
     }

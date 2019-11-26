@@ -6,14 +6,14 @@ import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.Stats;
 import spck.engine.framework.Graphics;
-import spck.engine.framework.Window;
+import spck.engine.framework.OpenGLWindow;
 
 class GameLoop {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameLoop.class);
     private final static int TARGET_FPS = 100;
-    private final Window window;
+    private final OpenGLWindow window;
 
-    GameLoop(Window window) {
+    GameLoop(OpenGLWindow window) {
         this.window = window;
     }
 

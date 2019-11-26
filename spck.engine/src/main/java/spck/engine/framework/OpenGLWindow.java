@@ -4,7 +4,9 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.ARBDebugOutput;
+import org.lwjgl.opengl.GL43;
+import org.lwjgl.opengl.GLCapabilities;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +23,11 @@ import java.util.Optional;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL41.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-public class Window {
+public class OpenGLWindow {
     public static class Preferences {
         private final boolean vSyncEnabled;
         private final Antialiasing antialiasing;
@@ -104,13 +107,13 @@ public class Window {
         }
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Window.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenGLWindow.class);
     private GLFWVidMode vidMode;
     private boolean resized;
     private final Preferences preferences;
     private long ID;
 
-    public Window(Preferences preferences) {
+    public OpenGLWindow(Preferences preferences) {
         this.preferences = preferences;
         MessageBus.register(LifeCycle.GAME_START.eventID(), this::onStart);
         MessageBus.register(LifeCycle.UPDATE.eventID(), this::onUpdate);
@@ -217,7 +220,26 @@ public class Window {
 
         glfwShowWindow(ID);
         calculateScreenScaleFactor();
-        GL.createCapabilities();
+        GLCapabilities capabilities = createCapabilities();
+        if (capabilities.OpenGL43) {
+            LOGGER.debug("OpenGL 4.3 debugging enabled");
+            GL43.glDebugMessageControl(
+                    GL43.GL_DEBUG_SOURCE_API, GL43.GL_DEBUG_TYPE_OTHER,
+                    GL43.GL_DEBUG_SEVERITY_NOTIFICATION, (IntBuffer) null, false
+            );
+        } else if (capabilities.GL_ARB_debug_output) {
+            LOGGER.debug("ARB debugging enabled");
+            ARBDebugOutput.glDebugMessageControlARB(
+                    ARBDebugOutput.GL_DEBUG_SOURCE_API_ARB,
+                    ARBDebugOutput.GL_DEBUG_TYPE_OTHER_ARB, ARBDebugOutput.GL_DEBUG_SEVERITY_LOW_ARB, (IntBuffer) null,
+                    false
+            );
+        }
+
+        LOGGER.debug("OpenGL Vendor: {}", glGetString(GL_VENDOR));
+        LOGGER.debug("Version: {}", glGetString(GL_VERSION));
+        LOGGER.debug("Renderer: {}", glGetString(GL_RENDERER));
+        LOGGER.debug("Shading Language Version: {}", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
         // window resize setup
         preferences.setWidth((preferences.fullscreenEnabled ? vidMode.width() : preferences.getWidth()));
@@ -233,7 +255,6 @@ public class Window {
         glCullFace(GL_BACK);
 
         LOGGER.debug("Window has been intialised");
-        LOGGER.debug("OpenGL version " + glGetString(GL_VERSION));
 
         Input.onKeyPressed(GLFW_KEY_Q, event -> glfwSetWindowShouldClose(ID, true));
     }

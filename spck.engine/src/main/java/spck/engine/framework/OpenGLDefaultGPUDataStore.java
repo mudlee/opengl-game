@@ -13,7 +13,7 @@ import spck.engine.render.textures.TextureUVModifier;
 
 import java.util.function.Supplier;
 
-public class OpenGLDefaultGPUDataStore extends AbstractGPUDataStore implements GPUDataStore {
+public class OpenGLDefaultGPUDataStore extends OpenGLAbstractGPUDataStore implements GPUDataStore {
     public enum LayoutQualifier {
         VX_POSITION(0),
         VX_NORMAL(1),
