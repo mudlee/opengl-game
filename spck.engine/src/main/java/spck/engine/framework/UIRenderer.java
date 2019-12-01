@@ -76,9 +76,13 @@ public class UIRenderer {
         float x = image.getScreenCoords().x;
         float y = image.getScreenCoords().y;
 
-        int imageID = nvglCreateImageFromHandle(pointer, image.getTextureId(), width, height, 0);
+        if (image.handle == null) {
+            image.handle = nvglCreateImageFromHandle(pointer, image.getTextureId(), width, height, 0);
+        }
+
+        //int imageID = nvglCreateImageFromHandle(pointer, image.getTextureId(), width, height, 0);
         NVGPaint paint = NVGPaint.create();
-        nvgImagePattern(pointer, x, y, width, height, 0, imageID, 1f, paint);
+        nvgImagePattern(pointer, x, y, width, height, 0, image.handle, 1f, paint);
         nvgBeginPath(pointer);
         nvgRect(pointer, x, y, width, height);
         nvgFillPaint(pointer, paint);

@@ -103,7 +103,7 @@ public class Main {
         });
 
 
-        Entity.create(new Map());
+        Entity.create(new Map(CAMERA));
         Entity.create(new CrossHair());
     }
 

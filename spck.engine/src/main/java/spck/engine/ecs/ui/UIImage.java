@@ -6,6 +6,7 @@ public class UIImage extends UIElement {
     private int textureId;
     private int width;
     private int height;
+    public Integer handle;
 
     private UIImage() {
     }

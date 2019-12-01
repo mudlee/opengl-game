@@ -7,6 +7,7 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.ARBDebugOutput;
 import org.lwjgl.opengl.GL43;
 import org.lwjgl.opengl.GLCapabilities;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.bus.WindowResizedEvent;
 
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,6 +27,7 @@ import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL41.*;
+import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class OpenGLWindow {
@@ -35,6 +38,8 @@ public class OpenGLWindow {
         private final boolean limitFPS;
         private String title = "SPCK";
         private Integer devicePixelRatio;
+        private Float deviceScaleX;
+        private Float deviceScaleY;
         private int width = 1280;
         private int height = 720;
 
@@ -61,6 +66,14 @@ public class OpenGLWindow {
             this.devicePixelRatio = devicePixelRatio;
         }
 
+        public void setDeviceScaleX(Float deviceScaleX) {
+            this.deviceScaleX = deviceScaleX;
+        }
+
+        public void setDeviceScaleY(Float deviceScaleY) {
+            this.deviceScaleY = deviceScaleY;
+        }
+
         public boolean isvSyncEnabled() {
             return vSyncEnabled;
         }
@@ -79,6 +92,14 @@ public class OpenGLWindow {
 
         public Optional<Integer> getDevicePixelRatio() {
             return Optional.ofNullable(devicePixelRatio);
+        }
+
+        public Optional<Float> getDeviceScaleX() {
+            return Optional.ofNullable(deviceScaleX);
+        }
+
+        public Optional<Float> getDeviceScaleY() {
+            return Optional.ofNullable(deviceScaleY);
         }
 
         public int getWidth() {
@@ -292,6 +313,15 @@ public class OpenGLWindow {
     }
 
     private void calculateScreenScaleFactor() {
+        try (MemoryStack stack = stackPush()) {
+            FloatBuffer sx = stack.mallocFloat(1);
+            FloatBuffer sy = stack.mallocFloat(1);
+            glfwGetWindowContentScale(getID(), sx, sy);
+
+            preferences.setDeviceScaleX(sx.get());
+            preferences.setDeviceScaleY(sy.get());
+        }
+
         // https://en.wikipedia.org/wiki/4K_resolution
         int uhdMinWidth = 3840;
         int uhdMinHeight = 1716;

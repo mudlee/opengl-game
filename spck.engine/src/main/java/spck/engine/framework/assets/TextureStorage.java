@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.Float.min;
 import static java.lang.Math.round;
 import static org.lwjgl.nanovg.NanoSVG.*;
 import static org.lwjgl.system.MemoryUtil.memAlloc;
@@ -109,10 +110,13 @@ public class TextureStorage {
         // rasterization
         long rast = nsvgCreateRasterizer();
 
-        int pixelRatio = Engine.window.getPreferences().getDevicePixelRatio().orElseThrow();
+        float scaleX = Engine.window.getPreferences().getDeviceScaleX().orElseThrow();
+        float scaleY = Engine.window.getPreferences().getDeviceScaleY().orElseThrow();
+        int width = (int) (svg.width() * scaleX);
+        int height = (int) (svg.height() * scaleY);
 
-        ByteBuffer image = memAlloc((int) svg.width() * (int) svg.height() * 4);
-        nsvgRasterize(rast, svg, 0, 0, pixelRatio, image, (int) svg.width(), (int) svg.height(), (int) svg.width() * 4);
+        ByteBuffer image = memAlloc(width * height * 4);
+        nsvgRasterize(rast, svg, 0, 0, min(scaleX, scaleY), image, width, height, width * 4);
         nsvgDeleteRasterizer(rast);
 
         // creating texture
@@ -122,13 +126,13 @@ public class TextureStorage {
             GL41.glTexParameteri(GL41.GL_TEXTURE_2D, GL41.GL_TEXTURE_WRAP_S, GL41.GL_CLAMP_TO_EDGE);
             GL41.glTexParameteri(GL41.GL_TEXTURE_2D, GL41.GL_TEXTURE_WRAP_T, GL41.GL_CLAMP_TO_EDGE);
 
-            premultiplyAlpha(image, (int) svg.width(), (int) svg.height(), (int) svg.width() * 4);
+            premultiplyAlpha(image, width, height, width * 4);
 
-            GL41.glTexImage2D(GL41.GL_TEXTURE_2D, 0, GL41.GL_RGBA, (int) svg.width(), (int) svg.height(), 0, GL41.GL_RGBA, GL41.GL_UNSIGNED_BYTE, image);
+            GL41.glTexImage2D(GL41.GL_TEXTURE_2D, 0, GL41.GL_RGBA, width, height, 0, GL41.GL_RGBA, GL41.GL_UNSIGNED_BYTE, image);
         });
 
         int nextIndex = getNextIndex();
-        Texture2D texture = new Texture2D(textureRegistryID, id, (int) svg.width(), (int) svg.height(), nextIndex, GL_SLOTS[nextIndex], null);
+        Texture2D texture = new Texture2D(textureRegistryID, id, width, height, nextIndex, GL_SLOTS[nextIndex], null);
         TEXTURES.add(texture);
         return texture;
     }

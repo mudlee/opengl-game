@@ -23,7 +23,7 @@ public abstract class UIElement {
         return position;
     }
 
-    public void setPosition(int x, int y) {
+    public void setPosition(float x, float y) {
         position.set(x, y);
         updateScreenCoords();
     }

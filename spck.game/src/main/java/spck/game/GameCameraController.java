@@ -81,17 +81,18 @@ public class GameCameraController extends UICanvasEntity {
 
         Engine.window.captureMouse();
 
-        Texture2D texture2D = TextureStorage.loadFromResource("/textures/pointer.png", CursorTextureRegistryID.CURSOR);
-        TextureRegistry.register(texture2D);
-        UIImage image = UIImage.build(texture2D.getId(), 30, 30);
-        canvasComponent.addImage(image);
+        Texture2D cursorTexture = TextureStorage.loadFromResource("/textures/pointer.png", CursorTextureRegistryID.CURSOR);
+        TextureRegistry.register(cursorTexture);
+        UIImage cursor = UIImage.build(cursorTexture.getId(), 30, 30);
+        canvasComponent
+                .addImage(cursor);
 
         Vector2d mousePos = Input.getMouseAbsolutePosition();
-        image.setPosition((int) mousePos.x, (int) mousePos.y);
+        cursor.setPosition((int) mousePos.x, (int) mousePos.y);
 
         Input.onMouseMove(event -> {
             move(event.direction);
-            image.setPosition((int) event.relativePosition.x, (int) event.relativePosition.y);
+            cursor.setPosition((int) event.relativePosition.x, (int) event.relativePosition.y);
         });
     }
 
