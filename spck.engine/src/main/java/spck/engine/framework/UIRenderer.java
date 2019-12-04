@@ -80,7 +80,6 @@ public class UIRenderer {
             image.handle = nvglCreateImageFromHandle(pointer, image.getTextureId(), width, height, 0);
         }
 
-        //int imageID = nvglCreateImageFromHandle(pointer, image.getTextureId(), width, height, 0);
         NVGPaint paint = NVGPaint.create();
         nvgImagePattern(pointer, x, y, width, height, 0, image.handle, 1f, paint);
         nvgBeginPath(pointer);

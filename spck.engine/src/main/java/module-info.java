@@ -17,7 +17,6 @@ module spck.engine {
     requires transitive org.joml;
 
     opens spck.engine.ecs to artemis.odb;
-    opens spck.engine.ecs.debug to artemis.odb;
     opens spck.engine.ecs.ui to artemis.odb;
     opens spck.engine.ecs.render to artemis.odb;
 
@@ -39,4 +38,5 @@ module spck.engine {
     exports spck.engine.Input;
     exports spck.engine.physics;
     exports spck.engine.ui.svg;
+    exports spck.engine.util;
 }

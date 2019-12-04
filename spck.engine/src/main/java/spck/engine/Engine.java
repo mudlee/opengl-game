@@ -9,9 +9,6 @@ import spck.engine.bus.MessageBus;
 import spck.engine.debug.Measure;
 import spck.engine.ecs.ECS;
 import spck.engine.ecs.EntityBatchStore;
-import spck.engine.ecs.debug.StatUITextSystem;
-import spck.engine.ecs.debug.StatusUI;
-import spck.engine.ecs.debug.StatusUICanvasRendererSystem;
 import spck.engine.ecs.render.PreRenderSystem;
 import spck.engine.ecs.render.RenderSystem;
 import spck.engine.ecs.ui.UICanvasRendererSystem;
@@ -28,6 +25,8 @@ public class Engine implements Runnable{
     public static OpenGLAABBGPUDataStore aabbGpuDataStore;
     public static OpenGLStandardShader shader;
     public static Renderer renderer;
+    public static ECS ecs;
+    public static UIRenderer uiRenderer;
 
     public static class Preferences {
         public String defaultFont = "GeosansLight";
@@ -70,18 +69,15 @@ public class Engine implements Runnable{
 
         window = new OpenGLWindow(windowPreferences);
         Input.initialize();
-        new StatusUI();
         LOGGER.debug("Window preferences: {}", window.getPreferences());
 
         EntityBatchStore batchStore = new EntityBatchStore();
-        UIRenderer uiRenderer = new UIRenderer(Engine.preferences.defaultFont);
+        uiRenderer = new UIRenderer(Engine.preferences.defaultFont);
 
-        new ECS(Arrays.asList(
+        ecs = new ECS(Arrays.asList(
                 new PreRenderSystem(batchStore),
                 new RenderSystem(batchStore, camera),
-                new StatUITextSystem(camera),
-                new UICanvasRendererSystem(uiRenderer),
-                new StatusUICanvasRendererSystem(uiRenderer)
+                new UICanvasRendererSystem(uiRenderer)
         ));
 
         gameLoop = new GameLoop(window);

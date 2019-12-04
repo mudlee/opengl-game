@@ -3,4 +3,5 @@ module spck.game {
     requires org.lwjgl.nanovg;
     requires org.lwjgl.opengl;
     requires org.lwjgl.stb;
+    opens spck.game.ui.debug to artemis.odb;
 }

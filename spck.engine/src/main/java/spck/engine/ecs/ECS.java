@@ -14,16 +14,23 @@ import java.util.List;
 public class ECS {
     public static World world;
     private final static Logger LOGGER = LoggerFactory.getLogger(ECS.class);
+    private final WorldConfigurationBuilder builder;
 
     public ECS(List<BaseSystem> systems) {
         LOGGER.debug("Initialising ECS World...");
-        WorldConfigurationBuilder builder = new WorldConfigurationBuilder();
+        builder = new WorldConfigurationBuilder();
 
         for (BaseSystem system : systems) {
-            LOGGER.debug("    Registering {} system...", system.getClass());
-            builder = builder.with(system);
+            add(system);
         }
+    }
 
+    public void add(BaseSystem system) {
+        LOGGER.debug("    Registering {} system...", system.getClass());
+        builder.with(system);
+    }
+
+    public void createWorld() {
         world = new World(builder.build());
         MessageBus.register(LifeCycle.AFTER_UPDATE.eventID(), this::process);
         LOGGER.debug("ECS is ready");
