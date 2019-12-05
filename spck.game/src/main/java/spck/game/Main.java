@@ -49,7 +49,7 @@ public class Main {
     private void start() {
         new DebugInputListener(CAMERA);
 
-        CAMERA.setPosition(new Vector3f(-3, 11, 10));
+        CAMERA.setPosition(new Vector3f(0, 0, 10));
         Input.setMousePosition(new Vector2d(
                 (double) Engine.window.getPreferences().getWidth() / 2,
                 (double) Engine.window.getPreferences().getHeight() / 2
@@ -96,7 +96,7 @@ public class Main {
         });
 
 
-        Entity.create(new Map(CAMERA));
+        Entity.create(new WorldMap());
         Entity.create(new CrossHair());
     }
 }

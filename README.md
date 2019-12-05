@@ -4,6 +4,19 @@ This is a WIP project. I'm working on it at nights, when I have time. Usually I 
 
 It will be a RPG game somewhere in the far future.
 
+## Links
+
+### Lan-Lot to 2D
+
+- https://www.baeldung.com/java-convert-latitude-longitude
+- https://gis.stackexchange.com/questions/20686/mercator-projection-problem-with-latitude-formula
+- https://math.stackexchange.com/questions/2673075/mercator-projection-use-existing-equation-to-solve-for-degrees/2673128
+- https://blog.batchgeo.com/latitude-longitude-map/
+
+### Ballistic Missile
+
+- https://en.wikipedia.org/wiki/Projectile_motion
+
 ## Technology
 
 The "engine" or rather the "framework" is written by me in Java. I use LWJGL as a wrapper and OpenGL as a renderer.
