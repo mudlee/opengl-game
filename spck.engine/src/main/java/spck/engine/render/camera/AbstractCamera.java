@@ -1,11 +1,10 @@
 package spck.engine.render.camera;
 
 import org.joml.Math;
-import org.joml.Matrix4f;
-import org.joml.Rayf;
-import org.joml.Vector3f;
+import org.joml.*;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
+import spck.engine.util.WorldSpaceToScreenSpace;
 
 public class AbstractCamera {
     private final Vector3f REUSABLE_RAY_VECTOR = new Vector3f().zero();
@@ -71,6 +70,10 @@ public class AbstractCamera {
 
     public Matrix4f getProjectionMatrix() {
         return projectionMatrix;
+    }
+
+    public Vector2f toScreenSpace(Vector3f worldPosition) {
+        return WorldSpaceToScreenSpace.convert(worldPosition, projectionMatrix, viewMatrix);
     }
 
     public boolean isViewMatrixChanged() {

@@ -26,6 +26,8 @@ public class GameCameraController extends UICanvasEntity {
     private static final float ACCELERATION = 3f;
     private static final float MOVE_SPEED = 3f;
     private static final float SCROLL_SPEED = 3f;
+    private static final float MIN_ZOOM = 4f;
+    private static final float MAX_ZOOM = 30f;
     private static final Vector3f REUSABLE_3D_VECTOR = new Vector3f();
     private static final Vector2f REUSABLE_2D_VECTOR = new Vector2f();
 
@@ -44,7 +46,7 @@ public class GameCameraController extends UICanvasEntity {
     private final Vector3f moveTarget;
     private final Vector2f zoomTarget;
 
-    public GameCameraController(GameCamera camera) {
+    GameCameraController(GameCamera camera) {
         this.camera = camera;
         moveTarget = new Vector3f(camera.getPosition());
         zoomTarget = new Vector2f(camera.getSize(), 0);
@@ -70,7 +72,9 @@ public class GameCameraController extends UICanvasEntity {
             if (Math.abs(zoomTarget.x - camera.getSize()) > 0.01f) {
                 REUSABLE_2D_VECTOR.set(camera.getSize(), 0);
                 REUSABLE_2D_VECTOR.lerp(zoomTarget, Time.deltaTime * ACCELERATION);
-                camera.setSize(REUSABLE_2D_VECTOR.x);
+                if (REUSABLE_2D_VECTOR.x > MIN_ZOOM && REUSABLE_2D_VECTOR.x < MAX_ZOOM) {
+                    camera.setSize(REUSABLE_2D_VECTOR.x);
+                }
             }
         });
     }

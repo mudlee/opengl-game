@@ -13,7 +13,6 @@ import spck.engine.ecs.Entity;
 import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.framework.OpenGLWindow;
 import spck.engine.lights.AmbientLight;
-import spck.engine.lights.DirectionalLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.physics.Physics;
@@ -21,7 +20,6 @@ import spck.game.ui.debug.StatUITextSystem;
 import spck.game.ui.debug.StatusUI;
 import spck.game.ui.debug.StatusUICanvasRendererSystem;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class Main {
@@ -63,25 +61,12 @@ public class Main {
         Entity.create(new GameCameraController(CAMERA));
 
         LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.9f));
-        LightSystem.addLight(new DirectionalLight(
-                new Vector4f(1, 1, 1, 1),
-                0.3f,
-                new Vector3f(40, 20, 10)
-        ));
 
-        Tree tree = new Tree();
+        /*Tree tree = new Tree();
         Entity.create(tree);
         tree.getComponent(RenderComponent.class).ifPresent(renderer -> {
             renderer.transform.setPosition(new Vector3f(0, 5, 0));
-        });
-
-        Input.onKeyHeldDown(GLFW_KEY_R, event -> {
-            tree.getComponent(RenderComponent.class).ifPresent(renderer -> {
-                Vector3f rot = renderer.transform.getRotation();
-                rot.x += 0.1f;
-                renderer.transform.setRotation(rot);
-            });
-        });
+        });*/
 
 
         Input.onMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT, event -> {
@@ -95,8 +80,8 @@ public class Main {
             });
         });
 
-
         Entity.create(new WorldMap());
         Entity.create(new CrossHair());
+        Entity.create(new Cities(CAMERA));
     }
 }
