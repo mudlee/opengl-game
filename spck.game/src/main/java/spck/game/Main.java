@@ -16,7 +16,7 @@ import spck.engine.lights.AmbientLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.physics.Physics;
-import spck.game.cities.CitiesEntity;
+import spck.game.nations.NationsEntity;
 import spck.game.ui.debug.StatUITextSystem;
 import spck.game.ui.debug.StatusUI;
 import spck.game.ui.debug.StatusUICanvasRendererSystem;
@@ -83,6 +83,6 @@ public class Main {
 
         Entity.create(new WorldMap());
         Entity.create(new CrossHair());
-        Entity.create(new CitiesEntity(CAMERA));
+        Entity.create(new NationsEntity(CAMERA));
     }
 }

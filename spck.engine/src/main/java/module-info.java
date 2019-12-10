@@ -11,8 +11,8 @@ module spck.engine {
     requires org.lwjgl.stb.natives;
     requires org.lwjgl.assimp;
     requires org.lwjgl.assimp.natives;
-    requires org.slf4j;
-    requires org.slf4j.simple;
+    requires transitive org.slf4j;
+    requires transitive org.slf4j.simple;
     requires transitive artemis.odb;
     requires transitive org.joml;
 
