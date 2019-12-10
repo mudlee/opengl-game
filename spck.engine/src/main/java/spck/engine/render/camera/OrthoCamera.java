@@ -30,6 +30,7 @@ public class OrthoCamera extends AbstractCamera implements Camera {
     public void setSize(float size) {
         this.size = size;
         projectionMatrixUpdater.run();
+        viewMatrixChanged = true;
     }
 
     public void setzNear(float zNear) {
