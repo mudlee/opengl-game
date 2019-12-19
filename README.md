@@ -36,6 +36,12 @@ Currentl I implemented the following features:
 - Remove all TODOs from the code (including this :))
 - If I have more time (haha), implement a Vulkan renderer
 
+### GUI
+
+- https://www.thecodingfox.com/nuklear-usage-guide-lwjgl
+- https://github.com/kotlin-graphics/imgui
+
+
 ## Running
 
 ### Running from IntelliJ IDEA

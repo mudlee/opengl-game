@@ -1,12 +1,13 @@
 package spck.engine.framework.assets;
 
-import org.lwjgl.nanovg.NSVGImage;
 import org.lwjgl.opengl.GL41;
-import spck.engine.Engine;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.framework.GL;
-import spck.engine.render.textures.*;
+import spck.engine.render.textures.Texture;
+import spck.engine.render.textures.Texture2D;
+import spck.engine.render.textures.TextureData;
+import spck.engine.render.textures.TextureRegistryID;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -14,10 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.Float.min;
 import static java.lang.Math.round;
-import static org.lwjgl.nanovg.NanoSVG.*;
-import static org.lwjgl.system.MemoryUtil.memAlloc;
 
 public class TextureStorage {
     private final static List<Texture> TEXTURES = new ArrayList<>();
@@ -63,28 +61,6 @@ public class TextureStorage {
             // GL has a max of 31
     };
 
-    public static TextureCubeMap loadCubeMapFromResource(String[] files, String shaderSampler, TextureRegistryID textureRegistryID) {
-        if (files.length != 6) {
-            throw new RuntimeException("CubeMaps have to have 6 sides, not " + files.length);
-        }
-
-        int id = GL.genTextureContext(GL41.GL_TEXTURE_CUBE_MAP, textureId -> {
-            for (int i = 0; i < files.length; i++) {
-                TextureData textureData = TextureLoader.loadFromResources(files[i]);
-                GL41.glTexImage2D(GL41.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL41.GL_RGBA, textureData.getWidth(), textureData.getHeight(), 0, GL41.GL_RGBA, GL41.GL_UNSIGNED_BYTE, textureData.getImage());
-            }
-
-            GL41.glTexParameteri(GL41.GL_TEXTURE_CUBE_MAP, GL41.GL_TEXTURE_MIN_FILTER, GL41.GL_LINEAR);
-            GL41.glTexParameteri(GL41.GL_TEXTURE_CUBE_MAP, GL41.GL_TEXTURE_MAG_FILTER, GL41.GL_LINEAR);
-        });
-
-        int nextIndex = TEXTURES.stream().mapToInt(Texture::getSamplerIndex).max().orElse(-1) + 1;
-
-        TextureCubeMap texture = new TextureCubeMap(textureRegistryID, id, nextIndex, GL_SLOTS[nextIndex], shaderSampler);
-        TEXTURES.add(texture);
-        return texture;
-    }
-
     public static Texture2D loadFromTextureData(TextureData textureData, String shaderSampler, TextureRegistryID textureRegistryID) {
         if (CACHE.containsKey(textureRegistryID)) {
             return (Texture2D) CACHE.get(textureRegistryID);
@@ -103,37 +79,6 @@ public class TextureStorage {
         TEXTURES.add(texture);
         CACHE.put(textureRegistryID, texture);
 
-        return texture;
-    }
-
-    public static Texture2D loadFromSVG(NSVGImage svg, TextureRegistryID textureRegistryID) {
-        // rasterization
-        long rast = nsvgCreateRasterizer();
-
-        float scaleX = Engine.window.getPreferences().getDeviceScaleX().orElseThrow();
-        float scaleY = Engine.window.getPreferences().getDeviceScaleY().orElseThrow();
-        int width = (int) (svg.width() * scaleX);
-        int height = (int) (svg.height() * scaleY);
-
-        ByteBuffer image = memAlloc(width * height * 4);
-        nsvgRasterize(rast, svg, 0, 0, min(scaleX, scaleY), image, width, height, width * 4);
-        nsvgDeleteRasterizer(rast);
-
-        // creating texture
-        int id = GL.genTextureContext(GL41.GL_TEXTURE_2D, textureId -> {
-            GL41.glTexParameteri(GL41.GL_TEXTURE_2D, GL41.GL_TEXTURE_MAG_FILTER, GL41.GL_LINEAR);
-            GL41.glTexParameteri(GL41.GL_TEXTURE_2D, GL41.GL_TEXTURE_MIN_FILTER, GL41.GL_LINEAR);
-            GL41.glTexParameteri(GL41.GL_TEXTURE_2D, GL41.GL_TEXTURE_WRAP_S, GL41.GL_CLAMP_TO_EDGE);
-            GL41.glTexParameteri(GL41.GL_TEXTURE_2D, GL41.GL_TEXTURE_WRAP_T, GL41.GL_CLAMP_TO_EDGE);
-
-            premultiplyAlpha(image, width, height, width * 4);
-
-            GL41.glTexImage2D(GL41.GL_TEXTURE_2D, 0, GL41.GL_RGBA, width, height, 0, GL41.GL_RGBA, GL41.GL_UNSIGNED_BYTE, image);
-        });
-
-        int nextIndex = getNextIndex();
-        Texture2D texture = new Texture2D(textureRegistryID, id, width, height, nextIndex, GL_SLOTS[nextIndex], null);
-        TEXTURES.add(texture);
         return texture;
     }
 

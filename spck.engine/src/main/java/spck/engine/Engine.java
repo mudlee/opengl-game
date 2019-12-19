@@ -14,6 +14,7 @@ import spck.engine.ecs.render.RenderSystem;
 import spck.engine.ecs.ui.UICanvasRendererSystem;
 import spck.engine.framework.*;
 import spck.engine.render.camera.Camera;
+import spck.engine.ui.NuklearHandler;
 import spck.engine.util.OSNameParser;
 
 import java.util.Arrays;
@@ -68,6 +69,7 @@ public class Engine implements Runnable{
         this.GAME_LOOP_THREAD=new Thread(this,"GAME_LOOP_THREAD");
 
         window = new OpenGLWindow(windowPreferences);
+        new NuklearHandler();
         Input.initialize();
         LOGGER.debug("Window preferences: {}", window.getPreferences());
 

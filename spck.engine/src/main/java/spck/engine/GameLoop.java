@@ -36,8 +36,6 @@ class GameLoop {
             window.swapBuffers();
             MessageBus.broadcast(LifeCycle.AFTER_BUFFER_SWAP.eventID());
 
-            window.pollEvents();
-
             MessageBus.broadcast(LifeCycle.BEFORE_FRAME_SYNC.eventID());
             if (!window.getPreferences().isvSyncEnabled()) {
                 if (window.getPreferences().isLimitFPS()) {

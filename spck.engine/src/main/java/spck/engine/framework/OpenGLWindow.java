@@ -141,10 +141,6 @@ public class OpenGLWindow {
         MessageBus.register(LifeCycle.CLEANUP.eventID(), this::onCleanUp);
     }
 
-    public void pollEvents() {
-        glfwPollEvents();
-    }
-
     public boolean shouldNotClose() {
         return !glfwWindowShouldClose(ID);
     }
