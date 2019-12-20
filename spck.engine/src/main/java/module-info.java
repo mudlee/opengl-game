@@ -37,8 +37,7 @@ module spck.engine {
     exports spck.engine.framework.assets;
     exports spck.engine.ecs.ui;
     exports spck.engine.ui;
-    exports spck.engine.Input;
+    exports spck.engine.window;
     exports spck.engine.physics;
-    exports spck.engine.ui.svg;
     exports spck.engine.util;
 }

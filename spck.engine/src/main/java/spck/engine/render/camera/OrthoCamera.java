@@ -1,6 +1,7 @@
 package spck.engine.render.camera;
 
 import spck.engine.Engine;
+import spck.engine.window.GLFWWindow;
 
 public class OrthoCamera extends AbstractCamera implements Camera {
     private float size;
@@ -15,13 +16,13 @@ public class OrthoCamera extends AbstractCamera implements Camera {
      * @param zFar,  for default, use 1000
      * @return OrthoCamera
      */
-    public OrthoCamera(float size, float zNear, float zFar) {
-        super();
+    public OrthoCamera(GLFWWindow window, float size, float zNear, float zFar) {
+        super(window);
         this.size = size;
         this.zNear = zNear;
         this.zFar = zFar;
         projectionMatrixUpdater = () -> {
-            float aspect = Engine.window.getPreferences().getWindowAspect();
+            float aspect = window.getWindowAspect();
             projectionMatrix.setOrtho(-this.size * aspect, this.size * aspect, -this.size, this.size, this.zNear, this.zFar);
             projectionMatrixChanged = true;
         };

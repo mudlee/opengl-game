@@ -4,7 +4,6 @@ import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import spck.engine.Engine;
-import spck.engine.Input.Input;
 import spck.engine.MoveDirection;
 import spck.engine.Time;
 import spck.engine.bus.LifeCycle;
@@ -12,9 +11,13 @@ import spck.engine.bus.MessageBus;
 import spck.engine.ecs.ui.UICanvasEntity;
 import spck.engine.ecs.ui.UIImage;
 import spck.engine.framework.assets.TextureStorage;
+import spck.engine.render.camera.Camera;
+import spck.engine.render.camera.OrthoCamera;
 import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureRegistry;
 import spck.engine.render.textures.TextureRegistryID;
+import spck.engine.window.GLFWWindow;
+import spck.engine.window.Input;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,20 +45,24 @@ public class GameCameraController extends UICanvasEntity {
         moveKeyMap.put(MoveDirection.DOWNWARD, GLFW_KEY_S);
     }
 
-    private final GameCamera camera;
+    private final OrthoCamera camera;
     private final Vector3f moveTarget;
     private final Vector2f zoomTarget;
+    private final GLFWWindow window;
+    private final Input input;
 
-    GameCameraController(GameCamera camera) {
+    GameCameraController(OrthoCamera camera, GLFWWindow window, Input input) {
         this.camera = camera;
+        this.window = window;
+        this.input = input;
         moveTarget = new Vector3f(camera.getPosition());
         zoomTarget = new Vector2f(camera.getSize(), 0);
 
         for (Map.Entry<MoveDirection, Integer> entry : moveKeyMap.entrySet()) {
-            Input.onKeyHeldDown(entry.getValue(), event -> move(entry.getKey()));
+            input.onKeyHeldDown(entry.getValue(), event -> move(entry.getKey()));
         }
 
-        Input.onMouseScroll(event -> {
+        input.onMouseScroll(event -> {
             if (event.offset.y > 0) {
                 move(MoveDirection.FORWARD);
             } else {
@@ -83,18 +90,17 @@ public class GameCameraController extends UICanvasEntity {
     public void onEntityCreated() {
         super.onEntityCreated();
 
-        Engine.window.captureMouse();
+        window.captureMouse();
 
         Texture2D cursorTexture = TextureStorage.loadFromResource("/textures/pointer.png", CursorTextureRegistryID.CURSOR);
         TextureRegistry.register(cursorTexture);
-        UIImage cursor = UIImage.build(cursorTexture.getId(), 30, 30);
-        canvasComponent
-                .addImage(cursor);
+        UIImage cursor = UIImage.build(cursorTexture.getId(), 30, 30, window);
+        canvasComponent.addImage(cursor);
 
-        Vector2d mousePos = Input.getMouseAbsolutePosition();
+        Vector2d mousePos = input.getMouseAbsolutePosition();
         cursor.setPosition((int) mousePos.x, (int) mousePos.y);
 
-        Input.onMouseMove(event -> {
+        input.onMouseMove(event -> {
             move(event.direction);
             cursor.setPosition((int) event.relativePosition.x, (int) event.relativePosition.y);
         });

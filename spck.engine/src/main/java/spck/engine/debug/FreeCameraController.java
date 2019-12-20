@@ -2,12 +2,13 @@ package spck.engine.debug;
 
 import org.joml.Vector3f;
 import spck.engine.Engine;
-import spck.engine.Input.Input;
 import spck.engine.MoveDirection;
 import spck.engine.Time;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.render.camera.Camera;
+import spck.engine.window.GLFWWindow;
+import spck.engine.window.Input;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,17 +36,17 @@ public class FreeCameraController {
     private final Camera camera;
     private final Vector3f moveTarget;
 
-    public FreeCameraController(Camera camera) {
+    public FreeCameraController(Camera camera, GLFWWindow window, Input input) {
         this.camera = camera;
         moveTarget = new Vector3f(camera.getPosition());
         rotation = new Vector3f(camera.getRotation());
-        Engine.window.captureMouse();
+        window.captureMouse();
 
         for (Map.Entry<MoveDirection, Integer> entry : moveKeyMap.entrySet()) {
-            Input.onKeyHeldDown(entry.getValue(), event -> move(entry.getKey()));
+            input.onKeyHeldDown(entry.getValue(), event -> move(entry.getKey()));
         }
 
-        Input.onMouseMove(event -> {
+        input.onMouseMove(event -> {
             //noinspection SuspiciousNameCombination
             rotation.y += event.offset.x; // yaw
             //noinspection SuspiciousNameCombination

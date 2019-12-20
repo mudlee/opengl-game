@@ -9,21 +9,25 @@ import spck.engine.bus.MessageBus;
 import spck.engine.ecs.ui.UICanvasEntity;
 import spck.engine.ecs.ui.UIText;
 import spck.engine.framework.RGBAColor;
+import spck.engine.render.camera.OrthoCamera;
 import spck.engine.ui.UIObjectPosition;
+import spck.engine.window.GLFWWindow;
 import spck.game.GameCamera;
 
 public class NationsEntity extends UICanvasEntity {
     private static final Logger LOGGER = LoggerFactory.getLogger(NationsEntity.class);
     private static final Vector2f TEXT_POS_TEMP = new Vector2f();
-    private final GameCamera camera;
+    private final OrthoCamera camera;
+    private final GLFWWindow window;
     private final Nation[] nations = new Nation[]{
             new EuropeanUnion()
     };
     private final UIText[] texts;
     private final CityArea[] areas;
 
-    public NationsEntity(GameCamera camera) {
+    public NationsEntity(OrthoCamera camera, GLFWWindow window) {
         this.camera = camera;
+        this.window = window;
 
         int numberOfCities = getNumberOfAreas();
         texts = new UIText[numberOfCities];
@@ -46,7 +50,8 @@ public class NationsEntity extends UICanvasEntity {
             for (CityArea area : nation.getAreas()) {
                 texts[i] = UIText.build(
                         area.getName(),
-                        UIObjectPosition.build((int) area.getPosition().x, (int) area.getPosition().y, Align.TOP_LEFT)
+                        UIObjectPosition.build((int) area.getPosition().x, (int) area.getPosition().y, Align.TOP_LEFT),
+                        window
                 ).color(RGBAColor.black());
                 canvasComponent.addText(texts[i]);
                 i++;
@@ -60,7 +65,7 @@ public class NationsEntity extends UICanvasEntity {
     private void onUpdate() {
         if (camera.isViewMatrixChanged()) {
             for (int i = 0; i < texts.length; i++) {
-                TEXT_POS_TEMP.set(camera.toScreenSpace(areas[i].getPosition()));
+                TEXT_POS_TEMP.set(camera.worldSpaceToScreenSpace(areas[i].getPosition()));
                 texts[i].setPosition(TEXT_POS_TEMP.x, TEXT_POS_TEMP.y);
             }
         }

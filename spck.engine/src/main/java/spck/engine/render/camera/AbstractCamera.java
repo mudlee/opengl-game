@@ -4,11 +4,17 @@ import org.joml.Math;
 import org.joml.*;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
-import spck.engine.util.WorldSpaceToScreenSpace;
+import spck.engine.window.GLFWWindow;
 
 public class AbstractCamera {
     private final Vector3f REUSABLE_RAY_VECTOR = new Vector3f().zero();
+    private final Vector4f WORLD_POS_TEMP = new Vector4f();
+    private final Vector4f CLIP_SPACE_TEMP = new Vector4f();
+    private final Vector3f NDC_SPACE_TEMP = new Vector3f();
+    private final Vector2f WINDOW_SPACE_TEMP = new Vector2f();
+    private final Vector2f WINDOW_SIZE_TEMP = new Vector2f();
     private final Matrix4f viewMatrix = new Matrix4f();
+    private final GLFWWindow window;
     protected boolean viewMatrixChanged = true;
     protected final Vector3f REUSABLE_UP_VECTOR = new Vector3f(0, 1, 0);
     protected final Vector3f REUSABLE_3D_VECTOR = new Vector3f().zero();
@@ -20,7 +26,8 @@ public class AbstractCamera {
     protected boolean positionChanged = true;
     protected Runnable projectionMatrixUpdater;
 
-    public AbstractCamera() {
+    public AbstractCamera(GLFWWindow window) {
+        this.window = window;
         MessageBus.register(LifeCycle.GAME_START.eventID(), this::onStart);
         MessageBus.register(LifeCycle.BEFORE_BUFFER_SWAP.eventID(), this::onBeforeBufferSwap);
         MessageBus.register(LifeCycle.WINDOW_RESIZED.eventID(), this::onWindowResized);
@@ -40,6 +47,18 @@ public class AbstractCamera {
         this.rotation.set(rotation);
         recalculateFrontVector();
         updateViewMatrix();
+    }
+
+    public Vector2f worldSpaceToScreenSpace(Vector3f worldPosition) {
+        WORLD_POS_TEMP.set(worldPosition, 1f);
+        WINDOW_SIZE_TEMP.set(window.getWidth(), window.getHeight());
+
+        CLIP_SPACE_TEMP.set(WORLD_POS_TEMP).mul(viewMatrix).mul(projectionMatrix);
+        NDC_SPACE_TEMP.set(CLIP_SPACE_TEMP.x, -CLIP_SPACE_TEMP.y, CLIP_SPACE_TEMP.z).div(CLIP_SPACE_TEMP.w);
+        WINDOW_SPACE_TEMP.set(NDC_SPACE_TEMP.x + 1f, NDC_SPACE_TEMP.y + 1f);
+        WINDOW_SPACE_TEMP.set(WINDOW_SPACE_TEMP.x / 2f, WINDOW_SPACE_TEMP.y / 2f);
+        WINDOW_SPACE_TEMP.mul(WINDOW_SIZE_TEMP);
+        return WINDOW_SPACE_TEMP;
     }
 
     public Vector3f getFrontVector() {
@@ -70,10 +89,6 @@ public class AbstractCamera {
 
     public Matrix4f getProjectionMatrix() {
         return projectionMatrix;
-    }
-
-    public Vector2f toScreenSpace(Vector3f worldPosition) {
-        return WorldSpaceToScreenSpace.convert(worldPosition, projectionMatrix, viewMatrix);
     }
 
     public boolean isViewMatrixChanged() {

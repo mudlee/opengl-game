@@ -1,6 +1,7 @@
 package spck.engine.render.camera;
 
 import spck.engine.Engine;
+import spck.engine.window.GLFWWindow;
 
 public class PerspectiveCamera extends AbstractCamera implements Camera {
     /**
@@ -13,10 +14,10 @@ public class PerspectiveCamera extends AbstractCamera implements Camera {
      * @param zFar,  for default, use 1000
      * @return PerspectiveCamera
      */
-    public PerspectiveCamera(float fov, float zNear, float zFar) {
-        super();
+    public PerspectiveCamera(GLFWWindow window, float fov, float zNear, float zFar) {
+        super(window);
         projectionMatrixUpdater = () -> {
-            float aspect = Engine.window.getPreferences().getWindowAspect();
+            float aspect = window.getWindowAspect();
             projectionMatrix.setPerspective(
                     (float) java.lang.Math.toRadians(fov),
                     aspect,

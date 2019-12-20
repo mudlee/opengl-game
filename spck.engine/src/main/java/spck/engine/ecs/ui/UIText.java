@@ -4,6 +4,7 @@ import spck.engine.Engine;
 import spck.engine.framework.RGBAColor;
 import spck.engine.framework.UIRenderer;
 import spck.engine.ui.UIObjectPosition;
+import spck.engine.window.GLFWWindow;
 
 public class UIText extends UIElement {
     private String text;
@@ -12,21 +13,23 @@ public class UIText extends UIElement {
     private String font = Engine.preferences.defaultFont;
     private int align = UIRenderer.Align.LEFT.getValue() | UIRenderer.Align.TOP.getValue();
 
-    private UIText() {
+    private UIText(GLFWWindow window) {
+        super(window);
     }
 
-    public static UIText build(String text, UIObjectPosition position) {
-        UIText uiText = new UIText();
+    // TODO: remove window later
+    public static UIText build(String text, UIObjectPosition position, GLFWWindow window) {
+        UIText uiText = new UIText(window);
         uiText.text = text;
         uiText.position = position;
         uiText.screenOffset.set(0, uiText.size);
-        uiText.size *= Engine.window.getPreferences().getDevicePixelRatio().orElseThrow();
+        uiText.size *= window.getDevicePixelRatio();
         uiText.updateScreenCoords();
         return uiText;
     }
 
-    public UIText size(int size) {
-        this.size = size * Engine.window.getPreferences().getDevicePixelRatio().orElseThrow();
+    public UIText size(int size, GLFWWindow window) {
+        this.size = size * window.getDevicePixelRatio();
         return this;
     }
 

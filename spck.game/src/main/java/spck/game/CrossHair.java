@@ -7,10 +7,17 @@ import spck.engine.framework.assets.TextureStorage;
 import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureRegistry;
 import spck.engine.render.textures.TextureRegistryID;
+import spck.engine.window.GLFWWindow;
 
 public class CrossHair extends UICanvasEntity {
+    private final GLFWWindow window;
+
     private enum CrossHairTextureRegistryID implements TextureRegistryID {
         CROSSHAIR
+    }
+
+    public CrossHair(GLFWWindow window) {
+        this.window = window;
     }
 
     @Override
@@ -19,11 +26,11 @@ public class CrossHair extends UICanvasEntity {
 
         Texture2D texture2D = TextureStorage.loadFromResource("/ui/crosshair.png", CrossHairTextureRegistryID.CROSSHAIR);
         TextureRegistry.register(texture2D);
-        UIImage image = UIImage.build(texture2D.getId(), 50, 50);
-        int pixelRatio = Engine.window.getPreferences().getDevicePixelRatio().orElseThrow();
+        UIImage image = UIImage.build(texture2D.getId(), 50, 50, window);
+        int pixelRatio = window.getDevicePixelRatio();
         image.setPosition(
-                Engine.window.getPreferences().getWidth() / 2 - pixelRatio * 25,
-                Engine.window.getPreferences().getHeight() / 2 - pixelRatio * 25
+                (float)window.getWidth() / 2f - pixelRatio * 25f,
+                (float)window.getHeight() / 2f - pixelRatio * 25f
         );
         canvasComponent.addImage(image);
     }

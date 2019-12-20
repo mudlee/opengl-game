@@ -1,4 +1,4 @@
-package spck.engine;
+package spck.engine.window;
 
 public enum Antialiasing {
     OFF(0),

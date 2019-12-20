@@ -15,6 +15,7 @@ import spck.engine.Engine;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.util.ResourceLoader;
+import spck.engine.window.GLFWWindow;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -39,6 +40,7 @@ public class NuklearHandler {
     private final NkUserFont default_font = NkUserFont.create();
     private final NkBuffer cmds = NkBuffer.create();
     private final NkDrawNullTexture null_texture = NkDrawNullTexture.create();
+    private final GLFWWindow window;
 
     private int vbo, vao, ebo;
     private int prog;
@@ -60,7 +62,8 @@ public class NuklearHandler {
                 .flip();
     }
 
-    public NuklearHandler() {
+    public NuklearHandler(GLFWWindow window) {
+        this.window = window;
         MessageBus.register(LifeCycle.GAME_START.eventID(), this::onStart);
         MessageBus.register(LifeCycle.FRAME_START.eventID(), this::onFrameStart);
         MessageBus.register(LifeCycle.BEFORE_BUFFER_SWAP.eventID(), this::onBeforeBufferSwap);
@@ -72,7 +75,7 @@ public class NuklearHandler {
 
     private void onStart() {
         LOGGER.debug("Initializing {}...", NuklearHandler.class.getName());
-        setupWindow(Engine.window.getID());
+        setupWindow(window.getId());
         initStb();
     }
 
@@ -91,15 +94,15 @@ public class NuklearHandler {
         glfwPollEvents();
         NkMouse mouse = ctx.input().mouse();
         if (mouse.grab()) {
-            glfwSetInputMode(Engine.window.getID(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            glfwSetInputMode(window.getId(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
         } else if (mouse.grabbed()) {
             float prevX = mouse.prev().x();
             float prevY = mouse.prev().y();
-            glfwSetCursorPos(Engine.window.getID(), prevX, prevY);
+            glfwSetCursorPos(window.getId(), prevX, prevY);
             mouse.pos().x(prevX);
             mouse.pos().y(prevY);
         } else if (mouse.ungrab()) {
-            glfwSetInputMode(Engine.window.getID(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetInputMode(window.getId(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
 
         nk_input_end(ctx);
@@ -154,8 +157,8 @@ public class NuklearHandler {
     }
 
     private void render(int AA, int max_vertex_buffer, int max_element_buffer) {
-        int height = Engine.window.getPreferences().getHeight();
-        int width = Engine.window.getPreferences().getWidth();
+        int height = window.getHeight();
+        int width = window.getWidth();
         int display_width = width;
         int display_height = height;
 

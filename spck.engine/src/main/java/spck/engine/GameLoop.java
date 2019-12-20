@@ -6,14 +6,14 @@ import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.Stats;
 import spck.engine.framework.Graphics;
-import spck.engine.framework.OpenGLWindow;
+import spck.engine.window.GLFWWindow;
 
 class GameLoop {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameLoop.class);
     private final static int TARGET_FPS = 100;
-    private final OpenGLWindow window;
+    private final GLFWWindow window;
 
-    GameLoop(OpenGLWindow window) {
+    GameLoop(GLFWWindow window) {
         this.window = window;
     }
 
@@ -34,11 +34,12 @@ class GameLoop {
             MessageBus.broadcast(LifeCycle.AFTER_UPDATE.eventID());
             MessageBus.broadcast(LifeCycle.BEFORE_BUFFER_SWAP.eventID()); // camera resets here
             window.swapBuffers();
+            window.pollEvents();
             MessageBus.broadcast(LifeCycle.AFTER_BUFFER_SWAP.eventID());
 
             MessageBus.broadcast(LifeCycle.BEFORE_FRAME_SYNC.eventID());
-            if (!window.getPreferences().isvSyncEnabled()) {
-                if (window.getPreferences().isLimitFPS()) {
+            if (!window.isvSync()) {
+                if (window.isLimitFps()) {
                     sync(lastLoopTime);
                 }
             }

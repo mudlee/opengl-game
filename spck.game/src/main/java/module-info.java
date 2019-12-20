@@ -4,4 +4,5 @@ module spck.game {
     requires org.lwjgl.opengl;
     requires org.lwjgl.stb;
     opens spck.game.ui.debug to artemis.odb;
+    exports spck.game to spck.engine;
 }

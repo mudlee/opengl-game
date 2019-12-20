@@ -5,17 +5,20 @@ import com.artemis.BaseEntitySystem;
 import com.artemis.Component;
 import com.artemis.ComponentMapper;
 import com.artemis.utils.IntBag;
-import spck.engine.Antialiasing;
 import spck.engine.Engine;
 import spck.engine.framework.Graphics;
 import spck.engine.framework.UIRenderer;
 import spck.engine.util.RunOnce;
+import spck.engine.window.Antialiasing;
+import spck.engine.window.GLFWWindow;
 
 public abstract class UICanvasRendererSystemCore extends BaseEntitySystem {
+    private final GLFWWindow window;
     private final UIRenderer uiRenderer;
 
-    public UICanvasRendererSystemCore(UIRenderer uiRenderer, Class<? extends Component> componentClass) {
+    public UICanvasRendererSystemCore(GLFWWindow window, UIRenderer uiRenderer, Class<? extends Component> componentClass) {
         super(Aspect.one(componentClass));
+        this.window = window;
         this.uiRenderer = uiRenderer;
     }
 
@@ -24,7 +27,7 @@ public abstract class UICanvasRendererSystemCore extends BaseEntitySystem {
     }
 
     protected void run(ComponentMapper<? extends UICanvasComponent> canvasComponents) {
-        RunOnce.run("Canvas rendering init", () -> uiRenderer.init(Engine.window.getPreferences().getAntialiasing() != Antialiasing.OFF));
+        RunOnce.run("Canvas rendering init", () -> uiRenderer.init(window.getAntialiasing() != Antialiasing.OFF));
 
         IntBag actives = subscription.getEntities();
         int[] ids = actives.getData();
@@ -38,9 +41,9 @@ public abstract class UICanvasRendererSystemCore extends BaseEntitySystem {
         }
 
         uiRenderer.beginFrame(
-                Engine.window.getPreferences().getWidth(),
-                Engine.window.getPreferences().getHeight(),
-                Engine.window.getPreferences().getDevicePixelRatio().orElseThrow()
+                window.getWidth(),
+                window.getHeight(),
+                window.getDevicePixelRatio()
         );
 
         for (int i = 0, s = actives.size(); s > i; i++) {

@@ -1,4 +1,4 @@
-package spck.engine.Input;
+package spck.engine.window;
 
 public class MouseButtonEvent {
     private int button;

@@ -1,6 +1,7 @@
 package spck.engine.ecs.ui;
 
 import spck.engine.Engine;
+import spck.engine.window.GLFWWindow;
 
 public class UIImage extends UIElement {
     private int textureId;
@@ -8,14 +9,15 @@ public class UIImage extends UIElement {
     private int height;
     public Integer handle;
 
-    private UIImage() {
+    private UIImage(GLFWWindow window) {
+        super(window);
     }
 
-    public static UIImage build(int textureId, int width, int height) {
-        UIImage image = new UIImage();
+    public static UIImage build(int textureId, int width, int height, GLFWWindow window) {
+        UIImage image = new UIImage(window);
         image.textureId = textureId;
-        image.width = width * Engine.window.getPreferences().getDevicePixelRatio().orElseThrow();
-        image.height = height * Engine.window.getPreferences().getDevicePixelRatio().orElseThrow();
+        image.width = width * window.getDevicePixelRatio();
+        image.height = height * window.getDevicePixelRatio();
         return image;
     }
 

@@ -7,16 +7,21 @@ import spck.engine.Engine;
 import spck.engine.debug.Measure;
 import spck.engine.debug.Stats;
 import spck.engine.ecs.ui.UIText;
+import spck.engine.render.camera.Camera;
+import spck.engine.render.camera.OrthoCamera;
 import spck.engine.util.NumberFormatter;
+import spck.engine.window.GLFWWindow;
 import spck.game.GameCamera;
 
 public class StatUITextSystem extends IteratingSystem {
-    private final GameCamera camera;
+    private final OrthoCamera camera;
+    private final GLFWWindow window;
     private ComponentMapper<StatusUICanvasComponent> canvasComponents;
 
-    public StatUITextSystem(GameCamera camera) {
+    public StatUITextSystem(OrthoCamera camera, GLFWWindow window) {
         super(Aspect.all(StatusUICanvasComponent.class));
         this.camera = camera;
+        this.window = window;
     }
 
     @Override
@@ -30,7 +35,7 @@ public class StatUITextSystem extends IteratingSystem {
                         text.text("FPS: " + Measure.getLastFPS());
                         break;
                     case VSYNC:
-                        text.text("Vsync: " + String.valueOf(Engine.window.getPreferences().isvSyncEnabled()).toUpperCase());
+                        text.text("Vsync: " + String.valueOf(window.isvSync()).toUpperCase());
                         break;
                     case RENDER_TIME:
                         text.text(String.format("Render time: %.2fms, (GFX: %.2fms)", Measure.getLastRenderTime(), Measure.getLastGraphicsRenderTime()));

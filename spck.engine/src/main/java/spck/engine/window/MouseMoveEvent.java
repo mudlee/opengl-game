@@ -1,4 +1,4 @@
-package spck.engine.Input;
+package spck.engine.window;
 
 import org.joml.Vector2d;
 import spck.engine.MoveDirection;
