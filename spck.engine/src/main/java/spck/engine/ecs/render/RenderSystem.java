@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class RenderSystem extends BaseSystem {
+    private final Renderer renderer;
     private final EntityBatchStore batchStore;
     private final PolygonShader polygonShader;
     private final AABBShader aabbShader;
@@ -26,7 +27,8 @@ public class RenderSystem extends BaseSystem {
     private final Renderer polygonOpenGLRenderer = new OpenGLPolygonRenderer();
     private final Renderer aabbRenderer = new OpenGLAABBRenderer();
 
-    public RenderSystem(EntityBatchStore batchStore, Camera camera) {
+    public RenderSystem(Renderer renderer, EntityBatchStore batchStore, Camera camera) {
+        this.renderer = renderer;
         this.batchStore = batchStore;
         polygonShader = new PolygonShader(camera);
         aabbShader = new AABBShader(camera);
@@ -81,7 +83,7 @@ public class RenderSystem extends BaseSystem {
         for (MaterialBatchGroup batchGroup : batchStore.getGroups().values()) {
             batchGroup.getMaterial().getShader().startShader(batchGroup.getMaterial());
             for (MeshMaterialBatch meshMaterialBatch : batchGroup.getBatches().values()) {
-                Engine.renderer.render(meshMaterialBatch);
+                renderer.render(meshMaterialBatch);
             }
             batchGroup.getMaterial().getShader().stopShader();
         }

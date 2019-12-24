@@ -24,10 +24,6 @@ public class Engine implements Runnable {
     public static OpenGLDefaultGPUDataStore gpuDataStore;
     public static OpenGLAABBGPUDataStore aabbGpuDataStore;
     public static OpenGLStandardShader shader;
-    public static Renderer renderer;
-    public static UIRenderer uiRenderer;
-    private final ECS ecs;
-    private final Camera camera;
 
     public static class Preferences {
         public String defaultFont = "GeosansLight";
@@ -52,12 +48,16 @@ public class Engine implements Runnable {
     private final GameLoop gameLoop;
     private final GLFWWindow window;
     private final Input input;
+    private final ECS ecs;
+    private final Camera camera;
+    private final UIRenderer uiRenderer;
 
     public Engine(Camera camera, GLFWWindow window, Input input) {
         this.camera = camera;
-        this.window =window;
+        this.window = window;
         this.input = input;
         this.ecs = new ECS();
+        this.uiRenderer = new UIRenderer(Engine.preferences.defaultFont);
 
         String osName = System.getProperty("os.name");
         preferences.os = OSNameParser.parse(osName);
@@ -72,12 +72,14 @@ public class Engine implements Runnable {
                     Camera.class,
                     GLFWWindow.class,
                     Input.class,
-                    ECS.class
+                    ECS.class,
+                    UIRenderer.class
             ).newInstance(
                     camera,
                     window,
                     input,
-                    ecs
+                    ecs,
+                    uiRenderer
             );
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new RuntimeException(e);
@@ -87,7 +89,6 @@ public class Engine implements Runnable {
         gpuDataStore = new OpenGLDefaultGPUDataStore();
         aabbGpuDataStore = new OpenGLAABBGPUDataStore();
         shader = new OpenGLStandardShader(camera);
-        renderer = new OpenGLDefaultMaterialRenderer();
 
         log.debug("OS name: {}", System.getProperty("os.name"));
         log.debug("OS version: {}", System.getProperty("os.version"));
@@ -101,10 +102,9 @@ public class Engine implements Runnable {
         //new NuklearHandler(window);
 
         EntityBatchStore batchStore = new EntityBatchStore();
-        uiRenderer = new UIRenderer(Engine.preferences.defaultFont);
 
         ecs.add(new PreRenderSystem(batchStore));
-        ecs.add(new RenderSystem(batchStore, camera));
+        ecs.add(new RenderSystem(new OpenGLDefaultMaterialRenderer(), batchStore, camera));
         ecs.add(new UICanvasRendererSystem(window, uiRenderer));
 
         new Measure();

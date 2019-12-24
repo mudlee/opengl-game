@@ -4,10 +4,10 @@ import org.joml.Vector2d;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import spck.engine.AbstractGame;
-import spck.engine.Engine;
 import spck.engine.debug.DebugInputListener;
 import spck.engine.ecs.ECS;
 import spck.engine.ecs.render.components.RenderComponent;
+import spck.engine.framework.UIRenderer;
 import spck.engine.lights.AmbientLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
@@ -24,14 +24,14 @@ import spck.game.ui.debug.StatusUICanvasRendererSystem;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class Game extends AbstractGame {
-	public Game(Camera camera, GLFWWindow window, Input input, ECS ecs) {
-		super(camera, window, input, ecs);
+	public Game(Camera camera, GLFWWindow window, Input input, ECS ecs, UIRenderer uiRenderer) {
+		super(camera, window, input, ecs, uiRenderer);
 	}
 
 	@Override
 	protected void registerECSSystems() {
 		ecs.add(new StatUITextSystem((OrthoCamera) camera, window));
-		ecs.add(new StatusUICanvasRendererSystem(Engine.uiRenderer, window));
+		ecs.add(new StatusUICanvasRendererSystem(uiRenderer, window));
 	}
 
 	@Override
