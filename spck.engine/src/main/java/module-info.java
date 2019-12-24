@@ -11,15 +11,13 @@ module spck.engine {
     requires org.lwjgl.stb.natives;
     requires org.lwjgl.assimp;
     requires org.lwjgl.assimp.natives;
-    requires org.lwjgl.nuklear;
-    requires org.lwjgl.nuklear.natives;
     requires transitive org.slf4j;
     requires transitive org.slf4j.simple;
     requires transitive artemis.odb;
     requires transitive org.joml;
 
     opens spck.engine.ecs to artemis.odb;
-    opens spck.engine.ecs.ui to artemis.odb;
+    opens spck.engine.ui to artemis.odb;
     opens spck.engine.ecs.render to artemis.odb;
 
     exports spck.engine;
@@ -35,7 +33,6 @@ module spck.engine {
     exports spck.engine.model;
     exports spck.engine.render.camera;
     exports spck.engine.framework.assets;
-    exports spck.engine.ecs.ui;
     exports spck.engine.ui;
     exports spck.engine.window;
     exports spck.engine.physics;

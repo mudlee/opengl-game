@@ -152,8 +152,8 @@ public class EntityBatchStore {
         if (!newBatchDataQueue.isEmpty()) {
             LOGGER.trace("Processing new Batches' data...");
             for (MeshMaterialBatch batch : newBatchDataQueue) {
-                Engine.gpuDataStore.uploadBatchDataToGPU(batch);
-                Engine.aabbGpuDataStore.uploadBatchDataToGPU(batch);
+                Engine.gpuDataStore.uploadDataToGPU(batch);
+                Engine.aabbGpuDataStore.uploadDataToGPU(batch);
             }
             newBatchDataQueue.clear();
             LOGGER.trace("New Batches' data processed");
@@ -162,8 +162,8 @@ public class EntityBatchStore {
         if (!changedBatchDataQueue.isEmpty()) {
             LOGGER.trace("Processing changed Batches' data...");
             for (MeshMaterialBatch batch : changedBatchDataQueue) {
-                Engine.gpuDataStore.updateBatchDataInGPU(batch);
-                Engine.aabbGpuDataStore.updateBatchDataInGPU(batch);
+                Engine.gpuDataStore.updateDataInGPU(batch);
+                Engine.aabbGpuDataStore.updateDataInGPU(batch);
                 batch.dataUpdated();
             }
             changedBatchDataQueue.clear();
@@ -180,8 +180,8 @@ public class EntityBatchStore {
             while (batchIterator.hasNext()) {
                 Map.Entry<Integer, MeshMaterialBatch> batchEntry = batchIterator.next();
                 if (batchEntry.getValue().getNumOfEntities() == 0) {
-                    Engine.gpuDataStore.updateBatchDataInGPU(batchEntry.getValue());
-                    Engine.aabbGpuDataStore.updateBatchDataInGPU(batchEntry.getValue());
+                    Engine.gpuDataStore.updateDataInGPU(batchEntry.getValue());
+                    Engine.aabbGpuDataStore.updateDataInGPU(batchEntry.getValue());
                     batchEntry.getValue().dataUpdated();
                     LOGGER.trace("Batch {} is empty, removing...", batchEntry.getValue().getID());
                     LOGGER.trace("Batch {} removed from newBatchDataQueue: {}", batchEntry.getValue().getID(), newBatchDataQueue.remove(batchEntry.getValue()));

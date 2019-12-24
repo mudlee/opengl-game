@@ -10,9 +10,9 @@ import spck.engine.ecs.ECS;
 import spck.engine.ecs.EntityBatchStore;
 import spck.engine.ecs.render.PreRenderSystem;
 import spck.engine.ecs.render.RenderSystem;
-import spck.engine.ecs.ui.UICanvasRendererSystem;
 import spck.engine.framework.*;
 import spck.engine.render.camera.Camera;
+import spck.engine.ui.UIRendererSystem;
 import spck.engine.util.OSNameParser;
 import spck.engine.window.GLFWWindow;
 import spck.engine.window.Input;
@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class Engine implements Runnable {
     public static final Preferences preferences = new Preferences();
-    public static OpenGLDefaultGPUDataStore gpuDataStore;
+    public static OpenGLDefaultGPUMeshDataStore gpuDataStore;
     public static OpenGLAABBGPUDataStore aabbGpuDataStore;
     public static OpenGLStandardShader shader;
 
@@ -50,14 +50,12 @@ public class Engine implements Runnable {
     private final Input input;
     private final ECS ecs;
     private final Camera camera;
-    private final UIRenderer uiRenderer;
 
     public Engine(Camera camera, GLFWWindow window, Input input) {
         this.camera = camera;
         this.window = window;
         this.input = input;
         this.ecs = new ECS();
-        this.uiRenderer = new UIRenderer(Engine.preferences.defaultFont);
 
         String osName = System.getProperty("os.name");
         preferences.os = OSNameParser.parse(osName);
@@ -72,21 +70,19 @@ public class Engine implements Runnable {
                     Camera.class,
                     GLFWWindow.class,
                     Input.class,
-                    ECS.class,
-                    UIRenderer.class
+                    ECS.class
             ).newInstance(
                     camera,
                     window,
                     input,
-                    ecs,
-                    uiRenderer
+                    ecs
             );
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
         log.debug("Launching game...");
 
-        gpuDataStore = new OpenGLDefaultGPUDataStore();
+        gpuDataStore = new OpenGLDefaultGPUMeshDataStore();
         aabbGpuDataStore = new OpenGLAABBGPUDataStore();
         shader = new OpenGLStandardShader(camera);
 
@@ -98,14 +94,11 @@ public class Engine implements Runnable {
         log.debug("Camera: {}", camera);
         log.debug("Creating GAME_LOOP_THREAD...");
 
-
-        //new NuklearHandler(window);
-
         EntityBatchStore batchStore = new EntityBatchStore();
 
         ecs.add(new PreRenderSystem(batchStore));
         ecs.add(new RenderSystem(new OpenGLDefaultMaterialRenderer(), batchStore, camera));
-        ecs.add(new UICanvasRendererSystem(window, uiRenderer));
+        ecs.add(new UIRendererSystem(preferences.defaultFont, window));
 
         new Measure();
 
@@ -119,7 +112,7 @@ public class Engine implements Runnable {
     @Override
     public void run() {
         window.create();
-        input.create(window.getWidth(), window.getHeight(), window.getCursorPositionConsumer());
+        input.create(window.getWindowWidth(), window.getWindowHeight(), window.getCursorPositionConsumer());
         MessageBus.broadcast(LifeCycle.GAME_START.eventID());
         gameLoop.loop();
         MessageBus.broadcast(LifeCycle.CLEANUP.eventID());

@@ -11,12 +11,12 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-class OpenGLAbstractGPUDataStore {
+public class OpenGLAbstractGPUDataStore {
     final List<Integer> vaos = new ArrayList<>();
     final List<Integer> vbos = new ArrayList<>();
     private final int instancedDataSize;
 
-    OpenGLAbstractGPUDataStore(int instancedDataSize) {
+    public OpenGLAbstractGPUDataStore(int instancedDataSize) {
         this.instancedDataSize = instancedDataSize;
         MessageBus.register(LifeCycle.CLEANUP.eventID(), this::onCleanUp);
     }
@@ -26,11 +26,21 @@ class OpenGLAbstractGPUDataStore {
         vbos.forEach(GL41::glDeleteBuffers);
     }
 
-    void addVAOAttribute(int vboId, int attributeIndex, int size) {
-        GL.bufferContext(vboId, () -> GL41.glVertexAttribPointer(attributeIndex, size, GL41.GL_FLOAT, false, 0, 0));
+    public void addVAOAttribute(int vboId, int attributeIndex, int size) {
+        addVAOAttribute(vboId, attributeIndex, size, GL41.GL_FLOAT, false, 0, 0);
     }
 
-    int createAndStoreDataInVBO(float[] data) {
+    public void addVAOAttribute(int vboId, int attributeIndex, int size, int type, boolean normalized, int stride, int pointer) {
+        GL.bufferContext(vboId, () -> GL41.glVertexAttribPointer(attributeIndex, size, type, normalized, stride, pointer));
+    }
+
+    public int createVBO(){
+        int vboId = GL41.glGenBuffers();
+        vbos.add(vboId);
+        return vboId;
+    }
+
+    public int createAndStoreDataInVBO(float[] data) {
         return GL.genBufferContext(vboId -> {
             FloatBuffer buffer = (FloatBuffer) ((Buffer) MemoryUtil.memAllocFloat(data.length).put(data)).flip();
             vbos.add(vboId);
@@ -40,7 +50,7 @@ class OpenGLAbstractGPUDataStore {
         });
     }
 
-    int createAndStoreDataInVBO(int[] data) {
+    public int createAndStoreDataInVBO(int[] data) {
         int vboId = GL41.glGenBuffers();
         vbos.add(vboId);
 
@@ -55,7 +65,7 @@ class OpenGLAbstractGPUDataStore {
         return vboId;
     }
 
-    void addInstancedVAOAttributeRequiresBind(int attributeIndex, int dataSize, int dataType, int offset) {
+    public void addInstancedVAOAttributeRequiresBind(int attributeIndex, int dataSize, int dataType, int offset) {
         GL41.glVertexAttribPointer(attributeIndex, dataSize, dataType, false, instancedDataSize * Float.BYTES, offset * Float.BYTES);
         GL41.glVertexAttribDivisor(attributeIndex, 1);
     }

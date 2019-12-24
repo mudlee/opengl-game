@@ -42,11 +42,12 @@ public class ECS {
         log.debug("ECS is ready");
     }
 
-    public void createEntity(AbstractEntity entity) {
+    public AbstractEntity createEntity(AbstractEntity entity) {
         int id = world.create();
         log.debug("Entity {} [{}] is created", id, entity.getClass().getSimpleName());
         entities.put(id, entity);
         entity.entityCreated(id);
+        return entity;
     }
 
     public void destroyEntity(int id) {

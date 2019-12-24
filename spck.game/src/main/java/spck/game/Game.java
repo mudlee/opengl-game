@@ -7,42 +7,41 @@ import spck.engine.AbstractGame;
 import spck.engine.debug.DebugInputListener;
 import spck.engine.ecs.ECS;
 import spck.engine.ecs.render.components.RenderComponent;
-import spck.engine.framework.UIRenderer;
 import spck.engine.lights.AmbientLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
 import spck.engine.physics.Physics;
 import spck.engine.render.camera.Camera;
 import spck.engine.render.camera.OrthoCamera;
+import spck.engine.ui.Align;
+import spck.engine.ui.Button;
+import spck.engine.ui.Canvas;
 import spck.engine.window.GLFWWindow;
 import spck.engine.window.Input;
 import spck.game.nations.NationsEntity;
-import spck.game.ui.debug.StatUITextSystem;
-import spck.game.ui.debug.StatusUICanvasEntity;
-import spck.game.ui.debug.StatusUICanvasRendererSystem;
+import spck.game.ui.DebugUI;
 
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class Game extends AbstractGame {
-	public Game(Camera camera, GLFWWindow window, Input input, ECS ecs, UIRenderer uiRenderer) {
-		super(camera, window, input, ecs, uiRenderer);
+	public Game(Camera camera, GLFWWindow window, Input input, ECS ecs) {
+		super(camera, window, input, ecs);
 	}
 
 	@Override
 	protected void registerECSSystems() {
-		ecs.add(new StatUITextSystem((OrthoCamera) camera, window));
-		ecs.add(new StatusUICanvasRendererSystem(uiRenderer, window));
 	}
 
 	@Override
 	protected void onStart() {
 		new DebugInputListener(camera, input);
+		input.onKeyPressed(GLFW_KEY_Q, event -> window.close());
 
 		camera.setPosition(new Vector3f(0, 0, 10));
 
 		window.setMousePosition(new Vector2d(
-				(double) window.getWidth() / 2,
-				(double) window.getHeight() / 2
+				(double) window.getWindowWidth() / 2,
+				(double) window.getWindowHeight() / 2
 		));
 
 		ecs.createEntity(new GameCameraController((OrthoCamera) camera, window, input));
@@ -61,8 +60,22 @@ public class Game extends AbstractGame {
 		});
 
 		ecs.createEntity(new WorldMap());
-		ecs.createEntity(new CrossHair(window));
-		ecs.createEntity(new NationsEntity((GameCamera) camera, window));
-		ecs.createEntity(new StatusUICanvasEntity(window));
+		ecs.createEntity(new CrossHairCanvas(window));
+		ecs.createEntity(new NationsEntity((GameCamera) camera));
+
+		new DebugUI(ecs, window, (OrthoCamera) camera);
+
+		Canvas canvas = (Canvas) ecs.createEntity(new Canvas());
+		canvas.addButton(Button.Builder
+				.create(100, 50, "Quit")
+				.withCornerRadius(5)
+				.withAlign(Align.MIDDLE_CENTER)
+				.withOnClickHandler(this::onQuitButtonClick)
+				.build()
+		);
+	}
+
+	private void onQuitButtonClick() {
+		window.close();
 	}
 }

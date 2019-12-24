@@ -5,7 +5,7 @@ import spck.engine.render.MeshMaterialBatch;
 
 import static spck.engine.framework.OpenGLAABBGPUDataStore.NUMBER_OF_INDICES_PER_AABB;
 
-public class OpenGLAABBRenderer implements Renderer {
+public class OpenGLAABBRenderer implements MeshRenderer {
     @Override
     public void render(MeshMaterialBatch batch) {
         GL.vaoContext(batch.getAABBVaoID(), () -> {

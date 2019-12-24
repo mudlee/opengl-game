@@ -7,13 +7,13 @@ import spck.engine.MoveDirection;
 import spck.engine.Time;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
-import spck.engine.ecs.ui.UICanvasEntity;
-import spck.engine.ecs.ui.UIImage;
 import spck.engine.framework.assets.TextureStorage;
 import spck.engine.render.camera.OrthoCamera;
 import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureRegistry;
 import spck.engine.render.textures.TextureRegistryID;
+import spck.engine.ui.Canvas;
+import spck.engine.ui.Image;
 import spck.engine.window.GLFWWindow;
 import spck.engine.window.Input;
 
@@ -22,7 +22,8 @@ import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class GameCameraController extends UICanvasEntity {
+// TODO it's not really a canvas
+public class GameCameraController extends Canvas {
     private static final Map<MoveDirection, Integer> moveKeyMap = new HashMap<>();
     private static final float ACCELERATION = 3f;
     private static final float MOVE_SPEED = 3f;
@@ -92,15 +93,22 @@ public class GameCameraController extends UICanvasEntity {
 
         Texture2D cursorTexture = TextureStorage.loadFromResource("/textures/pointer.png", CursorTextureRegistryID.CURSOR);
         TextureRegistry.register(cursorTexture);
-        UIImage cursor = UIImage.build(cursorTexture.getId(), 30, 30, window);
-        canvasComponent.addImage(cursor);
 
         Vector2d mousePos = input.getMouseAbsolutePosition();
-        cursor.setPosition((int) mousePos.x, (int) mousePos.y);
+
+        Image image = Image.Builder
+                .create(cursorTexture.getId())
+                .withX((int) mousePos.x)
+                .withY((int) mousePos.y)
+                .withWidth(30)
+                .withHeight(30)
+                .build();
+        addImage(image);
 
         input.onMouseMove(event -> {
             move(event.direction);
-            cursor.setPosition((int) event.relativePosition.x, (int) event.relativePosition.y);
+            image.setX((int) event.relativePosition.x);
+            image.setY((int) event.relativePosition.y);
         });
     }
 

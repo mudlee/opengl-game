@@ -11,7 +11,7 @@ public class RGBAColor {
         this.color = color;
     }
 
-    NVGColor getColor() {
+    public NVGColor toNVGColor() {
         return color;
     }
 
@@ -30,6 +30,15 @@ public class RGBAColor {
 
     public static Vector4f rgbaToVector4f(int r, int g, int b, int a) {
         return new Vector4f(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
+    }
+
+    public static RGBAColor red() {
+        NVGColor color = NVGColor.create();
+        color.r(1);
+        color.g(0);
+        color.b(0);
+        color.a(1);
+        return new RGBAColor(color);
     }
 
     public static RGBAColor white() {

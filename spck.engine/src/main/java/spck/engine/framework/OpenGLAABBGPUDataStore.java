@@ -10,7 +10,7 @@ import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.render.GPUDataStore;
 import spck.engine.render.MeshMaterialBatch;
 
-public class OpenGLAABBGPUDataStore extends OpenGLAbstractGPUDataStore implements GPUDataStore {
+public class OpenGLAABBGPUDataStore extends OpenGLAbstractGPUDataStore implements GPUDataStore<MeshMaterialBatch> {
     public enum LayoutQualifier {
         VX_POSITION(0);
 
@@ -39,7 +39,7 @@ public class OpenGLAABBGPUDataStore extends OpenGLAbstractGPUDataStore implement
     }
 
     @Override
-    public void uploadBatchDataToGPU(MeshMaterialBatch batch) {
+    public void uploadDataToGPU(MeshMaterialBatch batch) {
         GL.genVaoContext(vaoId -> {
             log.trace("AABB VAO created {}", vaoId);
             vaos.add(vaoId);
@@ -51,7 +51,7 @@ public class OpenGLAABBGPUDataStore extends OpenGLAbstractGPUDataStore implement
     }
 
     @Override
-    public void updateBatchDataInGPU(MeshMaterialBatch batch) {
+    public void updateDataInGPU(MeshMaterialBatch batch) {
         if (batch.getNumOfEntities() == 0) {
             log.trace("Batch {} is empty, removing its data from GPU", batch.getID());
             Stats.vboMemoryUsed -= batch.getOldSize() * batch.getEntityMemoryUsage();

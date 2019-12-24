@@ -5,10 +5,7 @@ import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
 import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.opengl.ARBDebugOutput;
-import org.lwjgl.opengl.GL41;
-import org.lwjgl.opengl.GL43;
-import org.lwjgl.opengl.GLCapabilities;
+import org.lwjgl.opengl.*;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
@@ -25,6 +22,7 @@ import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.glfwSetFramebufferSizeCallback;
 import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryStack.stackPush;
@@ -37,8 +35,10 @@ public class GLFWWindow {
 	private final DoubleBuffer mouseCursorAbsolutePositionX = MemoryUtil.memAllocDouble(1);
 	private final DoubleBuffer mouseCursorAbsolutePositionY = MemoryUtil.memAllocDouble(1);
 	private final Vector2f windowScale = new Vector2f();
-	private int width;
-	private int height;
+	private int windowWidth;
+	private int windowHeight;
+	private int displayWidth;
+	private int displayHeight;
 	private boolean vSync;
 	private boolean limitFps;
 	private Antialiasing antialiasing;
@@ -49,8 +49,8 @@ public class GLFWWindow {
 
 	public GLFWWindow(GLFWPreferences preferences, Input input) {
 		this.preferences = preferences;
-		this.width = preferences.getWidth();
-		this.height = preferences.getHeight();
+		this.windowWidth = preferences.getWidth();
+		this.windowHeight = preferences.getHeight();
 		this.vSync = preferences.isVsync();
 		this.limitFps = preferences.isLimitFps();
 		this.antialiasing = preferences.getAntialiasing();
@@ -85,8 +85,8 @@ public class GLFWWindow {
 
 		// fullscreen if needed
 		if (preferences.isFullscreen()) {
-			width = vidMode.width();
-			height = vidMode.height();
+			windowWidth = vidMode.width();
+			windowHeight = vidMode.height();
 			glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 		}
 
@@ -131,6 +131,7 @@ public class GLFWWindow {
 		});
 
 		calculateDevicePixelRatio();
+		setDisplayDimensions();
 
 		setupOpenGLDebug();
 
@@ -149,8 +150,10 @@ public class GLFWWindow {
 		GL41.glCullFace(GL41.GL_BACK);
 
 		log.debug("Window has been intialised");
+	}
 
-		input.onKeyPressed(GLFW_KEY_Q, event -> glfwSetWindowShouldClose(id, true));
+	public void close(){
+		glfwSetWindowShouldClose(id, true);
 	}
 
 	private void calculateDevicePixelRatio() {
@@ -194,7 +197,7 @@ public class GLFWWindow {
 	}
 
 	public float getWindowAspect() {
-		return (float) width / (float) height;
+		return (float) windowWidth / (float) windowHeight;
 	}
 
 	public void captureMouse() {
@@ -225,12 +228,20 @@ public class GLFWWindow {
 		return windowScale;
 	}
 
-	public int getWidth() {
-		return width;
+	public int getWindowWidth() {
+		return windowWidth;
 	}
 
-	public int getHeight() {
-		return height;
+	public int getWindowHeight() {
+		return windowHeight;
+	}
+
+	public int getDisplayWidth() {
+		return displayWidth;
+	}
+
+	public int getDisplayHeight() {
+		return displayHeight;
 	}
 
 	public boolean isvSync() {
@@ -255,10 +266,10 @@ public class GLFWWindow {
 
 	private void onUpdate() {
 		if (wasResized) {
-			glViewport(0, 0, width, height);
+			glViewport(0, 0, windowWidth, windowHeight);
 			calculateDevicePixelRatio();
 			wasResized = false;
-			log.debug("Window resized to {}x{}", width, height);
+			log.debug("Window resized to {}x{}", windowWidth, windowHeight);
 		}
 	}
 
@@ -277,13 +288,23 @@ public class GLFWWindow {
 		if (capabilities.OpenGL43) {
 			log.debug("OpenGL 4.3 debugging enabled");
 			GL43.glDebugMessageControl(
-					GL43.GL_DEBUG_SOURCE_API,
-					GL43.GL_DEBUG_TYPE_OTHER,
-					GL43.GL_DEBUG_SEVERITY_NOTIFICATION,
-					(IntBuffer) null,
-					false
+				GL43.GL_DEBUG_SOURCE_API,
+				GL43.GL_DEBUG_TYPE_OTHER,
+				GL43.GL_DEBUG_SEVERITY_NOTIFICATION,
+				(IntBuffer) null,
+				false
 			);
-		} else if (capabilities.GL_ARB_debug_output) {
+		}
+		else if(capabilities.GL_KHR_debug){
+			KHRDebug.glDebugMessageControl(
+				KHRDebug.GL_DEBUG_SOURCE_API,
+				KHRDebug.GL_DEBUG_TYPE_OTHER,
+				KHRDebug.GL_DEBUG_SEVERITY_NOTIFICATION,
+				(IntBuffer)null,
+				false
+			);
+		}
+		else if (capabilities.GL_ARB_debug_output) {
 			log.debug("ARB debugging enabled");
 			ARBDebugOutput.glDebugMessageControlARB(
 					ARBDebugOutput.GL_DEBUG_SOURCE_API_ARB,
@@ -300,8 +321,8 @@ public class GLFWWindow {
 			// Center our window
 			glfwSetWindowPos(
 					id,
-					(vidMode.width() - width) / 2,
-					(vidMode.height() - height) / 2
+					(vidMode.width() - windowWidth) / 2,
+					(vidMode.height() - windowHeight) / 2
 			);
 		}
 	}
@@ -309,17 +330,29 @@ public class GLFWWindow {
 	private void watchForResize() {
 		// watch for resize
 		final WindowResizedEvent windowResizedEvent = new WindowResizedEvent();
-		glfwSetFramebufferSizeCallback(id, new GLFWFramebufferSizeCallback() {
-			@Override
-			public void invoke(long window, int newWidth, int newHeight) {
-				width = newWidth;
-				height = newHeight;
-				wasResized = true;
+		glfwSetWindowSizeCallback(id, (window, width, height) -> {
+			windowWidth = width;
+			windowHeight = height;
+			wasResized = true;
 
-				windowResizedEvent.set(width, height);
-				input.windowResizedCallback(width, height);
-				MessageBus.broadcast(LifeCycle.WINDOW_RESIZED.eventID(), windowResizedEvent);
-			}
+			windowResizedEvent.set(windowWidth, windowHeight);
+			input.windowResizedCallback(windowWidth, windowHeight);
+			MessageBus.broadcast(LifeCycle.WINDOW_RESIZED.eventID(), windowResizedEvent);
 		});
+		glfwSetFramebufferSizeCallback(id, (window, width, height) -> {
+			displayWidth = width;
+			displayHeight = height;
+		});
+	}
+
+	private void setDisplayDimensions() {
+		try (MemoryStack stack = stackPush()) {
+			IntBuffer w = stack.mallocInt(1);
+			IntBuffer h = stack.mallocInt(1);
+
+			glfwGetFramebufferSize(id, w, h);
+			displayWidth = w.get(0);
+			displayHeight = h.get(0);
+		}
 	}
 }

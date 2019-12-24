@@ -13,7 +13,7 @@ import spck.engine.render.textures.TextureUVModifier;
 
 import java.util.function.Supplier;
 
-public class OpenGLDefaultGPUDataStore extends OpenGLAbstractGPUDataStore implements GPUDataStore {
+public class OpenGLDefaultGPUMeshDataStore extends OpenGLAbstractGPUDataStore implements GPUDataStore<MeshMaterialBatch> {
     public enum LayoutQualifier {
         VX_POSITION(0),
         VX_NORMAL(1),
@@ -32,19 +32,19 @@ public class OpenGLDefaultGPUDataStore extends OpenGLAbstractGPUDataStore implem
         }
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenGLDefaultGPUDataStore.class);
+    private static final Logger log = LoggerFactory.getLogger(OpenGLDefaultGPUMeshDataStore.class);
     // transformationMatrixInstanced(4x4) + uv scale(1) + uv offset(2)
     private static final int INSTANCED_DATA_SIZE_IN_BYTES = 19;
 
-    public OpenGLDefaultGPUDataStore() {
+    public OpenGLDefaultGPUMeshDataStore() {
         super(INSTANCED_DATA_SIZE_IN_BYTES);
     }
 
     @Override
-    public void uploadBatchDataToGPU(MeshMaterialBatch batch) {
-        LOGGER.trace("Uploading data to GPU for batch {}, num of Entities: {}", batch.getID(), batch.getNumOfEntities());
+    public void uploadDataToGPU(MeshMaterialBatch batch) {
+        log.trace("Uploading data to GPU for batch {}, num of Entities: {}", batch.getID(), batch.getNumOfEntities());
         GL.genVaoContext(vaoId -> {
-            LOGGER.trace("VAO created {}", vaoId);
+            log.trace("VAO created {}", vaoId);
             vaos.add(vaoId);
             batch.setVaoID(vaoId);
 
@@ -55,16 +55,16 @@ public class OpenGLDefaultGPUDataStore extends OpenGLAbstractGPUDataStore implem
     }
 
     @Override
-    public void updateBatchDataInGPU(MeshMaterialBatch batch) {
+    public void updateDataInGPU(MeshMaterialBatch batch) {
         if (batch.getNumOfEntities() == 0) {
-            LOGGER.trace("Batch {} is empty, removing its data from GPU", batch.getID());
+            log.trace("Batch {} is empty, removing its data from GPU", batch.getID());
             Stats.vboMemoryUsed -= batch.getOldSize() * batch.getEntityMemoryUsage();
             removeBatchDataFromGPU(batch);
             return;
         }
 
         GL.bufferContext(batch.getInstancedVboID(), () -> {
-            LOGGER.trace("Updating batch {} data in GPU. Size: {}->{}",
+            log.trace("Updating batch {} data in GPU. Size: {}->{}",
                     batch.getID(),
                     batch.getOldSize(),
                     batch.getNumOfEntities()
@@ -79,12 +79,12 @@ public class OpenGLDefaultGPUDataStore extends OpenGLAbstractGPUDataStore implem
             float[] instancedVBOData = getInstancedVBOData(batch);
             // updating the data in the array buffer
             GL41.glBufferSubData(GL41.GL_ARRAY_BUFFER, 0, instancedVBOData);
-            LOGGER.trace("    Data has been updated for batch {}", batch.getID());
+            log.trace("    Data has been updated for batch {}", batch.getID());
         });
     }
 
     private void removeBatchDataFromGPU(MeshMaterialBatch batch) {
-        LOGGER.trace("Removing Batch {} data from GPU...", batch.getID());
+        log.trace("Removing Batch {} data from GPU...", batch.getID());
         // Batch is now empty, delete datas
         GL41.glDeleteVertexArrays(batch.getVaoID());
         GL41.glDeleteBuffers(batch.getIndicesVBOID());
@@ -102,16 +102,16 @@ public class OpenGLDefaultGPUDataStore extends OpenGLAbstractGPUDataStore implem
         }
 
         vaos.remove(batch.getVaoID());
-        LOGGER.trace("Batch {} data removed from GPU", batch.getID());
+        log.trace("Batch {} data removed from GPU", batch.getID());
     }
 
     private void setupInstancedRendering(MeshMaterialBatch batch) {
-        LOGGER.trace("    Setting up instanced rendering for {} in [VAO:{}]", batch.getMesh(), batch.getVaoID());
+        log.trace("    Setting up instanced rendering for {} in [VAO:{}]", batch.getMesh(), batch.getVaoID());
 
         // Create VBO for instanced attributes
         int instancedDataVboId = GL41.glGenBuffers();
         vbos.add(instancedDataVboId);
-        LOGGER.trace("    INSTANCED_DATA-VBO:{}", instancedDataVboId);
+        log.trace("    INSTANCED_DATA-VBO:{}", instancedDataVboId);
         batch.setInstancedVboID(instancedDataVboId);
 
         GL.bufferContext(instancedDataVboId, () -> {
@@ -172,25 +172,25 @@ public class OpenGLDefaultGPUDataStore extends OpenGLAbstractGPUDataStore implem
     }
 
     private void loadBatchMeshDataIntoVAO(MeshMaterialBatch batch) {
-        LOGGER.trace("    Loading mesh {} into [VAO:{}]", batch.getMesh(), batch.getVaoID());
+        log.trace("    Loading mesh {} into [VAO:{}]", batch.getMesh(), batch.getVaoID());
 
         // vertices
         int verticesVboID = createAndStoreDataInVBO(batch.getMesh().getVertices());
         vbos.add(verticesVboID);
-        LOGGER.trace("    VERTICES-VBO:{}", verticesVboID);
+        log.trace("    VERTICES-VBO:{}", verticesVboID);
         batch.setVerticesVBOId(verticesVboID);
         addVAOAttribute(verticesVboID, LayoutQualifier.VX_POSITION.location, 3);
 
         // indices
         int indicesVboID = createAndStoreDataInVBO(batch.getMesh().getIndices());
         vbos.add(indicesVboID);
-        LOGGER.trace("    INDICES-VBO:{}", indicesVboID);
+        log.trace("    INDICES-VBO:{}", indicesVboID);
         batch.setIndicesVBOID(indicesVboID);
 
         // normals
         int normalsVboID = createAndStoreDataInVBO(batch.getMesh().getNormals());
         vbos.add(normalsVboID);
-        LOGGER.trace("    NORMALS-VBO:{}", normalsVboID);
+        log.trace("    NORMALS-VBO:{}", normalsVboID);
         addVAOAttribute(normalsVboID, LayoutQualifier.VX_NORMAL.location, 3);
         batch.setNormalsVBOId(normalsVboID);
 
@@ -201,7 +201,7 @@ public class OpenGLDefaultGPUDataStore extends OpenGLAbstractGPUDataStore implem
             }
 
             int uvVboId = createAndStoreDataInVBO(batch.getMesh().getUVCoords());
-            LOGGER.trace("    UV_COORDS-VBO:{}", uvVboId);
+            log.trace("    UV_COORDS-VBO:{}", uvVboId);
             addVAOAttribute(uvVboId, LayoutQualifier.VX_UV_COORDS.location, 2);
             batch.setUVVBOId(uvVboId);
         }

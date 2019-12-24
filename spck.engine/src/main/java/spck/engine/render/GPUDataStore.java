@@ -1,7 +1,7 @@
 package spck.engine.render;
 
-public interface GPUDataStore {
-    void uploadBatchDataToGPU(MeshMaterialBatch batch);
+public interface GPUDataStore<T> {
+    void uploadDataToGPU(T data);
 
-    void updateBatchDataInGPU(MeshMaterialBatch batch);
+    void updateDataInGPU(T data);
 }
