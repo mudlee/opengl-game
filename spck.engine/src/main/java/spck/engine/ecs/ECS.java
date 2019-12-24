@@ -9,31 +9,58 @@ import spck.engine.Time;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ECS {
-    public static World world;
-    private final static Logger LOGGER = LoggerFactory.getLogger(ECS.class);
+    private static final Map<Integer, AbstractEntity> entities = new HashMap<>();
+    private static World world;
+    private final static Logger log = LoggerFactory.getLogger(ECS.class);
     private final WorldConfigurationBuilder builder;
 
-    public ECS(List<BaseSystem> systems) {
-        LOGGER.debug("Initialising ECS World...");
+    public ECS() {
         builder = new WorldConfigurationBuilder();
+    }
 
-        for (BaseSystem system : systems) {
-            add(system);
-        }
+    public static Collection<AbstractEntity> getAllCreated() {
+        return entities.values();
     }
 
     public void add(BaseSystem system) {
-        LOGGER.debug("    Registering {} system...", system.getClass());
+        log.debug("Registering {} system...", system.getClass());
         builder.with(system);
     }
 
     public void createWorld() {
+        log.debug("Creating ECS world...");
+        if (world != null) {
+            throw new RuntimeException("ECS world is already created");
+        }
         world = new World(builder.build());
         MessageBus.register(LifeCycle.AFTER_UPDATE.eventID(), this::process);
-        LOGGER.debug("ECS is ready");
+        log.debug("ECS is ready");
+    }
+
+    public void createEntity(AbstractEntity entity) {
+        int id = world.create();
+        log.debug("Entity {} [{}] is created", id, entity.getClass().getSimpleName());
+        entities.put(id, entity);
+        entity.entityCreated(id);
+    }
+
+    public void destroyEntity(int id) {
+        if (entities.containsKey(id)) {
+            entities.get(id).destroy();
+            entities.remove(id);
+        }
+    }
+
+    public static World getWorld() {
+        if (world == null) {
+            throw new RuntimeException("ECS is not yet initiated");
+        }
+        return world;
     }
 
     private void process() {

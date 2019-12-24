@@ -24,7 +24,7 @@ public class OpenGLAABBGPUDataStore extends OpenGLAbstractGPUDataStore implement
     public static final int NUMBER_OF_INDICES_PER_AABB = 36;
     private static final int NUMBER_OF_VERTICES_PER_AABB = 24;
     private static final AABBf REUSABLE_AABB = new AABBf();
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenGLAABBGPUDataStore.class);
+    private static final Logger log = LoggerFactory.getLogger(OpenGLAABBGPUDataStore.class);
     private static final int[] BASE_INDICES = new int[]{
             0, 1, 2, 1, 3, 2, // front
             3, 1, 5, 3, 5, 4, // right
@@ -41,7 +41,7 @@ public class OpenGLAABBGPUDataStore extends OpenGLAbstractGPUDataStore implement
     @Override
     public void uploadBatchDataToGPU(MeshMaterialBatch batch) {
         GL.genVaoContext(vaoId -> {
-            LOGGER.trace("AABB VAO created {}", vaoId);
+            log.trace("AABB VAO created {}", vaoId);
             vaos.add(vaoId);
             batch.setAABBVaoID(vaoId);
 
@@ -53,14 +53,14 @@ public class OpenGLAABBGPUDataStore extends OpenGLAbstractGPUDataStore implement
     @Override
     public void updateBatchDataInGPU(MeshMaterialBatch batch) {
         if (batch.getNumOfEntities() == 0) {
-            LOGGER.trace("Batch {} is empty, removing its data from GPU", batch.getID());
+            log.trace("Batch {} is empty, removing its data from GPU", batch.getID());
             Stats.vboMemoryUsed -= batch.getOldSize() * batch.getEntityMemoryUsage();
             removeBatchDataFromGPU(batch);
             return;
         }
 
         GL.bufferContext(batch.getAABBVerticesVboID(), () -> {
-            LOGGER.trace("Updating batch {} AABB data in GPU. Size: {}->{}",
+            log.trace("Updating batch {} AABB data in GPU. Size: {}->{}",
                     batch.getID(),
                     batch.getOldSize(),
                     batch.getNumOfEntities()
@@ -71,12 +71,12 @@ public class OpenGLAABBGPUDataStore extends OpenGLAbstractGPUDataStore implement
                 GL41.glBufferData(GL41.GL_ARRAY_BUFFER, batch.getNumOfEntities() * NUMBER_OF_VERTICES_PER_AABB * Float.BYTES, GL41.GL_DYNAMIC_DRAW);
             }
             GL41.glBufferSubData(GL41.GL_ARRAY_BUFFER, 0, data);
-            LOGGER.trace("    AABB Data has been updated for batch {}", batch.getID());
+            log.trace("    AABB Data has been updated for batch {}", batch.getID());
         });
     }
 
     private void removeBatchDataFromGPU(MeshMaterialBatch batch) {
-        LOGGER.trace("Removing Batch {} AABB data from GPU...", batch.getID());
+        log.trace("Removing Batch {} AABB data from GPU...", batch.getID());
         // Batch is now empty, delete datas
         GL41.glDeleteVertexArrays(batch.getAABBVaoID());
         GL41.glDeleteBuffers(batch.getAABBVerticesVboID());
@@ -84,7 +84,7 @@ public class OpenGLAABBGPUDataStore extends OpenGLAbstractGPUDataStore implement
         vbos.remove(batch.getAABBVerticesVboID());
         vbos.remove(batch.getAABBIndicesVboID());
         vaos.remove(batch.getAABBVaoID());
-        LOGGER.trace("Batch {} AABB data removed from GPU", batch.getID());
+        log.trace("Batch {} AABB data removed from GPU", batch.getID());
     }
 
     private void loadAABBDataIntoVao(MeshMaterialBatch batch) {
@@ -93,14 +93,14 @@ public class OpenGLAABBGPUDataStore extends OpenGLAbstractGPUDataStore implement
         // AABB vertices
         int aabbVboID = createAndStoreDataInVBO(vertices);
         vbos.add(aabbVboID);
-        LOGGER.trace("    AABB-VBO:{}", aabbVboID);
+        log.trace("    AABB-VBO:{}", aabbVboID);
         addVAOAttribute(aabbVboID, LayoutQualifier.VX_POSITION.location, 3);
         batch.setAABBVBOID(aabbVboID);
 
         // AABB indices
         int aabbIndicesVboID = createAndStoreDataInVBO(calculateIndices(batch.getNumOfEntities()));
         vbos.add(aabbIndicesVboID);
-        LOGGER.trace("    AABB_INDICES-VBO:{}", aabbIndicesVboID);
+        log.trace("    AABB_INDICES-VBO:{}", aabbIndicesVboID);
         batch.setAABBIndicesVBOID(aabbIndicesVboID);
     }
 
@@ -109,7 +109,7 @@ public class OpenGLAABBGPUDataStore extends OpenGLAbstractGPUDataStore implement
 
         int index = 0;
         for (Integer entityId : batch.getEntities()) {
-            RenderComponent component = ECS.world.getEntity(entityId).getComponent(RenderComponent.class);
+            RenderComponent component = ECS.getWorld().getEntity(entityId).getComponent(RenderComponent.class);
             batch.getMesh().getAABB().transform(component.transform.getTransformationMatrix(), REUSABLE_AABB);
             for (float vertex : calculateVertices(REUSABLE_AABB)) {
                 vertices[index++] = vertex;

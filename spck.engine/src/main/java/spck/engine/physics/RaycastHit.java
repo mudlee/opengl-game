@@ -1,13 +1,13 @@
 package spck.engine.physics;
 
 import org.joml.Vector3f;
-import spck.engine.ecs.Entity;
+import spck.engine.ecs.AbstractEntity;
 
 public class RaycastHit {
     private final Vector3f position;
-    private final Entity entity;
+    private final AbstractEntity entity;
 
-    public RaycastHit(Vector3f position, Entity entity) {
+    public RaycastHit(Vector3f position, AbstractEntity entity) {
         this.position = position;
         this.entity = entity;
     }
@@ -16,7 +16,7 @@ public class RaycastHit {
         return position;
     }
 
-    public Entity getEntity() {
+    public AbstractEntity getEntity() {
         return entity;
     }
 }

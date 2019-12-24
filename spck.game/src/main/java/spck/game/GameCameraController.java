@@ -3,7 +3,6 @@ package spck.game;
 import org.joml.Vector2d;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import spck.engine.Engine;
 import spck.engine.MoveDirection;
 import spck.engine.Time;
 import spck.engine.bus.LifeCycle;
@@ -11,7 +10,6 @@ import spck.engine.bus.MessageBus;
 import spck.engine.ecs.ui.UICanvasEntity;
 import spck.engine.ecs.ui.UIImage;
 import spck.engine.framework.assets.TextureStorage;
-import spck.engine.render.camera.Camera;
 import spck.engine.render.camera.OrthoCamera;
 import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureRegistry;
@@ -87,8 +85,8 @@ public class GameCameraController extends UICanvasEntity {
     }
 
     @Override
-    public void onEntityCreated() {
-        super.onEntityCreated();
+    public void onEntityReady() {
+        super.onEntityReady();
 
         window.captureMouse();
 

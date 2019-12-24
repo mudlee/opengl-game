@@ -15,7 +15,7 @@ public class StatusUICanvasEntity extends UICanvasEntity {
     }
 
     @Override
-    public void onEntityCreated() {
+    public void onEntityReady() {
         canvasComponent = addComponent(StatusUICanvasComponent.class);
         canvasComponent.addText(UIText.build("?", UIObjectPosition.build(10, 10, Align.TOP_LEFT), window).id(StatusType.FPS.name()).color(RGBAColor.black()));
         canvasComponent.addText(UIText.build("?", UIObjectPosition.build(10, 45, Align.TOP_LEFT), window).id(StatusType.VSYNC.name()).color(RGBAColor.black()));

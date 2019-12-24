@@ -141,7 +141,7 @@ public class OpenGLDefaultGPUDataStore extends OpenGLAbstractGPUDataStore implem
 
         int index = 0;
         for (int entityId : batch.getEntities()) {
-            RenderComponent component = ECS.world.getEntity(entityId).getComponent(RenderComponent.class);
+            RenderComponent component = ECS.getWorld().getEntity(entityId).getComponent(RenderComponent.class);
             component.transform.getTransformationMatrix().get(vboData, offset);
             offset += 16;
 

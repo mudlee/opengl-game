@@ -1,14 +1,14 @@
 package spck.engine.ecs.ui;
 
-import spck.engine.ecs.Entity;
+import spck.engine.ecs.AbstractEntity;
 
 import java.util.Objects;
 
-public class UICanvasEntity extends Entity {
+public class UICanvasEntity extends AbstractEntity {
     protected UICanvasComponent canvasComponent;
 
     @Override
-    public void onEntityCreated() {
+    public void onEntityReady() {
         canvasComponent = addComponent(UICanvasComponent.class);
     }
 

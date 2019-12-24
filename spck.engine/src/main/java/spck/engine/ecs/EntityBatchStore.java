@@ -125,7 +125,7 @@ public class EntityBatchStore {
 
     public void destroyEntity(int entityId) {
         LOGGER.trace("Removing entity {}", entityId);
-        ECS.world.delete(entityId);
+        ECS.getWorld().delete(entityId);
         entities.remove(entityId);
 
         Supplier<RuntimeException> exceptionSupplier = () -> new RuntimeException(String.format("Entity's %s was marked for deletion, but it's not in the batching system", entityId));

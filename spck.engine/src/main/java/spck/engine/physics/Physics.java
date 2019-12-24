@@ -1,7 +1,8 @@
 package spck.engine.physics;
 
 import org.joml.*;
-import spck.engine.ecs.Entity;
+import spck.engine.ecs.AbstractEntity;
+import spck.engine.ecs.ECS;
 import spck.engine.ecs.render.components.RenderComponent;
 
 import java.util.Iterator;
@@ -13,13 +14,13 @@ public class Physics {
     private static final AABBf REUSABLE_AABB = new AABBf();
 
     public static Optional<RaycastHit> raycast(Rayf ray, float length) {
-        Iterator<Entity> iterator = Entity.getAllCreated().iterator();
+        Iterator<AbstractEntity> iterator = ECS.getAllCreated().iterator();
         Vector2f result = new Vector2f();
         Vector2f closestNearFar = null;
-        Entity closest = null;
+        AbstractEntity closest = null;
 
         while (iterator.hasNext()) {
-            Entity entity = iterator.next();
+            AbstractEntity entity = iterator.next();
             if (!(entity instanceof PhysicsEntity)) {
                 continue;
             }

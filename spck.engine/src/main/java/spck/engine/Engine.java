@@ -13,14 +13,11 @@ import spck.engine.ecs.render.RenderSystem;
 import spck.engine.ecs.ui.UICanvasRendererSystem;
 import spck.engine.framework.*;
 import spck.engine.render.camera.Camera;
-import spck.engine.ui.NuklearHandler;
 import spck.engine.util.OSNameParser;
-import spck.engine.window.GLFWPreferences;
 import spck.engine.window.GLFWWindow;
 import spck.engine.window.Input;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
 public class Engine implements Runnable {
     public static final Preferences preferences = new Preferences();
@@ -28,8 +25,8 @@ public class Engine implements Runnable {
     public static OpenGLAABBGPUDataStore aabbGpuDataStore;
     public static OpenGLStandardShader shader;
     public static Renderer renderer;
-    public static ECS ecs;
     public static UIRenderer uiRenderer;
+    private final ECS ecs;
     private final Camera camera;
 
     public static class Preferences {
@@ -50,7 +47,7 @@ public class Engine implements Runnable {
         }
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Engine.class);
+    private static final Logger log = LoggerFactory.getLogger(Engine.class);
     private final Thread GAME_LOOP_THREAD;
     private final GameLoop gameLoop;
     private final GLFWWindow window;
@@ -60,6 +57,7 @@ public class Engine implements Runnable {
         this.camera = camera;
         this.window =window;
         this.input = input;
+        this.ecs = new ECS();
 
         String osName = System.getProperty("os.name");
         preferences.os = OSNameParser.parse(osName);
@@ -71,31 +69,33 @@ public class Engine implements Runnable {
     public void launch(Class<? extends AbstractGame> gameClass) {
         try {
             gameClass.getDeclaredConstructor(
-                Camera.class,
-                GLFWWindow.class,
-                Input.class
+                    Camera.class,
+                    GLFWWindow.class,
+                    Input.class,
+                    ECS.class
             ).newInstance(
-                camera,
-                window,
-                input
+                    camera,
+                    window,
+                    input,
+                    ecs
             );
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
-        LOGGER.debug("Launching game...");
+        log.debug("Launching game...");
 
         gpuDataStore = new OpenGLDefaultGPUDataStore();
         aabbGpuDataStore = new OpenGLAABBGPUDataStore();
         shader = new OpenGLStandardShader(camera);
         renderer = new OpenGLDefaultMaterialRenderer();
 
-        LOGGER.debug("OS name: {}", System.getProperty("os.name"));
-        LOGGER.debug("OS version: {}", System.getProperty("os.version"));
-        LOGGER.debug("Java version: {}, {}", System.getProperty("java.version"), System.getProperty("java.vendor"));
-        LOGGER.debug("LWJGL version: {}", org.lwjgl.Version.getVersion());
-        LOGGER.debug("Engine preferences: {}", preferences);
-        LOGGER.debug("Camera: {}", camera);
-        LOGGER.debug("Creating GAME_LOOP_THREAD...");
+        log.debug("OS name: {}", System.getProperty("os.name"));
+        log.debug("OS version: {}", System.getProperty("os.version"));
+        log.debug("Java version: {}, {}", System.getProperty("java.version"), System.getProperty("java.vendor"));
+        log.debug("LWJGL version: {}", org.lwjgl.Version.getVersion());
+        log.debug("Engine preferences: {}", preferences);
+        log.debug("Camera: {}", camera);
+        log.debug("Creating GAME_LOOP_THREAD...");
 
 
         //new NuklearHandler(window);
@@ -103,18 +103,15 @@ public class Engine implements Runnable {
         EntityBatchStore batchStore = new EntityBatchStore();
         uiRenderer = new UIRenderer(Engine.preferences.defaultFont);
 
-        ecs = new ECS(Arrays.asList(
-                new PreRenderSystem(batchStore),
-                new RenderSystem(batchStore, camera),
-                new UICanvasRendererSystem(window,uiRenderer)
-        ));
+        ecs.add(new PreRenderSystem(batchStore));
+        ecs.add(new RenderSystem(batchStore, camera));
+        ecs.add(new UICanvasRendererSystem(window, uiRenderer));
 
         new Measure();
 
         if (preferences.os == OS.MACOS) {
             GAME_LOOP_THREAD.run();
-        }
-        else {
+        } else {
             GAME_LOOP_THREAD.start();
         }
     }

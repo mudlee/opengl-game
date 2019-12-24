@@ -12,7 +12,6 @@ import spck.engine.framework.RGBAColor;
 import spck.engine.render.camera.OrthoCamera;
 import spck.engine.ui.UIObjectPosition;
 import spck.engine.window.GLFWWindow;
-import spck.game.GameCamera;
 
 public class NationsEntity extends UICanvasEntity {
     private static final Logger LOGGER = LoggerFactory.getLogger(NationsEntity.class);
@@ -42,8 +41,8 @@ public class NationsEntity extends UICanvasEntity {
     }
 
     @Override
-    public void onEntityCreated() {
-        super.onEntityCreated();
+    public void onEntityReady() {
+        super.onEntityReady();
 
         int i = 0;
         for (Nation nation : nations) {
