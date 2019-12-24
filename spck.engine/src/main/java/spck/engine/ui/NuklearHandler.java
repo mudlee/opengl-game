@@ -11,7 +11,6 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spck.engine.Engine;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.util.ResourceLoader;
@@ -66,11 +65,6 @@ public class NuklearHandler {
         this.window = window;
         MessageBus.register(LifeCycle.GAME_START.eventID(), this::onStart);
         MessageBus.register(LifeCycle.FRAME_START.eventID(), this::onFrameStart);
-        MessageBus.register(LifeCycle.BEFORE_BUFFER_SWAP.eventID(), this::onBeforeBufferSwap);
-    }
-
-    private void onBeforeBufferSwap() {
-        //render(NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
     }
 
     private void onStart() {
@@ -91,7 +85,6 @@ public class NuklearHandler {
 
     private void onFrameStart() {
         nk_input_begin(ctx);
-        glfwPollEvents();
         NkMouse mouse = ctx.input().mouse();
         if (mouse.grab()) {
             glfwSetInputMode(window.getId(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -157,8 +150,8 @@ public class NuklearHandler {
     }
 
     private void render(int AA, int max_vertex_buffer, int max_element_buffer) {
-        int height = window.getHeight();
-        int width = window.getWidth();
+        int height = window.getWindowHeight();
+        int width = window.getWindowWidth();
         int display_width = width;
         int display_height = height;
 
@@ -513,6 +506,8 @@ public class NuklearHandler {
                         "}\n";
 
         nk_buffer_init(cmds, ALLOCATOR, BUFFER_INITIAL_SIZE);
+
+        // SHADING
         prog = GL41.glCreateProgram();
         vert_shdr = GL41.glCreateShader(GL41.GL_VERTEX_SHADER);
         frag_shdr = GL41.glCreateShader(GL41.GL_FRAGMENT_SHADER);
@@ -535,6 +530,8 @@ public class NuklearHandler {
 
         uniform_tex = GL41.glGetUniformLocation(prog, "Texture");
         uniform_proj = GL41.glGetUniformLocation(prog, "ProjMtx");
+        // SHADING
+
         int attrib_pos = GL41.glGetAttribLocation(prog, "Position");
         int attrib_uv = GL41.glGetAttribLocation(prog, "TexCoord");
         int attrib_col = GL41.glGetAttribLocation(prog, "Color");

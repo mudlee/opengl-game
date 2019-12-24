@@ -3,7 +3,6 @@ package spck.engine.ecs.ui;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import spck.engine.Align;
-import spck.engine.Engine;
 import spck.engine.ui.UIObjectPosition;
 import spck.engine.window.GLFWWindow;
 
@@ -42,24 +41,24 @@ public abstract class UIElement {
                 screenCoords.y = position.get().y;
                 break;
             case TOP_RIGHT:
-                screenCoords.x = window.getWidth() - (position.get().x) + screenOffset.x;
+                screenCoords.x = window.getWindowWidth() - (position.get().x) + screenOffset.x;
                 screenCoords.y = position.get().y;
                 break;
             case BOTTOM_LEFT:
                 screenCoords.x = position.get().x;
-                screenCoords.y = window.getHeight()
+                screenCoords.y = window.getWindowHeight()
                         - screenOffset.y
                         - position.get().y;
                 break;
             case BOTTOM_RIGHT:
-                screenCoords.x = window.getWidth() - (position.get().y) + screenOffset.x;
-                screenCoords.y = window.getHeight()
+                screenCoords.x = window.getWindowWidth() - (position.get().y) + screenOffset.x;
+                screenCoords.y = window.getWindowHeight()
                         - screenOffset.y
                         - position.get().y;
                 break;
             case CENTER_CENTER:
-                screenCoords.x = (float) window.getWidth() / 2 - (float) screenOffset.x / 2;
-                screenCoords.y = (float) window.getHeight() / 2 - (float) screenOffset.y / 2;
+                screenCoords.x = (float) window.getWindowWidth() / 2 - (float) screenOffset.x / 2;
+                screenCoords.y = (float) window.getWindowHeight() / 2 - (float) screenOffset.y / 2;
                 break;
         }
     }

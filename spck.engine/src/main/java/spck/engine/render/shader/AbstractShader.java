@@ -17,47 +17,47 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractShader {
-    private final static Logger LOGGER = LoggerFactory.getLogger(AbstractShader.class);
+    private final static Logger log = LoggerFactory.getLogger(AbstractShader.class);
     private final static List<Integer> vertexShaders = new ArrayList<>();
     private final static List<Integer> fragmentShaders = new ArrayList<>();
     private final Map<String, Integer> uniforms = new HashMap<>();
-    private final Class child;
-    private int ID;
+    private final Class<? extends AbstractShader> child;
+    protected int programId;
 
-    public AbstractShader(Class child) {
+    public AbstractShader(Class<? extends AbstractShader> child) {
         this.child = child;
     }
 
     public void init() {
-        ID = GL41.glGenProgramPipelines();
-        LOGGER.debug("Pipeline was created [ID:{}] for {}", ID, this.getClass().getSimpleName());
+        programId = GL41.glGenProgramPipelines();
+        log.debug("Pipeline was created [ID:{}] for {}", programId, this.getClass().getSimpleName());
 
         MessageBus.register(LifeCycle.CLEANUP.eventID(), this::cleanUp);
     }
 
     protected void bind() {
-        GL41.glBindProgramPipeline(ID);
+        GL41.glBindProgramPipeline(programId);
     }
 
     protected void unbind() {
         GL41.glBindProgramPipeline(0);
     }
 
-    protected void createUniform(int programID, Enum uniformName) {
-        createUniform(programID, uniformName.name());
+    protected void createUniform(int programId, Enum uniformName) {
+        createUniform(programId, uniformName.name());
     }
 
-    protected void createUniform(int programID, String uniformName) {
+    protected void createUniform(int programId, String uniformName) {
         if (uniforms.containsKey(uniformName)) {
-            LOGGER.error("Uniform [NAME:{}] is already created", uniformName);
+            log.error("Uniform [NAME:{}] is already created", uniformName);
             return;
         }
 
-        int location = GL41.glGetUniformLocation(programID, uniformName);
+        int location = GL41.glGetUniformLocation(programId, uniformName);
         if (location < 0) {
-            LOGGER.error("Uniform could not find ({}) or not used, so optimized out when trying to create: {}", location, uniformName);
+            log.error("Uniform could not find ({}) or not used, so optimized out when trying to create: {}", location, uniformName);
         } else {
-            LOGGER.trace("Uniform [NAME:{}] created for program [ID:{}] in pipeline [ID:{}]", uniformName, programID, ID);
+            log.trace("Uniform [NAME:{}] created for program [ID:{}] in pipeline [ID:{}]", uniformName, programId, this.programId);
         }
 
         uniforms.put(uniformName, location);
@@ -65,7 +65,7 @@ public abstract class AbstractShader {
 
     protected int attachVertexShader(String path) {
         int vertexID = GL41.glCreateShaderProgramv(GL41.GL_VERTEX_SHADER, ResourceLoader.load(path));
-        GL41.glUseProgramStages(ID, GL41.GL_VERTEX_SHADER_BIT, vertexID);
+        GL41.glUseProgramStages(programId, GL41.GL_VERTEX_SHADER_BIT, vertexID);
         validateShaderProgram(vertexID, path);
         vertexShaders.add(vertexID);
         return vertexID;
@@ -73,77 +73,87 @@ public abstract class AbstractShader {
 
     protected int attachFragmentShader(String path) {
         int fragmentID = GL41.glCreateShaderProgramv(GL41.GL_FRAGMENT_SHADER, ResourceLoader.load(path));
-        GL41.glUseProgramStages(ID, GL41.GL_FRAGMENT_SHADER_BIT, fragmentID);
+        GL41.glUseProgramStages(programId, GL41.GL_FRAGMENT_SHADER_BIT, fragmentID);
         validateShaderProgram(fragmentID, path);
         fragmentShaders.add(fragmentID);
         return fragmentID;
     }
 
-    protected void setUniform(int programID, Enum uniformName, Matrix4f value) {
+    protected void setUniform(int programId, Enum uniformName, Matrix4f value) {
         checkUniform(uniformName.name());
-        setUniform(programID, uniformName.name(), value);
+        setUniform(programId, uniformName.name(), value);
+    }
+    
+    protected void setUniform(int programId, Enum uniformName, int value) {
+        checkUniform(uniformName.name());
+        GL41.glUniform1i(programId, value);
     }
 
-    protected void setUniform(int programID, String uniformName, Matrix4f value) {
+    protected void setUniform(int programId, Enum uniformName, boolean transpose, FloatBuffer value) {
+        checkUniform(uniformName.name());
+        GL41.glUniformMatrix4fv(programId, transpose, value);
+    }
+
+    protected void setUniform(int programId, String uniformName, Matrix4f value) {
         checkUniform(uniformName);
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             FloatBuffer buffer = stack.mallocFloat(16);
             value.get(buffer);
-            GL41.glProgramUniformMatrix4fv(programID, uniforms.get(uniformName), false, buffer);
+            GL41.glProgramUniformMatrix4fv(programId, uniforms.get(uniformName), false, buffer);
         }
     }
 
-    protected void setUniform(int programID, String uniformName, Vector2f value) {
+    protected void setUniform(int programId, String uniformName, Vector2f value) {
         checkUniform(uniformName);
-        GL41.glProgramUniform2f(programID, uniforms.get(uniformName), value.x, value.y);
+        GL41.glProgramUniform2f(programId, uniforms.get(uniformName), value.x, value.y);
     }
 
-    protected void setUniform(int programID, String uniformName, Vector4f value) {
+    protected void setUniform(int programId, String uniformName, Vector4f value) {
         checkUniform(uniformName);
-        GL41.glProgramUniform4f(programID, uniforms.get(uniformName), value.x, value.y, value.z, value.w);
+        GL41.glProgramUniform4f(programId, uniforms.get(uniformName), value.x, value.y, value.z, value.w);
     }
 
-    protected void setUniform(int programID, String uniformName, int value) {
+    protected void setUniform(int programId, String uniformName, int value) {
         checkUniform(uniformName);
-        GL41.glProgramUniform1i(programID, uniforms.get(uniformName), value);
+        GL41.glProgramUniform1i(programId, uniforms.get(uniformName), value);
     }
 
-    protected void setUniform(int programID, ShaderUniform uniformName, int value) {
+    protected void setUniform(int programId, ShaderUniform uniformName, int value) {
         checkUniform(uniformName.name());
-        GL41.glProgramUniform1i(programID, uniforms.get(uniformName.name()), value);
+        GL41.glProgramUniform1i(programId, uniforms.get(uniformName.name()), value);
     }
 
-    protected void setUniform(int programID, String uniformName, float value) {
+    protected void setUniform(int programId, String uniformName, float value) {
         checkUniform(uniformName);
-        GL41.glProgramUniform1f(programID, uniforms.get(uniformName), value);
+        GL41.glProgramUniform1f(programId, uniforms.get(uniformName), value);
     }
 
-    protected void setUniform(int programID, String uniformName, Vector3f value) {
+    protected void setUniform(int programId, String uniformName, Vector3f value) {
         checkUniform(uniformName);
-        GL41.glProgramUniform3f(programID, uniforms.get(uniformName), value.x, value.y, value.z);
+        GL41.glProgramUniform3f(programId, uniforms.get(uniformName), value.x, value.y, value.z);
     }
 
-    protected void setUniform(int programID, Enum uniform, Vector3f value) {
+    protected void setUniform(int programId, Enum uniform, Vector3f value) {
         checkUniform(uniform.name());
-        GL41.glProgramUniform3f(programID, uniforms.get(uniform.name()), value.x, value.y, value.z);
+        GL41.glProgramUniform3f(programId, uniforms.get(uniform.name()), value.x, value.y, value.z);
     }
 
-    protected void setUniform(int programID, String uniformName, boolean value) {
+    protected void setUniform(int programId, String uniformName, boolean value) {
         checkUniform(uniformName);
-        GL41.glProgramUniform1i(programID, uniforms.get(uniformName), value ? 1 : 0);
+        GL41.glProgramUniform1i(programId, uniforms.get(uniformName), value ? 1 : 0);
     }
 
-    protected void setUniform(int programID, String uniformName, Vector3i value) {
+    protected void setUniform(int programId, String uniformName, Vector3i value) {
         checkUniform(uniformName);
-        GL41.glProgramUniform3i(programID, uniforms.get(uniformName), value.x, value.y, value.z);
+        GL41.glProgramUniform3i(programId, uniforms.get(uniformName), value.x, value.y, value.z);
     }
 
     private void cleanUp() {
-        LOGGER.debug("Cleaning up {}...", child.getSimpleName());
+        log.debug("Cleaning up {}...", child.getSimpleName());
         unbind();
 
-        GL41.glDeleteProgramPipelines(ID);
+        GL41.glDeleteProgramPipelines(programId);
         vertexShaders.forEach(GL41::glDeleteProgram);
         fragmentShaders.forEach(GL41::glDeleteProgram);
     }
@@ -154,15 +164,15 @@ public abstract class AbstractShader {
         }
     }
 
-    private void validateShaderProgram(int programID, String path) {
+    private void validateShaderProgram(int programId, String path) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer buffer = stack.mallocInt(1);
-            GL41.glGetProgramiv(programID, GL41.GL_LINK_STATUS, buffer);
+            GL41.glGetProgramiv(programId, GL41.GL_LINK_STATUS, buffer);
             if (buffer.get() == GL41.GL_FALSE) {
-                LOGGER.error(
+                log.error(
                         "Shader '{}' could not be linked\n---\n{}---",
                         path,
-                        GL41.glGetProgramInfoLog(programID, 1024)
+                        GL41.glGetProgramInfoLog(programId, 1024)
                 );
                 throw new RuntimeException("Shader validating failed");
             }

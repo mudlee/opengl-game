@@ -41,8 +41,8 @@ public abstract class UICanvasRendererSystemCore extends BaseEntitySystem {
         }
 
         uiRenderer.beginFrame(
-                window.getWidth(),
-                window.getHeight(),
+                window.getWindowWidth(),
+                window.getWindowHeight(),
                 window.getDevicePixelRatio()
         );
 

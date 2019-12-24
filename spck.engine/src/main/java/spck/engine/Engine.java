@@ -13,6 +13,7 @@ import spck.engine.ecs.render.RenderSystem;
 import spck.engine.ecs.ui.UICanvasRendererSystem;
 import spck.engine.framework.*;
 import spck.engine.render.camera.Camera;
+import spck.engine.ui.UIRendererSystem;
 import spck.engine.util.OSNameParser;
 import spck.engine.window.GLFWWindow;
 import spck.engine.window.Input;
@@ -21,7 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class Engine implements Runnable {
     public static final Preferences preferences = new Preferences();
-    public static OpenGLDefaultGPUDataStore gpuDataStore;
+    public static OpenGLDefaultGPUMeshDataStore gpuDataStore;
     public static OpenGLAABBGPUDataStore aabbGpuDataStore;
     public static OpenGLStandardShader shader;
 
@@ -86,7 +87,7 @@ public class Engine implements Runnable {
         }
         log.debug("Launching game...");
 
-        gpuDataStore = new OpenGLDefaultGPUDataStore();
+        gpuDataStore = new OpenGLDefaultGPUMeshDataStore();
         aabbGpuDataStore = new OpenGLAABBGPUDataStore();
         shader = new OpenGLStandardShader(camera);
 
@@ -106,6 +107,7 @@ public class Engine implements Runnable {
         ecs.add(new PreRenderSystem(batchStore));
         ecs.add(new RenderSystem(new OpenGLDefaultMaterialRenderer(), batchStore, camera));
         ecs.add(new UICanvasRendererSystem(window, uiRenderer));
+        ecs.add(new UIRendererSystem(window));
 
         new Measure();
 
@@ -119,7 +121,7 @@ public class Engine implements Runnable {
     @Override
     public void run() {
         window.create();
-        input.create(window.getWidth(), window.getHeight(), window.getCursorPositionConsumer());
+        input.create(window.getWindowWidth(), window.getWindowHeight(), window.getCursorPositionConsumer());
         MessageBus.broadcast(LifeCycle.GAME_START.eventID());
         gameLoop.loop();
         MessageBus.broadcast(LifeCycle.CLEANUP.eventID());

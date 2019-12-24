@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class OpenGLStandardShader extends AbstractShader implements Shader {
-    private final static Logger LOGGER = LoggerFactory.getLogger(OpenGLStandardShader.class);
+    private final static Logger log = LoggerFactory.getLogger(OpenGLStandardShader.class);
     private final static String vertexShader = "/shaders/standard/vertex.glsl";
     private final static String fragmenthader = "/shaders/standard/fragment.glsl";
     private final Camera camera;
@@ -29,7 +29,7 @@ public class OpenGLStandardShader extends AbstractShader implements Shader {
     @Override
     public void init() {
         super.init();
-        LOGGER.debug("Initialising shader...");
+        log.debug("Initialising shader...");
 
         // Camera has to be updated at least one, when we run startShader
         camera.forceUpdate();

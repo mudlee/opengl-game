@@ -51,7 +51,7 @@ public class AbstractCamera {
 
     public Vector2f worldSpaceToScreenSpace(Vector3f worldPosition) {
         WORLD_POS_TEMP.set(worldPosition, 1f);
-        WINDOW_SIZE_TEMP.set(window.getWidth(), window.getHeight());
+        WINDOW_SIZE_TEMP.set(window.getWindowWidth(), window.getWindowHeight());
 
         CLIP_SPACE_TEMP.set(WORLD_POS_TEMP).mul(viewMatrix).mul(projectionMatrix);
         NDC_SPACE_TEMP.set(CLIP_SPACE_TEMP.x, -CLIP_SPACE_TEMP.y, CLIP_SPACE_TEMP.z).div(CLIP_SPACE_TEMP.w);

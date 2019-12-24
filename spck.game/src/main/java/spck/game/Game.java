@@ -41,8 +41,8 @@ public class Game extends AbstractGame {
 		camera.setPosition(new Vector3f(0, 0, 10));
 
 		window.setMousePosition(new Vector2d(
-				(double) window.getWidth() / 2,
-				(double) window.getHeight() / 2
+				(double) window.getWindowWidth() / 2,
+				(double) window.getWindowHeight() / 2
 		));
 
 		ecs.createEntity(new GameCameraController((OrthoCamera) camera, window, input));

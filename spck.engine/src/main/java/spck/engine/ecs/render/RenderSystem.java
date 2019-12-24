@@ -7,7 +7,7 @@ import spck.engine.ecs.EntityBatchStore;
 import spck.engine.framework.Graphics;
 import spck.engine.framework.OpenGLAABBRenderer;
 import spck.engine.framework.OpenGLPolygonRenderer;
-import spck.engine.framework.Renderer;
+import spck.engine.framework.MeshRenderer;
 import spck.engine.render.MaterialBatchGroup;
 import spck.engine.render.MeshMaterialBatch;
 import spck.engine.render.camera.Camera;
@@ -19,15 +19,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class RenderSystem extends BaseSystem {
-    private final Renderer renderer;
+    private final MeshRenderer renderer;
     private final EntityBatchStore batchStore;
     private final PolygonShader polygonShader;
     private final AABBShader aabbShader;
     private final Set<Integer> entityIdsStat = new HashSet<>();
-    private final Renderer polygonOpenGLRenderer = new OpenGLPolygonRenderer();
-    private final Renderer aabbRenderer = new OpenGLAABBRenderer();
+    private final MeshRenderer polygonOpenGLRenderer = new OpenGLPolygonRenderer();
+    private final MeshRenderer aabbRenderer = new OpenGLAABBRenderer();
 
-    public RenderSystem(Renderer renderer, EntityBatchStore batchStore, Camera camera) {
+    public RenderSystem(MeshRenderer renderer, EntityBatchStore batchStore, Camera camera) {
         this.renderer = renderer;
         this.batchStore = batchStore;
         polygonShader = new PolygonShader(camera);

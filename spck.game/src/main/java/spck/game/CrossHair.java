@@ -28,8 +28,8 @@ public class CrossHair extends UICanvasEntity {
         UIImage image = UIImage.build(texture2D.getId(), 50, 50, window);
         int pixelRatio = window.getDevicePixelRatio();
         image.setPosition(
-                (float) window.getWidth() / 2f - pixelRatio * 25f,
-                (float) window.getHeight() / 2f - pixelRatio * 25f
+                (float) window.getWindowWidth() / 2f - pixelRatio * 25f,
+                (float) window.getWindowHeight() / 2f - pixelRatio * 25f
         );
         canvasComponent.addImage(image);
     }

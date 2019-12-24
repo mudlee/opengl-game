@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import spck.engine.Engine;
-import spck.engine.framework.OpenGLDefaultGPUDataStore;
+import spck.engine.framework.OpenGLDefaultGPUMeshDataStore;
 import spck.engine.render.*;
 
 import java.util.ArrayList;
@@ -274,7 +274,7 @@ class EntityBatchStoreTest {
     }
 
     private void mockStandardRenderer() {
-        Engine.gpuDataStore = Mockito.mock(OpenGLDefaultGPUDataStore.class);
+        Engine.gpuDataStore = Mockito.mock(OpenGLDefaultGPUMeshDataStore.class);
     }
 
     private Mesh createEmptyMesh() {
