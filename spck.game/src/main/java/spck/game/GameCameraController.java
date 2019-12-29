@@ -7,6 +7,7 @@ import spck.engine.MoveDirection;
 import spck.engine.Time;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
+import spck.engine.ecs.AbstractEntity;
 import spck.engine.framework.assets.TextureStorage;
 import spck.engine.render.camera.OrthoCamera;
 import spck.engine.render.textures.Texture2D;
@@ -22,8 +23,7 @@ import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-// TODO it's not really a canvas
-public class GameCameraController extends Canvas {
+public class GameCameraController extends AbstractEntity {
     private static final Map<MoveDirection, Integer> moveKeyMap = new HashMap<>();
     private static final float ACCELERATION = 3f;
     private static final float MOVE_SPEED = 3f;
@@ -47,15 +47,17 @@ public class GameCameraController extends Canvas {
     private final OrthoCamera camera;
     private final Vector3f moveTarget;
     private final Vector2f zoomTarget;
+    private final Canvas canvas;
     private final GLFWWindow window;
     private final Input input;
 
-    GameCameraController(OrthoCamera camera, GLFWWindow window, Input input) {
+    GameCameraController(OrthoCamera camera, GLFWWindow window, Input input, Canvas canvas) {
         this.camera = camera;
         this.window = window;
         this.input = input;
         moveTarget = new Vector3f(camera.getPosition());
         zoomTarget = new Vector2f(camera.getSize(), 0);
+        this.canvas = canvas;
 
         for (Map.Entry<MoveDirection, Integer> entry : moveKeyMap.entrySet()) {
             input.onKeyHeldDown(entry.getValue(), event -> move(entry.getKey()));
@@ -87,8 +89,6 @@ public class GameCameraController extends Canvas {
 
     @Override
     public void onEntityReady() {
-        super.onEntityReady();
-
         window.captureMouse();
 
         Texture2D cursorTexture = TextureStorage.loadFromResource("/textures/pointer.png", CursorTextureRegistryID.CURSOR);
@@ -96,19 +96,19 @@ public class GameCameraController extends Canvas {
 
         Vector2d mousePos = input.getMouseAbsolutePosition();
 
-        Image image = Image.Builder
+        Image cursor = Image.Builder
                 .create(cursorTexture.getId())
                 .withX((int) mousePos.x)
                 .withY((int) mousePos.y)
                 .withWidth(30)
                 .withHeight(30)
                 .build();
-        addImage(image);
+        canvas.addImage(cursor, 1);
 
         input.onMouseMove(event -> {
             move(event.direction);
-            image.setX((int) event.relativePosition.x);
-            image.setY((int) event.relativePosition.y);
+            cursor.setX((int) event.relativePosition.x);
+            cursor.setY((int) event.relativePosition.y);
         });
     }
 

@@ -1,5 +1,6 @@
 package spck.game;
 
+import spck.engine.ecs.AbstractEntity;
 import spck.engine.framework.assets.TextureStorage;
 import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureRegistry;
@@ -8,21 +9,21 @@ import spck.engine.ui.Canvas;
 import spck.engine.ui.Image;
 import spck.engine.window.GLFWWindow;
 
-public class CrossHairCanvas extends Canvas {
+public class CrossHairCanvas extends AbstractEntity {
     private final GLFWWindow window;
+    private final Canvas canvas;
 
     private enum CrossHairTextureRegistryID implements TextureRegistryID {
         CROSSHAIR
     }
 
-    public CrossHairCanvas(GLFWWindow window) {
+    public CrossHairCanvas(GLFWWindow window, Canvas canvas) {
         this.window = window;
+        this.canvas = canvas;
     }
 
     @Override
     public void onEntityReady() {
-        super.onEntityReady();
-
         Texture2D texture2D = TextureStorage.loadFromResource("/ui/crosshair.png", CrossHairTextureRegistryID.CROSSHAIR);
         TextureRegistry.register(texture2D);
         int pixelRatio = window.getDevicePixelRatio();
@@ -33,6 +34,6 @@ public class CrossHairCanvas extends Canvas {
                 .withWidth(50)
                 .withHeight(50)
                 .build();
-        addImage(image);
+        canvas.addImage(image);
     }
 }

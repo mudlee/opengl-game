@@ -2,6 +2,8 @@ package spck.engine.ui;
 
 import spck.engine.ecs.AbstractEntity;
 
+import java.util.ArrayList;
+
 public class Canvas extends AbstractEntity {
 	private CanvasComponent canvasComponent;
 
@@ -11,17 +13,35 @@ public class Canvas extends AbstractEntity {
 	}
 
 	public Text addText(Text text) {
-		canvasComponent.texts.add(text);
+		addText(text, 0);
 		return text;
 	}
 
-	public Image addImage(Image image){
-		canvasComponent.images.add(image);
+	public Text addText(Text text, int zIndex) {
+		canvasComponent.elements.putIfAbsent(zIndex, new ArrayList<>());
+		canvasComponent.elements.get(zIndex).add(text);
+		return text;
+	}
+
+	public Image addImage(Image image) {
+		addImage(image, 0);
+		return image;
+	}
+
+	public Image addImage(Image image, int zIndex) {
+		canvasComponent.elements.putIfAbsent(zIndex, new ArrayList<>());
+		canvasComponent.elements.get(zIndex).add(image);
 		return image;
 	}
 
 	public Button addButton(Button button) {
-		canvasComponent.buttons.add(button);
+		addButton(button, 0);
+		return button;
+	}
+
+	public Button addButton(Button button, int zIndex) {
+		canvasComponent.elements.putIfAbsent(zIndex, new ArrayList<>());
+		canvasComponent.elements.get(zIndex).add(button);
 		return button;
 	}
 }

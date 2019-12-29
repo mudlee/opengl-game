@@ -5,24 +5,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
+import spck.engine.ecs.AbstractEntity;
 import spck.engine.framework.RGBAColor;
 import spck.engine.render.camera.OrthoCamera;
 import spck.engine.ui.Canvas;
 import spck.engine.ui.Text;
 
-// TODO it's not really a canvas
-public class NationsEntity extends Canvas {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NationsEntity.class);
+public class NationsEntity extends AbstractEntity {
+    private static final Logger log = LoggerFactory.getLogger(NationsEntity.class);
     private static final Vector2f TEXT_POS_TEMP = new Vector2f();
     private final OrthoCamera camera;
+    private final Canvas canvas;
     private final Nation[] nations = new Nation[]{
             new EuropeanUnion()
     };
     private final Text[] texts;
     private final CityArea[] areas;
 
-    public NationsEntity(OrthoCamera camera) {
+    public NationsEntity(OrthoCamera camera, Canvas canvas) {
         this.camera = camera;
+        this.canvas = canvas;
 
         int numberOfCities = getNumberOfAreas();
         texts = new Text[numberOfCities];
@@ -38,8 +40,6 @@ public class NationsEntity extends Canvas {
 
     @Override
     public void onEntityReady() {
-        super.onEntityReady();
-
         int i = 0;
         for (Nation nation : nations) {
             for (CityArea area : nation.getAreas()) {
@@ -50,9 +50,9 @@ public class NationsEntity extends Canvas {
                         .withY((int) area.getPosition().y)
                         .withColor(RGBAColor.black())
                         .build();
-                addText(texts[i]);
+                canvas.addText(texts[i]);
                 i++;
-                LOGGER.debug("Area {} added", area.getName());
+                log.debug("Area {} added", area.getName());
             }
         }
 

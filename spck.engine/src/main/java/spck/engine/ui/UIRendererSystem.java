@@ -22,6 +22,7 @@ import spck.engine.window.Input;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
@@ -95,16 +96,17 @@ public class UIRendererSystem extends BaseEntitySystem {
 		for (int i = 0, s = actives.size(); s > i; i++) {
 			if (canvasComponents.has(ids[i])) {
 				CanvasComponent canvas = canvasComponents.get(ids[i]);
-				for (Text text : canvas.texts) {
-					renderText(text);
-				}
 
-				for (Image image : canvas.images) {
-					renderImage(image);
-				}
-
-				for (Button button : canvas.buttons) {
-					renderbutton(button);
+				for (List<UIElement> elementsAtIndex : canvas.elements.values()) {
+					for (UIElement element : elementsAtIndex) {
+						if (element instanceof Text) {
+							renderText((Text) element);
+						} else if (element instanceof Image) {
+							renderImage((Image) element);
+						} else if (element instanceof Button) {
+							renderbutton((Button) element);
+						}
+					}
 				}
 			}
 		}
@@ -115,7 +117,6 @@ public class UIRendererSystem extends BaseEntitySystem {
 
 	// TODO: check which part does what
 	// TODO: align right and center are wrong
-	// TODO: z-index
 	private void renderbutton(Button button) {
 		NVGPaint bg = NVGPaint.create();
 

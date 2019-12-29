@@ -46,7 +46,8 @@ public class Game extends AbstractGame {
 				(double) window.getWindowHeight() / 2
 		));
 
-		ecs.createEntity(new GameCameraController((OrthoCamera) camera, window, input));
+		Canvas canvas = (Canvas) ecs.createEntity(new Canvas());
+		ecs.createEntity(new GameCameraController((OrthoCamera) camera, window, input, canvas));
 
 		LightSystem.setAmbientLight(new AmbientLight(new Vector4f(1, 1, 1, 1), 0.9f));
 
@@ -62,12 +63,11 @@ public class Game extends AbstractGame {
 		});
 
 		ecs.createEntity(new WorldMap());
-		ecs.createEntity(new CrossHairCanvas(window));
-		ecs.createEntity(new NationsEntity((GameCamera) camera));
+		ecs.createEntity(new CrossHairCanvas(window, canvas));
+		ecs.createEntity(new NationsEntity((GameCamera) camera, canvas));
 
 		new DebugUI(ecs, window, (OrthoCamera) camera);
 
-		Canvas canvas = (Canvas) ecs.createEntity(new Canvas());
 		canvas.addButton(Button.Builder
 				.create(100, 50, "QUIT")
 				.withCornerRadius(5)
