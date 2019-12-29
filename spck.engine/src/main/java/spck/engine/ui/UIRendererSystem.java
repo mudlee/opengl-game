@@ -20,7 +20,6 @@ import spck.engine.window.GLFWWindow;
 import spck.engine.window.Input;
 
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +89,7 @@ public class UIRendererSystem extends BaseEntitySystem {
 
 	private void render(IntBag actives, int[] ids) {
 		MOUSE_POS_TEMP.set(input.getMouseRelativePosition());
+
 		nvgBeginFrame(pointer, window.getWindowWidth(), window.getWindowHeight(), window.getDevicePixelRatio());
 		nvgFontFace(pointer, defaultFont);
 
@@ -115,8 +115,6 @@ public class UIRendererSystem extends BaseEntitySystem {
 		restoreGLState();
 	}
 
-	// TODO: check which part does what
-	// TODO: align right and center are wrong
 	private void renderbutton(Button button) {
 		NVGPaint bg = NVGPaint.create();
 
@@ -125,8 +123,8 @@ public class UIRendererSystem extends BaseEntitySystem {
 		int textSize = button.textSize * window.getDevicePixelRatio();
 		int cornerRadius = button.cornerRadius * window.getDevicePixelRatio();
 		// TODO: cache positions
-		float x = calculatePosX(button.x, button.align);
-		float y = calculatePosY(button.y, button.align);
+		float x = calculatePosX(button.x, button.align, width);
+		float y = calculatePosY(button.y, button.align, height);
 
 		boolean mouseOver = button.backgroundMouseOverColor != null && isMouseOverButton((int) x, (int) y, width, height);
 
@@ -148,28 +146,18 @@ public class UIRendererSystem extends BaseEntitySystem {
 		);
 
 		nvgBeginPath(pointer);
-		nvgRoundedRect(pointer, x + 1, y + 1, width - 2, height - 2, cornerRadius - 1);
+		nvgRoundedRect(pointer, x, y, width, height, cornerRadius);
 		nvgFillPaint(pointer, bg);
 		nvgFill(pointer);
-
-		if(button.stroke != null) {
-			nvgBeginPath(pointer);
-			nvgRoundedRect(pointer, x + 0.5f, y + 0.5f, width - 1, height - 1, cornerRadius - 0.5f);
-			nvgStrokeColor(pointer, button.stroke.color.toNVGColor());
-			nvgStroke(pointer);
-		}
 
 		if (!button.textFont.equals(defaultFont)) {
 			nvgFontFace(pointer, button.textFont);
 		}
 
 		nvgFontSize(pointer, textSize);
-		float textWidth = nvgTextBounds(pointer, 0, 0, button.text, (FloatBuffer) null);
-
-		nvgFontSize(pointer, textSize);
 		nvgTextAlign(pointer, button.textAlign.getNvgValue());
 		nvgFillColor(pointer, button.textColor.toNVGColor());
-		nvgText(pointer, x + width * 0.5f - textWidth * 0.5f * 0.25f, y + height * 0.5f - 1, button.text);
+		nvgText(pointer, x + width * 0.5f, y + height * 0.5f, button.text);
 
 		if (!button.textFont.equals(defaultFont)) {
 			nvgFontFace(pointer, defaultFont);
@@ -246,6 +234,22 @@ public class UIRendererSystem extends BaseEntitySystem {
 		throw new RuntimeException("Not supported align: " + align);
 	}
 
+	private float calculatePosX(int x, Align align, int width) {
+		float result = calculatePosX(x, align);
+		switch (align) {
+			case TOP_RIGHT:
+			case BOTTOM_RIGHT:
+			case MIDDLE_RIGHT:
+				return result - width;
+			case TOP_CENTER:
+			case MIDDLE_CENTER:
+			case BOTTOM_CENTER:
+				return result - width / 2f;
+		}
+
+		return result;
+	}
+
 	private float calculatePosY(int y, Align align) {
 		switch (align) {
 			case TOP_LEFT:
@@ -263,6 +267,22 @@ public class UIRendererSystem extends BaseEntitySystem {
 		}
 
 		throw new RuntimeException("Not supported align: " + align);
+	}
+
+	private float calculatePosY(int y, Align align, int height) {
+		float result = calculatePosY(y, align);
+		switch (align) {
+			case BOTTOM_LEFT:
+			case BOTTOM_RIGHT:
+			case BOTTOM_CENTER:
+				return result - height;
+			case MIDDLE_LEFT:
+			case MIDDLE_RIGHT:
+			case MIDDLE_CENTER:
+				return result - height / 2f;
+		}
+
+		return result;
 	}
 
 	private void loadFont(String name, String path) {

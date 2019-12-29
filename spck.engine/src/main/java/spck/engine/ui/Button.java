@@ -4,16 +4,6 @@ import spck.engine.Engine;
 import spck.engine.framework.RGBAColor;
 
 public class Button extends UIElement {
-	public class Stroke {
-		protected RGBAColor color;
-		protected int strength;
-
-		public Stroke(RGBAColor color, int strength) {
-			this.color = color;
-			this.strength = strength;
-		}
-	}
-
 	protected String text;
 	protected int textSize;
 	protected Align textAlign;
@@ -25,7 +15,6 @@ public class Button extends UIElement {
 	protected int width;
 	protected int height;
 	protected int cornerRadius;
-	protected Stroke stroke;
 	protected Runnable onClickHandler;
 
 	public Button(
@@ -43,7 +32,6 @@ public class Button extends UIElement {
 			int width,
 			int height,
 			int cornerRadius,
-			Stroke stroke,
 			Runnable onClickHandler
 	) {
 		super(x, y, align);
@@ -58,7 +46,6 @@ public class Button extends UIElement {
 		this.width = width;
 		this.height = height;
 		this.cornerRadius = cornerRadius;
-		this.stroke = stroke;
 		this.onClickHandler = onClickHandler;
 	}
 
@@ -77,7 +64,6 @@ public class Button extends UIElement {
 		private int width;
 		private int height;
 		private int cornerRadius;
-		private Stroke stroke;
 		private Runnable onClickHandler;
 
 		private Builder() {
@@ -141,11 +127,6 @@ public class Button extends UIElement {
 			return this;
 		}
 
-		public Builder withStrore(Stroke stroke) {
-			this.stroke = stroke;
-			return this;
-		}
-
 		public Builder withCornerRadius(int cornerRadius) {
 			this.cornerRadius = cornerRadius;
 			return this;
@@ -172,7 +153,6 @@ public class Button extends UIElement {
 					width,
 					height,
 					cornerRadius,
-					stroke,
 					onClickHandler
 			);
 		}

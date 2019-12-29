@@ -71,7 +71,9 @@ public class Game extends AbstractGame {
 		canvas.addButton(Button.Builder
 				.create(100, 50, "QUIT")
 				.withCornerRadius(5)
-				.withAlign(Align.MIDDLE_CENTER)
+				.withX(50)
+				.withY(50)
+				.withAlign(Align.BOTTOM_RIGHT)
 				.withOnClickHandler(this::onQuitButtonClick)
 				.withBackgroundMouseOverColor(RGBAColor.red())
 				.build()
