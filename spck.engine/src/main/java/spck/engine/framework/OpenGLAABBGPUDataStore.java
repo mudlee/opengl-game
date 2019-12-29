@@ -6,9 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spck.engine.debug.Stats;
 import spck.engine.ecs.ECS;
-import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.render.GPUDataStore;
 import spck.engine.render.MeshMaterialBatch;
+import spck.engine.render.RenderComponent;
 
 public class OpenGLAABBGPUDataStore extends OpenGLAbstractGPUDataStore implements GPUDataStore<MeshMaterialBatch> {
     public enum LayoutQualifier {

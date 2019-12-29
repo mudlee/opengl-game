@@ -2,7 +2,7 @@ package spck.engine.debug;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spck.engine.ecs.render.RenderSystem;
+import spck.engine.render.RenderSystem;
 import spck.engine.render.camera.Camera;
 import spck.engine.window.Input;
 

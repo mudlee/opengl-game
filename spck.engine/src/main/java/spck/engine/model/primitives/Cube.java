@@ -1,9 +1,9 @@
 package spck.engine.model.primitives;
 
 import spck.engine.ecs.AbstractEntity;
-import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.model.ModelLoader;
 import spck.engine.render.MeshMaterialCollection;
+import spck.engine.render.RenderComponent;
 import spck.engine.render.Transform;
 
 public class Cube extends AbstractEntity {

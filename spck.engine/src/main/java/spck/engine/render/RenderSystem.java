@@ -1,11 +1,11 @@
-package spck.engine.ecs.render;
+package spck.engine.render;
 
 import com.artemis.BaseSystem;
 import spck.engine.debug.Stats;
-import spck.engine.ecs.EntityBatchStore;
-import spck.engine.framework.*;
-import spck.engine.render.MaterialBatchGroup;
-import spck.engine.render.MeshMaterialBatch;
+import spck.engine.framework.Graphics;
+import spck.engine.framework.OpenGLAABBRenderer;
+import spck.engine.framework.OpenGLPolygonRenderer;
+import spck.engine.framework.OpenGLStandardShader;
 import spck.engine.render.camera.Camera;
 import spck.engine.render.shader.AABBShader;
 import spck.engine.render.shader.PolygonShader;
@@ -19,7 +19,7 @@ public class RenderSystem extends BaseSystem {
     public static boolean polygonRenderMode;
     public static boolean renderAABB;
     private final MeshRenderer renderer;
-    private final EntityBatchStore batchStore;
+    private final RenderBatchStore batchStore;
     private final PolygonShader polygonShader;
     private final AABBShader aabbShader;
     private final Set<Integer> entityIdsStat = new HashSet<>();
@@ -27,7 +27,7 @@ public class RenderSystem extends BaseSystem {
     private final MeshRenderer aabbRenderer = new OpenGLAABBRenderer();
     private final Shader defaultShader;
 
-    public RenderSystem(MeshRenderer renderer, EntityBatchStore batchStore, Camera camera) {
+    public RenderSystem(MeshRenderer renderer, RenderBatchStore batchStore, Camera camera) {
         this.renderer = renderer;
         this.batchStore = batchStore;
         polygonShader = new PolygonShader(camera);

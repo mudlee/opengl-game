@@ -1,6 +1,4 @@
-package spck.engine.framework;
-
-import spck.engine.render.MeshMaterialBatch;
+package spck.engine.render;
 
 public interface MeshRenderer {
     void render(MeshMaterialBatch batch);

@@ -1,4 +1,4 @@
-package spck.engine.ecs.render;
+package spck.engine.render;
 
 import com.artemis.Aspect;
 import com.artemis.ComponentMapper;
@@ -6,9 +6,6 @@ import com.artemis.systems.IteratingSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spck.engine.ecs.ComponentState;
-import spck.engine.ecs.EntityBatchStore;
-import spck.engine.ecs.render.components.RenderComponent;
-import spck.engine.render.MeshMaterialPair;
 import spck.engine.render.shader.Shader;
 
 import java.util.List;
@@ -17,13 +14,13 @@ public class PreRenderSystem extends IteratingSystem {
     private static final Logger log = LoggerFactory.getLogger(PreRenderSystem.class);
 	private final Runnable doNothing = () -> {
 	};
-    private final EntityBatchStore batchStore;
-    private ComponentMapper<RenderComponent> meshRendererMapper;
+	private final RenderBatchStore batchStore;
+	private ComponentMapper<RenderComponent> meshRendererMapper;
 
-    public PreRenderSystem(EntityBatchStore batchStore) {
-        super(Aspect.all(RenderComponent.class));
-        this.batchStore = batchStore;
-    }
+	public PreRenderSystem(RenderBatchStore batchStore) {
+		super(Aspect.all(RenderComponent.class));
+		this.batchStore = batchStore;
+	}
 
     @Override
     protected void process(int entityId) {

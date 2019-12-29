@@ -1,8 +1,6 @@
-package spck.engine.ecs.render.components;
+package spck.engine.render;
 
 import spck.engine.ecs.StateAwareComponent;
-import spck.engine.render.MeshMaterialCollection;
-import spck.engine.render.Transform;
 
 public class RenderComponent extends StateAwareComponent {
     public MeshMaterialCollection meshMaterialCollection;

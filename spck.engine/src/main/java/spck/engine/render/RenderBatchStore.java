@@ -1,26 +1,24 @@
-package spck.engine.ecs;
+package spck.engine.render;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spck.engine.ecs.render.components.RenderComponent;
-import spck.engine.render.*;
+import spck.engine.ecs.ECS;
 
 import java.util.*;
 import java.util.function.Supplier;
 
-public class EntityBatchStore {
-    private static class BatchGroupBatchTouple {
+public class RenderBatchStore {
+	private static class BatchGroupBatchTouple {
+		int batchGroupID;
+		int batchID;
 
-        int batchGroupID;
-        int batchID;
-        BatchGroupBatchTouple(int batchGroupID, int batchID) {
-            this.batchGroupID = batchGroupID;
-            this.batchID = batchID;
-        }
+		BatchGroupBatchTouple(int batchGroupID, int batchID) {
+			this.batchGroupID = batchGroupID;
+			this.batchID = batchID;
+		}
+	}
 
-    }
-
-    private static final Logger log = LoggerFactory.getLogger(EntityBatchStore.class);
+	private static final Logger log = LoggerFactory.getLogger(RenderBatchStore.class);
 	private final Map<Integer, List<BatchGroupBatchTouple>> entityBatchGroupBatchIDMap = new HashMap<>();
     private final Map<Integer, MaterialBatchGroup> groups = new HashMap<>();
     private final Set<Integer> entities = new HashSet<>();
@@ -41,7 +39,7 @@ public class EntityBatchStore {
 	private final GPUDataStore<MeshMaterialBatch> gpuDataStore;
 	private final GPUDataStore<MeshMaterialBatch> aabbGpuDataStore;
 
-	public EntityBatchStore(GPUDataStore<MeshMaterialBatch> gpuDataStore, GPUDataStore<MeshMaterialBatch> aabbGpuDataStore) {
+	public RenderBatchStore(GPUDataStore<MeshMaterialBatch> gpuDataStore, GPUDataStore<MeshMaterialBatch> aabbGpuDataStore) {
 		this.gpuDataStore = gpuDataStore;
 		this.aabbGpuDataStore = aabbGpuDataStore;
 	}

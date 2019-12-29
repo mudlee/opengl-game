@@ -7,12 +7,12 @@ import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.Measure;
 import spck.engine.ecs.ECS;
-import spck.engine.ecs.EntityBatchStore;
-import spck.engine.ecs.render.PreRenderSystem;
-import spck.engine.ecs.render.RenderSystem;
 import spck.engine.framework.OpenGLAABBGPUDataStore;
 import spck.engine.framework.OpenGLDefaultGPUMeshDataStore;
 import spck.engine.framework.OpenGLDefaultMaterialRenderer;
+import spck.engine.render.PreRenderSystem;
+import spck.engine.render.RenderBatchStore;
+import spck.engine.render.RenderSystem;
 import spck.engine.render.camera.Camera;
 import spck.engine.ui.UIRendererSystem;
 import spck.engine.window.GLFWWindow;
@@ -66,7 +66,7 @@ public class Engine implements Runnable {
         log.debug("Camera: {}", camera);
         log.debug("Creating GAME_LOOP_THREAD...");
 
-        EntityBatchStore batchStore = new EntityBatchStore(
+        RenderBatchStore batchStore = new RenderBatchStore(
                 new OpenGLDefaultGPUMeshDataStore(),
                 new OpenGLAABBGPUDataStore()
         );

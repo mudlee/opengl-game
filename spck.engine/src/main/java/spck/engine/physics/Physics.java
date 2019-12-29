@@ -3,7 +3,7 @@ package spck.engine.physics;
 import org.joml.*;
 import spck.engine.ecs.AbstractEntity;
 import spck.engine.ecs.ECS;
-import spck.engine.ecs.render.components.RenderComponent;
+import spck.engine.render.RenderComponent;
 
 import java.util.Iterator;
 import java.util.Optional;

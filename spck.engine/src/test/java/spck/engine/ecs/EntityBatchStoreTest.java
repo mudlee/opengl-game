@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 class EntityBatchStoreTest {
-    private EntityBatchStore store;
+    private RenderBatchStore store;
 
     @BeforeEach
     void before() {
         GPUDataStore<MeshMaterialBatch> gpuDataStore = Mockito.mock(OpenGLDefaultGPUMeshDataStore.class);
         GPUDataStore<MeshMaterialBatch> aabbGpuDataStore = Mockito.mock(OpenGLAABBGPUDataStore.class);
-        store = new EntityBatchStore(gpuDataStore, aabbGpuDataStore);
+        store = new RenderBatchStore(gpuDataStore, aabbGpuDataStore);
     }
 
     @Test

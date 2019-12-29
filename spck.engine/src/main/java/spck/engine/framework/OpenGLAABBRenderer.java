@@ -2,6 +2,7 @@ package spck.engine.framework;
 
 import org.lwjgl.opengl.GL41;
 import spck.engine.render.MeshMaterialBatch;
+import spck.engine.render.MeshRenderer;
 
 import static spck.engine.framework.OpenGLAABBGPUDataStore.NUMBER_OF_INDICES_PER_AABB;
 

@@ -2,9 +2,9 @@ package spck.game;
 
 import org.joml.Vector3f;
 import spck.engine.ecs.AbstractEntity;
-import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.model.ModelLoader;
 import spck.engine.render.MeshMaterialCollection;
+import spck.engine.render.RenderComponent;
 
 public class WorldMap extends AbstractEntity {
 

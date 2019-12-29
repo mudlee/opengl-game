@@ -18,14 +18,13 @@ module spck.engine {
 
     opens spck.engine.ecs to artemis.odb;
     opens spck.engine.ui to artemis.odb;
-    opens spck.engine.ecs.render to artemis.odb;
+	opens spck.engine.render to artemis.odb;
 
     exports spck.engine;
     exports spck.engine.framework;
     exports spck.engine.bus;
     exports spck.engine.debug;
     exports spck.engine.ecs;
-    exports spck.engine.ecs.render.components;
     exports spck.engine.lights;
 	exports spck.engine.model.primitives;
 	exports spck.engine.render;
@@ -37,5 +36,4 @@ module spck.engine {
 	exports spck.engine.window;
 	exports spck.engine.physics;
 	exports spck.engine.util;
-	exports spck.engine.ecs.render;
 }
