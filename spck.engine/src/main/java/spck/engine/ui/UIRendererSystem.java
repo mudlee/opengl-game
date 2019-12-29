@@ -4,6 +4,7 @@ import com.artemis.Aspect;
 import com.artemis.BaseEntitySystem;
 import com.artemis.ComponentMapper;
 import com.artemis.utils.IntBag;
+import org.joml.Vector2d;
 import org.lwjgl.nanovg.NVGPaint;
 import org.lwjgl.opengl.GL41;
 import org.slf4j.Logger;
@@ -12,38 +13,48 @@ import spck.engine.Engine;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.framework.Graphics;
+import spck.engine.framework.RGBAColor;
 import spck.engine.util.ResourceLoader;
 import spck.engine.window.Antialiasing;
 import spck.engine.window.GLFWWindow;
+import spck.engine.window.Input;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.nanovg.NanoVG.*;
 import static org.lwjgl.nanovg.NanoVGGL3.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class UIRendererSystem extends BaseEntitySystem {
 	private static final Logger log = LoggerFactory.getLogger(UIRendererSystem.class);
+	private final Vector2d MOUSE_POS_TEMP = new Vector2d();
 	private final String defaultFont;
+	private final Input input;
 	private final Map<String, ByteBuffer> loadedFonts = new HashMap<>();
 	private final GLFWWindow window;
 	private ComponentMapper<CanvasComponent> canvasComponents;
 	private Long pointer;
+	private boolean leftMouseButtonClicked;
 
 	public UIRendererSystem(
 			String defaultFont,
-			GLFWWindow window
+			GLFWWindow window,
+			Input input
 	) {
 
 		super(Aspect.one(CanvasComponent.class));
 		this.window = window;
 		this.defaultFont = defaultFont;
+		this.input = input;
 
 		MessageBus.register(LifeCycle.GAME_START.eventID(), this::onStart);
 		MessageBus.register(LifeCycle.CLEANUP.eventID(), this::onCleanUp);
+		input.onMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT, event -> leftMouseButtonClicked = true);
+		input.onMouseButtonReleased(GLFW_MOUSE_BUTTON_LEFT, event -> leftMouseButtonClicked = false);
 	}
 
 	@Override
@@ -77,6 +88,7 @@ public class UIRendererSystem extends BaseEntitySystem {
 	}
 
 	private void render(IntBag actives, int[] ids) {
+		MOUSE_POS_TEMP.set(input.getMouseRelativePosition());
 		nvgBeginFrame(pointer, window.getWindowWidth(), window.getWindowHeight(), window.getDevicePixelRatio());
 		nvgFontFace(pointer, defaultFont);
 
@@ -103,8 +115,7 @@ public class UIRendererSystem extends BaseEntitySystem {
 
 	// TODO: check which part does what
 	// TODO: align right and center are wrong
-	// TODO: mouse over handling
-	// TODO: onclick eventhandling
+	// TODO: z-index
 	private void renderbutton(Button button) {
 		NVGPaint bg = NVGPaint.create();
 
@@ -116,23 +127,27 @@ public class UIRendererSystem extends BaseEntitySystem {
 		float x = calculatePosX(button.x, button.align);
 		float y = calculatePosY(button.y, button.align);
 
+		boolean mouseOver = button.backgroundMouseOverColor != null && isMouseOverButton((int) x, (int) y, width, height);
+
+		if (leftMouseButtonClicked && mouseOver && button.onClickHandler != null) {
+			button.onClickHandler.run();
+		}
+
+		RGBAColor bgColor = mouseOver ? button.backgroundMouseOverColor : button.backgroundColor;
+
 		nvgLinearGradient(
 				pointer,
 				x,
 				y,
 				x,
 				y + height,
-				button.backgroundColor.toNVGColor(),
-				button.backgroundColor.toNVGColor(),
+				bgColor.toNVGColor(),
+				bgColor.toNVGColor(),
 				bg
 		);
 
 		nvgBeginPath(pointer);
 		nvgRoundedRect(pointer, x + 1, y + 1, width - 2, height - 2, cornerRadius - 1);
-		/*if (!isBlack(col)) {
-			nvgFillColor(pointer, col);
-			nvgFill(pointer);
-		}*/
 		nvgFillPaint(pointer, bg);
 		nvgFill(pointer);
 
@@ -148,16 +163,12 @@ public class UIRendererSystem extends BaseEntitySystem {
 		}
 
 		nvgFontSize(pointer, textSize);
-		//nvgFontFace(pointer, button.textFont);
 		float textWidth = nvgTextBounds(pointer, 0, 0, button.text, (FloatBuffer) null);
 
 		nvgFontSize(pointer, textSize);
-		//nvgFontFace(pointer, "sans-bold");
 		nvgTextAlign(pointer, button.textAlign.getNvgValue());
-		nvgFillColor(pointer, button.backgroundColor.toNVGColor());
-		nvgText(pointer, x + width * 0.5f - textWidth * 0.5f * 0.25f, y + height * 0.5f - 1, button.text);
 		nvgFillColor(pointer, button.textColor.toNVGColor());
-		nvgText(pointer, x + width * 0.5f - textWidth * 0.5f * 0.25f, y + height * 0.5f, button.text);
+		nvgText(pointer, x + width * 0.5f - textWidth * 0.5f * 0.25f, y + height * 0.5f - 1, button.text);
 
 		if (!button.textFont.equals(defaultFont)) {
 			nvgFontFace(pointer, defaultFont);
@@ -203,6 +214,16 @@ public class UIRendererSystem extends BaseEntitySystem {
 		nvgRect(pointer, x, y, width, height);
 		nvgFillPaint(pointer, paint);
 		nvgFill(pointer);
+	}
+
+	private boolean isMouseOverButton(int xMin, int yMin, int width, int height) {
+		int xMax = xMin + width;
+		int yMax = yMin + height;
+
+		return (int) MOUSE_POS_TEMP.x >= xMin &&
+				(int) MOUSE_POS_TEMP.x <= xMax &&
+				(int) MOUSE_POS_TEMP.y >= yMin &&
+				(int) MOUSE_POS_TEMP.y <= yMax;
 	}
 
 	private float calculatePosX(int x, Align align) {

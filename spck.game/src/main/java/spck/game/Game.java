@@ -7,6 +7,7 @@ import spck.engine.AbstractGame;
 import spck.engine.debug.DebugInputListener;
 import spck.engine.ecs.ECS;
 import spck.engine.ecs.render.components.RenderComponent;
+import spck.engine.framework.RGBAColor;
 import spck.engine.lights.AmbientLight;
 import spck.engine.lights.LightSystem;
 import spck.engine.model.primitives.Cube;
@@ -21,7 +22,8 @@ import spck.engine.window.Input;
 import spck.game.nations.NationsEntity;
 import spck.game.ui.DebugUI;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_Q;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class Game extends AbstractGame {
 	public Game(Camera camera, GLFWWindow window, Input input, ECS ecs) {
@@ -67,10 +69,11 @@ public class Game extends AbstractGame {
 
 		Canvas canvas = (Canvas) ecs.createEntity(new Canvas());
 		canvas.addButton(Button.Builder
-				.create(100, 50, "Quit")
+				.create(100, 50, "QUIT")
 				.withCornerRadius(5)
 				.withAlign(Align.MIDDLE_CENTER)
 				.withOnClickHandler(this::onQuitButtonClick)
+				.withBackgroundMouseOverColor(RGBAColor.red())
 				.build()
 		);
 	}

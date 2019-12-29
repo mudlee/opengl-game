@@ -52,7 +52,9 @@ public class Button extends UIElement {
 		this.textAlign = textAlign;
 		this.textFont = textFont;
 		this.textColor = textColor;
+		this.textMouseOverColor = textMouseOverColor;
 		this.backgroundColor = backgroundColor;
+		this.backgroundMouseOverColor = backgroundMouseOverColor;
 		this.width = width;
 		this.height = height;
 		this.cornerRadius = cornerRadius;
@@ -69,9 +71,9 @@ public class Button extends UIElement {
 		private Align textAlign = Align.MIDDLE_CENTER;
 		private String textFont = Engine.preferences.defaultFont;
 		private RGBAColor textColor = RGBAColor.white();
-		private RGBAColor textMouseOverColor = RGBAColor.white();
+		private RGBAColor textMouseOverColor;
 		private RGBAColor backgroundColor = RGBAColor.black();
-		private RGBAColor backgroundMouseOverColor = RGBAColor.black();
+		private RGBAColor backgroundMouseOverColor;
 		private int width;
 		private int height;
 		private int cornerRadius;

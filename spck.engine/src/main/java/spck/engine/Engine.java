@@ -10,7 +10,10 @@ import spck.engine.ecs.ECS;
 import spck.engine.ecs.EntityBatchStore;
 import spck.engine.ecs.render.PreRenderSystem;
 import spck.engine.ecs.render.RenderSystem;
-import spck.engine.framework.*;
+import spck.engine.framework.OpenGLAABBGPUDataStore;
+import spck.engine.framework.OpenGLDefaultGPUMeshDataStore;
+import spck.engine.framework.OpenGLDefaultMaterialRenderer;
+import spck.engine.framework.OpenGLStandardShader;
 import spck.engine.render.camera.Camera;
 import spck.engine.ui.UIRendererSystem;
 import spck.engine.util.OSNameParser;
@@ -98,7 +101,7 @@ public class Engine implements Runnable {
 
         ecs.add(new PreRenderSystem(batchStore));
         ecs.add(new RenderSystem(new OpenGLDefaultMaterialRenderer(), batchStore, camera));
-        ecs.add(new UIRendererSystem(preferences.defaultFont, window));
+        ecs.add(new UIRendererSystem(preferences.defaultFont, window, input));
 
         new Measure();
 
