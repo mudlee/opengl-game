@@ -9,9 +9,9 @@ import org.lwjgl.nanovg.NVGPaint;
 import org.lwjgl.opengl.GL41;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spck.engine.Engine;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
+import spck.engine.ecs.render.RenderSystem;
 import spck.engine.framework.Graphics;
 import spck.engine.framework.RGBAColor;
 import spck.engine.util.ResourceLoader;
@@ -33,6 +33,9 @@ public class UIRendererSystem extends BaseEntitySystem {
 	private static final Logger log = LoggerFactory.getLogger(UIRendererSystem.class);
 	private final Vector2d MOUSE_POS_TEMP = new Vector2d();
 	private final String defaultFont;
+	private final RGBAColor defaultTextColor = RGBAColor.black();
+	private final RGBAColor defaultButtonTextColor = RGBAColor.white();
+	private final RGBAColor defaultButtonBgColor = RGBAColor.black();
 	private final Input input;
 	private final Map<String, ByteBuffer> loadedFonts = new HashMap<>();
 	private final GLFWWindow window;
@@ -66,11 +69,11 @@ public class UIRendererSystem extends BaseEntitySystem {
 			return;
 		}
 
-		if (Engine.preferences.polygonRenderMode) Graphics.setPolygonMode(Graphics.PolygonMode.FILL);
+		if (RenderSystem.polygonRenderMode) Graphics.setPolygonMode(Graphics.PolygonMode.FILL);
 
 		render(actives, ids);
 
-		if (Engine.preferences.polygonRenderMode) Graphics.setPolygonMode(Graphics.PolygonMode.LINE);
+		if (RenderSystem.polygonRenderMode) Graphics.setPolygonMode(Graphics.PolygonMode.LINE);
 	}
 
 	private void onStart() {
@@ -118,21 +121,25 @@ public class UIRendererSystem extends BaseEntitySystem {
 	private void renderbutton(Button button) {
 		NVGPaint bg = NVGPaint.create();
 
-		int width = button.width * window.getDevicePixelRatio();
-		int height = button.height * window.getDevicePixelRatio();
-		int textSize = button.textSize * window.getDevicePixelRatio();
-		int cornerRadius = button.cornerRadius * window.getDevicePixelRatio();
+		int width = button.getWidth() * window.getDevicePixelRatio();
+		int height = button.getHeight() * window.getDevicePixelRatio();
+		int textSize = button.getTextSize() * window.getDevicePixelRatio();
+		int cornerRadius = button.getCornerRadius() * window.getDevicePixelRatio();
 		// TODO: cache positions
 		float x = calculatePosX(button.x, button.align, width);
 		float y = calculatePosY(button.y, button.align, height);
+		String textFont = button.getTextFont().orElse(defaultFont);
 
-		boolean mouseOver = button.backgroundMouseOverColor != null && isMouseOverButton((int) x, (int) y, width, height);
+		boolean mouseOver = isMouseOverButton((int) x, (int) y, width, height);
 
-		if (leftMouseButtonClicked && mouseOver && button.onClickHandler != null) {
-			button.onClickHandler.run();
-		}
+		button.getOnClickHandler().ifPresent(handler -> {
+			if (leftMouseButtonClicked && mouseOver) {
+				handler.run();
+			}
+		});
 
-		RGBAColor bgColor = mouseOver ? button.backgroundMouseOverColor : button.backgroundColor;
+		boolean hasMouseOverColor = button.getBackgroundMouseOverColor().isPresent();
+		RGBAColor bgColor = mouseOver && hasMouseOverColor ? button.getBackgroundMouseOverColor().get() : button.getBackgroundColor().orElse(defaultButtonBgColor);
 
 		nvgLinearGradient(
 				pointer,
@@ -150,25 +157,28 @@ public class UIRendererSystem extends BaseEntitySystem {
 		nvgFillPaint(pointer, bg);
 		nvgFill(pointer);
 
-		if (!button.textFont.equals(defaultFont)) {
-			nvgFontFace(pointer, button.textFont);
+		if (!textFont.equals(defaultFont)) {
+			nvgFontFace(pointer, textFont);
 		}
 
 		nvgFontSize(pointer, textSize);
-		nvgTextAlign(pointer, button.textAlign.getNvgValue());
-		nvgFillColor(pointer, button.textColor.toNVGColor());
-		nvgText(pointer, x + width * 0.5f, y + height * 0.5f, button.text);
+		nvgTextAlign(pointer, button.getTextAlign().getNvgValue());
+		nvgFillColor(pointer, button.getTextColor().orElse(defaultButtonTextColor).toNVGColor());
+		nvgText(pointer, x + width * 0.5f, y + height * 0.5f, button.getText());
 
-		if (!button.textFont.equals(defaultFont)) {
+		if (!textFont.equals(defaultFont)) {
 			nvgFontFace(pointer, defaultFont);
 		}
 	}
 
 	private void renderText(Text text) {
+		String textFont = text.getFont().orElse(defaultFont);
+		RGBAColor textColor = text.getColor().orElse(defaultTextColor);
+
 		// setting fontFace is a slow operation, so we suppose that all the texts are using the default font
 		// if not, we handle it here. Use the current text's font, then set back the default
-		if (!text.getFont().equals(defaultFont)) {
-			nvgFontFace(pointer, text.getFont());
+		if (!textFont.equals(defaultFont)) {
+			nvgFontFace(pointer, textFont);
 		}
 
 		// TODO: cache positions
@@ -176,11 +186,11 @@ public class UIRendererSystem extends BaseEntitySystem {
 		float y = calculatePosY(text.y, text.align);
 
 		nvgFontSize(pointer, text.getSize() * window.getDevicePixelRatio());
-		nvgTextAlign(pointer, text.getAlign().getNvgValue());
-		nvgFillColor(pointer, text.getColor().toNVGColor());
+		nvgTextAlign(pointer, text.align.getNvgValue());
+		nvgFillColor(pointer, textColor.toNVGColor());
 		nvgText(pointer, x, y, text.getText());
 
-		if (!text.getFont().equals(defaultFont)) {
+		if (!textFont.equals(defaultFont)) {
 			nvgFontFace(pointer, defaultFont);
 		}
 	}

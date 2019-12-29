@@ -5,7 +5,7 @@ import org.joml.Vector3f;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import spck.engine.Engine;
+import spck.engine.framework.OpenGLAABBGPUDataStore;
 import spck.engine.framework.OpenGLDefaultGPUMeshDataStore;
 import spck.engine.render.*;
 
@@ -17,7 +17,9 @@ class EntityBatchStoreTest {
 
     @BeforeEach
     void before() {
-        store = new EntityBatchStore();
+        GPUDataStore<MeshMaterialBatch> gpuDataStore = Mockito.mock(OpenGLDefaultGPUMeshDataStore.class);
+        GPUDataStore<MeshMaterialBatch> aabbGpuDataStore = Mockito.mock(OpenGLAABBGPUDataStore.class);
+        store = new EntityBatchStore(gpuDataStore, aabbGpuDataStore);
     }
 
     @Test
@@ -109,8 +111,6 @@ class EntityBatchStoreTest {
 
     @Test
     void addingMultipleDiffMatDiffMesh() {
-        mockStandardRenderer();
-
         Material mat1 = new DefaultMaterial();
         Material mat2 = new DefaultMaterial();
         mat2.setDiffuseColor(new Vector3f(0, 0, 0));
@@ -135,8 +135,6 @@ class EntityBatchStoreTest {
 
     @Test
     void changeMaterial() {
-        mockStandardRenderer();
-
         Material mat1 = new DefaultMaterial();
         Material mat2 = new DefaultMaterial();
 
@@ -185,8 +183,6 @@ class EntityBatchStoreTest {
 
     @Test
     void changeMesh() {
-        mockStandardRenderer();
-
         Material mat = new DefaultMaterial();
         Mesh mesh1 = createEmptyMesh();
         Mesh mesh2 = createEmptyMesh();
@@ -233,8 +229,6 @@ class EntityBatchStoreTest {
 
     @Test
     void changeMeshAndMaterial() {
-        mockStandardRenderer();
-
         Material mat1 = new DefaultMaterial();
         Material mat2 = new DefaultMaterial();
         Mesh mesh1 = createEmptyMesh();
@@ -271,10 +265,6 @@ class EntityBatchStoreTest {
         List<MeshMaterialBatch> groupBatchesAfter2 = new ArrayList<>(batchGroupsAfter.get(1).getBatches().values());
         Assertions.assertThat(groupBatchesAfter2.get(0).getEntities().size()).isEqualTo(1);
         Assertions.assertThat(groupBatchesAfter2.get(0).getEntities().contains(2)).isTrue();
-    }
-
-    private void mockStandardRenderer() {
-        Engine.gpuDataStore = Mockito.mock(OpenGLDefaultGPUMeshDataStore.class);
     }
 
     private Mesh createEmptyMesh() {

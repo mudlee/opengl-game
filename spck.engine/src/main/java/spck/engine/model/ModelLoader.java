@@ -4,10 +4,9 @@ import org.joml.AABBf;
 import org.joml.Vector3f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
+import org.lwjgl.system.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spck.engine.Engine;
-import spck.engine.OS;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.framework.assets.TextureLoader;
@@ -90,9 +89,9 @@ public class ModelLoader {
     }
 
     private static String getmodelPath(String path) {
-        if (Engine.preferences.os == OS.WINDOWS) {
-            return path.substring(1);
-        }
+		if (Platform.get() == Platform.WINDOWS) {
+			return path.substring(1);
+		}
 
         return path;
     }

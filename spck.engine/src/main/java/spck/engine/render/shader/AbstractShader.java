@@ -22,26 +22,32 @@ public abstract class AbstractShader {
     private final static List<Integer> fragmentShaders = new ArrayList<>();
     private final Map<String, Integer> uniforms = new HashMap<>();
     private final Class<? extends AbstractShader> child;
-    protected int programId;
+	private boolean initialized;
+	protected int programId;
 
-    public AbstractShader(Class<? extends AbstractShader> child) {
-        this.child = child;
-    }
+	public AbstractShader(Class<? extends AbstractShader> child) {
+		this.child = child;
+	}
 
-    public void init() {
-        programId = GL41.glGenProgramPipelines();
-        log.debug("Pipeline was created [ID:{}] for {}", programId, this.getClass().getSimpleName());
+	public void init() {
+		programId = GL41.glGenProgramPipelines();
+		log.debug("Pipeline was created [ID:{}] for {}", programId, this.getClass().getSimpleName());
 
-        MessageBus.register(LifeCycle.CLEANUP.eventID(), this::cleanUp);
-    }
+		MessageBus.register(LifeCycle.CLEANUP.eventID(), this::cleanUp);
+		initialized = true;
+	}
 
-    protected void bind() {
-        GL41.glBindProgramPipeline(programId);
-    }
+	public boolean isInitialized() {
+		return initialized;
+	}
 
-    protected void unbind() {
-        GL41.glBindProgramPipeline(0);
-    }
+	protected void bind() {
+		GL41.glBindProgramPipeline(programId);
+	}
+
+	protected void unbind() {
+		GL41.glBindProgramPipeline(0);
+	}
 
     protected void createUniform(int programId, Enum uniformName) {
         createUniform(programId, uniformName.name());

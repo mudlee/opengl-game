@@ -3,9 +3,11 @@ package spck.engine.render.shader;
 import spck.engine.render.Material;
 
 public interface Shader {
-    void init();
+	void init();
 
-    void startShader(Material material);
+	boolean isInitialized();
 
-    void stopShader();
+	void startShader(Material material);
+
+	void stopShader();
 }

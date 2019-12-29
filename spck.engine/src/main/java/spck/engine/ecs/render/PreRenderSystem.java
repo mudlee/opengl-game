@@ -11,15 +11,13 @@ import spck.engine.ecs.render.components.RenderComponent;
 import spck.engine.render.MeshMaterialPair;
 import spck.engine.render.shader.Shader;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PreRenderSystem extends IteratingSystem {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PreRenderSystem.class);
-    private final Runnable doNothing = () -> {
-    };
+    private static final Logger log = LoggerFactory.getLogger(PreRenderSystem.class);
+	private final Runnable doNothing = () -> {
+	};
     private final EntityBatchStore batchStore;
-    private final List<Shader> initialisedShaders = new ArrayList<>();
     private ComponentMapper<RenderComponent> meshRendererMapper;
 
     public PreRenderSystem(EntityBatchStore batchStore) {
@@ -51,24 +49,23 @@ public class PreRenderSystem extends IteratingSystem {
 
             component.transform.processChanges(() -> batchStore.entityTransformHasChanged(entityId, component));
         } else {
-            component.meshMaterialCollection.getCollection().forEach(meshMaterialPair -> batchStore.add(entityId, meshMaterialPair));
-            initShaderIfNeeded(component.meshMaterialCollection.getShaders());
+			component.meshMaterialCollection.getCollection().forEach(meshMaterialPair -> batchStore.add(entityId, meshMaterialPair));
+			for (MeshMaterialPair meshMaterialPair : component.meshMaterialCollection.getCollection()) {
+				meshMaterialPair.getMaterial().getShader().ifPresent(this::initShaderIfNeeded);
+			}
 
-            // mark everything up2date as the data was just uploaded to the GPU
-            component.meshMaterialCollection.ackMeshChanges();
-            component.meshMaterialCollection.ackMaterialChanges();
-            component.transform.processChanges(doNothing);
-        }
-    }
+			// mark everything up2date as the data was just uploaded to the GPU
+			component.meshMaterialCollection.ackMeshChanges();
+			component.meshMaterialCollection.ackMaterialChanges();
+			component.transform.processChanges(doNothing);
+		}
+	}
 
-    private void initShaderIfNeeded(List<Shader> shaders) {
-        shaders.forEach(shader -> {
-            if (!initialisedShaders.contains(shader)) {
-                LOGGER.debug("Initialising shader {}", shader);
-                shader.init();
-                initialisedShaders.add(shader);
-                LOGGER.debug("Shader {} initialised", shader);
-            }
-        });
-    }
+	private void initShaderIfNeeded(Shader shader) {
+		if (!shader.isInitialized()) {
+			log.debug("Initialising shader {}", shader);
+			shader.init();
+			log.debug("Shader {} initialised", shader);
+		}
+	}
 }

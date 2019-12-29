@@ -30,7 +30,7 @@ public interface Material {
 
     Optional<TextureUVModifier> getDiffuseTextureUVModifier();
 
-    Shader getShader();
+    Optional<Shader> getShader();
 
     float getShininess();
 

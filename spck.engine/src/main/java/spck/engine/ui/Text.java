@@ -1,7 +1,8 @@
 package spck.engine.ui;
 
-import spck.engine.Engine;
 import spck.engine.framework.RGBAColor;
+
+import java.util.Optional;
 
 public class Text extends UIElement {
 	private String text;
@@ -9,8 +10,9 @@ public class Text extends UIElement {
 	private String font;
 	private RGBAColor color;
 
-	private Text(int x, int y, Align align) {
+	private Text(String text, int x, int y, Align align) {
 		super(x, y, align);
+		this.text = text;
 	}
 
 	public String getText() {
@@ -21,12 +23,12 @@ public class Text extends UIElement {
 		return size;
 	}
 
-	public String getFont() {
-		return font;
+	public Optional<String> getFont() {
+		return Optional.ofNullable(font);
 	}
 
-	public RGBAColor getColor() {
-		return color;
+	public Optional<RGBAColor> getColor() {
+		return Optional.ofNullable(color);
 	}
 
 	public void setText(String text) {
@@ -49,21 +51,18 @@ public class Text extends UIElement {
 		private int x;
 		private int y;
 		private Align align = Align.TOP_LEFT;
-		private String text = "TEXT";
+		private String text;
 		private int size = 15;
-		private String font = Engine.preferences.defaultFont;
-		private RGBAColor color = RGBAColor.white();
+		private String font;
+		private RGBAColor color;
 
 		private Builder() {
 		}
 
-		public static Builder create() {
-			return new Builder();
-		}
-
-		public Builder withText(String text) {
-			this.text = text;
-			return this;
+		public static Builder create(String text) {
+			Builder builder = new Builder();
+			builder.text = text;
+			return builder;
 		}
 
 		public Builder withX(int x) {
@@ -97,8 +96,7 @@ public class Text extends UIElement {
 		}
 
 		public Text build() {
-			Text text = new Text(x, y, align);
-			text.text = this.text;
+			Text text = new Text(this.text, x, y, align);
 			text.font = this.font;
 			text.size = this.size;
 			text.color = this.color;

@@ -1,7 +1,6 @@
 package spck.engine.render;
 
 import org.joml.Vector3f;
-import spck.engine.Engine;
 import spck.engine.render.shader.Shader;
 import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureUVModifier;
@@ -9,28 +8,31 @@ import spck.engine.render.textures.TextureUVModifier;
 import java.util.Optional;
 
 public class DefaultMaterial implements Material {
-    private final Shader shader;
-    private float shininess = 1.0f;
-    private Vector3f specularColor = new Vector3f(0.5f, 0.5f, 0.5f);
-    private Vector3f diffuseColor = new Vector3f(0.5f, 0.5f, 0.5f);
-    private Vector3f ambientColor = new Vector3f(0.5f, 0.5f, 0.5f);
-    private Texture2D diffuseTexture = null;
-    private TextureUVModifier diffuseTextureUVModifier = null;
-    private boolean changed;
+    private Shader shader;
+	private float shininess = 1.0f;
+	private Vector3f specularColor = new Vector3f(0.5f, 0.5f, 0.5f);
+	private Vector3f diffuseColor = new Vector3f(0.5f, 0.5f, 0.5f);
+	private Vector3f ambientColor = new Vector3f(0.5f, 0.5f, 0.5f);
+	private Texture2D diffuseTexture = null;
+	private TextureUVModifier diffuseTextureUVModifier = null;
+	private boolean changed;
 
-    public DefaultMaterial() {
-        shader = Engine.shader;
-    }
+	public DefaultMaterial() {
+	}
 
-    /*
-     * We consider DefaultMaterial equal if they have the same color and texture settings
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DefaultMaterial)) return false;
+	public DefaultMaterial(Shader shader) {
+		this.shader = shader;
+	}
 
-        DefaultMaterial that = (DefaultMaterial) o;
+	/*
+	 * We consider DefaultMaterial equal if they have the same color and texture settings
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof DefaultMaterial)) return false;
+
+		DefaultMaterial that = (DefaultMaterial) o;
 
         if (Float.compare(that.shininess, shininess) != 0) return false;
         if (!specularColor.equals(that.specularColor)) return false;
@@ -108,10 +110,10 @@ public class DefaultMaterial implements Material {
         return diffuseTexture != null;
     }
 
-    @Override
-    public Shader getShader() {
-        return shader;
-    }
+	@Override
+	public Optional<Shader> getShader() {
+		return Optional.ofNullable(shader);
+	}
 
     @Override
     public float getShininess() {

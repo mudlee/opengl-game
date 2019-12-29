@@ -27,14 +27,15 @@ module spck.engine {
     exports spck.engine.ecs;
     exports spck.engine.ecs.render.components;
     exports spck.engine.lights;
-    exports spck.engine.model.primitives;
-    exports spck.engine.render;
-    exports spck.engine.render.textures;
-    exports spck.engine.model;
-    exports spck.engine.render.camera;
-    exports spck.engine.framework.assets;
-    exports spck.engine.ui;
-    exports spck.engine.window;
-    exports spck.engine.physics;
-    exports spck.engine.util;
+	exports spck.engine.model.primitives;
+	exports spck.engine.render;
+	exports spck.engine.render.textures;
+	exports spck.engine.model;
+	exports spck.engine.render.camera;
+	exports spck.engine.framework.assets;
+	exports spck.engine.ui;
+	exports spck.engine.window;
+	exports spck.engine.physics;
+	exports spck.engine.util;
+	exports spck.engine.ecs.render;
 }

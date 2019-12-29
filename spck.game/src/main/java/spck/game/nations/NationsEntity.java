@@ -44,8 +44,7 @@ public class NationsEntity extends AbstractEntity {
         for (Nation nation : nations) {
             for (CityArea area : nation.getAreas()) {
                 texts[i] = Text.Builder
-                        .create()
-                        .withText(area.getName())
+                        .create(area.getName())
                         .withX((int) area.getPosition().x)
                         .withY((int) area.getPosition().y)
                         .withColor(RGBAColor.black())

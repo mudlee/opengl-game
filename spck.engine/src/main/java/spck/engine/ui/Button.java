@@ -1,21 +1,22 @@
 package spck.engine.ui;
 
-import spck.engine.Engine;
 import spck.engine.framework.RGBAColor;
 
+import java.util.Optional;
+
 public class Button extends UIElement {
-	protected String text;
-	protected int textSize;
-	protected Align textAlign;
-	protected String textFont;
-	protected RGBAColor textColor;
-	protected RGBAColor textMouseOverColor;
-	protected RGBAColor backgroundColor;
-	protected RGBAColor backgroundMouseOverColor;
-	protected int width;
-	protected int height;
-	protected int cornerRadius;
-	protected Runnable onClickHandler;
+	private String text;
+	private int textSize;
+	private Align textAlign;
+	private String textFont;
+	private RGBAColor textColor;
+	private RGBAColor textMouseOverColor;
+	private RGBAColor backgroundColor;
+	private RGBAColor backgroundMouseOverColor;
+	private int width;
+	private int height;
+	private int cornerRadius;
+	private Runnable onClickHandler;
 
 	public Button(
 			int x,
@@ -38,7 +39,6 @@ public class Button extends UIElement {
 		this.text = text;
 		this.textSize = textSize;
 		this.textAlign = textAlign;
-		this.textFont = textFont;
 		this.textColor = textColor;
 		this.textMouseOverColor = textMouseOverColor;
 		this.backgroundColor = backgroundColor;
@@ -49,6 +49,54 @@ public class Button extends UIElement {
 		this.onClickHandler = onClickHandler;
 	}
 
+	public String getText() {
+		return text;
+	}
+
+	public int getTextSize() {
+		return textSize;
+	}
+
+	public Align getTextAlign() {
+		return textAlign;
+	}
+
+	public Optional<String> getTextFont() {
+		return Optional.ofNullable(textFont);
+	}
+
+	public Optional<RGBAColor> getTextColor() {
+		return Optional.ofNullable(textColor);
+	}
+
+	public Optional<RGBAColor> getTextMouseOverColor() {
+		return Optional.ofNullable(textMouseOverColor);
+	}
+
+	public Optional<RGBAColor> getBackgroundColor() {
+		return Optional.ofNullable(backgroundColor);
+	}
+
+	public Optional<RGBAColor> getBackgroundMouseOverColor() {
+		return Optional.ofNullable(backgroundMouseOverColor);
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public int getCornerRadius() {
+		return cornerRadius;
+	}
+
+	public Optional<Runnable> getOnClickHandler() {
+		return Optional.ofNullable(onClickHandler);
+	}
+
 	public static final class Builder {
 		private int x;
 		private int y;
@@ -56,10 +104,10 @@ public class Button extends UIElement {
 		private String text;
 		private int textSize = 15;
 		private Align textAlign = Align.MIDDLE_CENTER;
-		private String textFont = Engine.preferences.defaultFont;
-		private RGBAColor textColor = RGBAColor.white();
+		private String textFont;
+		private RGBAColor textColor;
 		private RGBAColor textMouseOverColor;
-		private RGBAColor backgroundColor = RGBAColor.black();
+		private RGBAColor backgroundColor;
 		private RGBAColor backgroundMouseOverColor;
 		private int width;
 		private int height;

@@ -1,5 +1,6 @@
 package spck.engine;
 
+import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spck.engine.bus.LifeCycle;
@@ -11,19 +12,21 @@ import spck.engine.window.GLFWWindow;
 class GameLoop {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameLoop.class);
     private final static int TARGET_FPS = 100;
-    private final GLFWWindow window;
+	private final GLFWWindow window;
+	private final Vector4f clearColor;
 
-    GameLoop(GLFWWindow window) {
-        this.window = window;
-    }
+	GameLoop(GLFWWindow window, Vector4f clearColor) {
+		this.window = window;
+		this.clearColor = clearColor;
+	}
 
     void loop() {
         LOGGER.debug("Running game loop...");
         double lastLoopTime = Time.getJVMTimeInSec();
 
         while (window.shouldNotClose()) {
-            Stats.reset();
-            Graphics.clearScreen(Engine.preferences.clearColor.x, Engine.preferences.clearColor.y, Engine.preferences.clearColor.z, Engine.preferences.clearColor.w);
+			Stats.reset();
+			Graphics.clearScreen(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
 
             double currentTime = Time.getJVMTimeInSec();
             Time.deltaTime = (float) (currentTime - lastLoopTime);

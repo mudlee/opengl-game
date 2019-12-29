@@ -1,24 +1,23 @@
 package spck.engine.ecs.render;
 
 import com.artemis.BaseSystem;
-import spck.engine.Engine;
 import spck.engine.debug.Stats;
 import spck.engine.ecs.EntityBatchStore;
-import spck.engine.framework.Graphics;
-import spck.engine.framework.OpenGLAABBRenderer;
-import spck.engine.framework.OpenGLPolygonRenderer;
-import spck.engine.framework.MeshRenderer;
+import spck.engine.framework.*;
 import spck.engine.render.MaterialBatchGroup;
 import spck.engine.render.MeshMaterialBatch;
 import spck.engine.render.camera.Camera;
 import spck.engine.render.shader.AABBShader;
 import spck.engine.render.shader.PolygonShader;
+import spck.engine.render.shader.Shader;
 import spck.engine.util.RunOnce;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class RenderSystem extends BaseSystem {
+    public static boolean polygonRenderMode;
+    public static boolean renderAABB;
     private final MeshRenderer renderer;
     private final EntityBatchStore batchStore;
     private final PolygonShader polygonShader;
@@ -26,28 +25,31 @@ public class RenderSystem extends BaseSystem {
     private final Set<Integer> entityIdsStat = new HashSet<>();
     private final MeshRenderer polygonOpenGLRenderer = new OpenGLPolygonRenderer();
     private final MeshRenderer aabbRenderer = new OpenGLAABBRenderer();
+    private final Shader defaultShader;
 
     public RenderSystem(MeshRenderer renderer, EntityBatchStore batchStore, Camera camera) {
         this.renderer = renderer;
         this.batchStore = batchStore;
         polygonShader = new PolygonShader(camera);
         aabbShader = new AABBShader(camera);
+        defaultShader = new OpenGLStandardShader(camera);
     }
 
     @Override
     protected void processSystem() {
         RunOnce.run("PolygonShader init", polygonShader::init);
         RunOnce.run("AABBShader init", aabbShader::init);
+        RunOnce.run("Default shader init", defaultShader::init);
 
         batchStore.processChanges();
 
-        if (Engine.preferences.polygonRenderMode) {
+        if (polygonRenderMode) {
             polygonRender();
         } else {
             forwardRender();
         }
 
-        if (Engine.preferences.renderAABB) {
+        if (renderAABB) {
             aabbRender();
         }
     }
@@ -81,11 +83,11 @@ public class RenderSystem extends BaseSystem {
         updateStats();
 
         for (MaterialBatchGroup batchGroup : batchStore.getGroups().values()) {
-            batchGroup.getMaterial().getShader().startShader(batchGroup.getMaterial());
+            batchGroup.getMaterial().getShader().orElse(defaultShader).startShader(batchGroup.getMaterial());
             for (MeshMaterialBatch meshMaterialBatch : batchGroup.getBatches().values()) {
                 renderer.render(meshMaterialBatch);
             }
-            batchGroup.getMaterial().getShader().stopShader();
+            batchGroup.getMaterial().getShader().orElse(defaultShader).stopShader();
         }
     }
 

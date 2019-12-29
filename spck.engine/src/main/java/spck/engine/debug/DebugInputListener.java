@@ -2,7 +2,7 @@ package spck.engine.debug;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spck.engine.Engine;
+import spck.engine.ecs.render.RenderSystem;
 import spck.engine.render.camera.Camera;
 import spck.engine.window.Input;
 
@@ -16,13 +16,13 @@ public class DebugInputListener {
         input.onKeyPressed(GLFW_KEY_F12, event -> {
             camera.forceUpdate();
 
-            Engine.preferences.polygonRenderMode = !Engine.preferences.polygonRenderMode;
-            LOGGER.debug("polygonMode has been set to: {}", Engine.preferences.polygonRenderMode);
+            RenderSystem.polygonRenderMode = !RenderSystem.polygonRenderMode;
+            LOGGER.debug("polygonMode has been set to: {}", RenderSystem.polygonRenderMode);
         });
 
         input.onKeyPressed(GLFW_KEY_F11, event -> {
-            Engine.preferences.renderAABB = !Engine.preferences.renderAABB;
-            LOGGER.debug("renderAABB has been set to: {}", Engine.preferences.renderAABB);
+            RenderSystem.renderAABB = !RenderSystem.renderAABB;
+            LOGGER.debug("renderAABB has been set to: {}", RenderSystem.renderAABB);
         });
     }
 }

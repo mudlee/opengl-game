@@ -1,11 +1,11 @@
 package spck.game.ui;
 
-import spck.engine.Engine;
 import spck.engine.bus.LifeCycle;
 import spck.engine.bus.MessageBus;
 import spck.engine.debug.Measure;
 import spck.engine.debug.Stats;
 import spck.engine.ecs.ECS;
+import spck.engine.ecs.render.RenderSystem;
 import spck.engine.framework.RGBAColor;
 import spck.engine.render.camera.OrthoCamera;
 import spck.engine.ui.Align;
@@ -41,23 +41,23 @@ public class DebugUI {
 		MessageBus.register(LifeCycle.UPDATE.eventID(), this::onUpdate);
 
 		Canvas debugCanvas = (Canvas) ecs.createEntity(new Canvas());
-		fps = debugCanvas.addText(Text.Builder.create().withX(10).withY(10).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		vsync = debugCanvas.addText(Text.Builder.create().withX(10).withY(45).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		renderTime = debugCanvas.addText(Text.Builder.create().withX(10).withY(80).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		camPos = debugCanvas.addText(Text.Builder.create().withX(10).withY(115).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		camRot = debugCanvas.addText(Text.Builder.create().withX(10).withY(150).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		camSize = debugCanvas.addText(Text.Builder.create().withX(10).withY(185).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		verts = debugCanvas.addText(Text.Builder.create().withX(10).withY(220).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		vertsTotal = debugCanvas.addText(Text.Builder.create().withX(10).withY(255).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		batchGroups = debugCanvas.addText(Text.Builder.create().withX(10).withY(290).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		batches = debugCanvas.addText(Text.Builder.create().withX(10).withY(325).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		numOfEntities = debugCanvas.addText(Text.Builder.create().withX(10).withY(360).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		vboMemoryUsed = debugCanvas.addText(Text.Builder.create().withX(10).withY(395).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		jvmMemoryFree = debugCanvas.addText(Text.Builder.create().withX(10).withY(430).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		jvmMemoryAllocated = debugCanvas.addText(Text.Builder.create().withX(10).withY(465).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		jvmMemoryMax = debugCanvas.addText(Text.Builder.create().withX(10).withY(500).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		jvmMemoryTotalFree = debugCanvas.addText(Text.Builder.create().withX(10).withY(535).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
-		aabbRendering = debugCanvas.addText(Text.Builder.create().withX(10).withY(570).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		fps = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(10).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		vsync = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(45).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		renderTime = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(80).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		camPos = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(115).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		camRot = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(150).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		camSize = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(185).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		verts = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(220).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		vertsTotal = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(255).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		batchGroups = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(290).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		batches = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(325).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		numOfEntities = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(360).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		vboMemoryUsed = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(395).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		jvmMemoryFree = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(430).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		jvmMemoryAllocated = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(465).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		jvmMemoryMax = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(500).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		jvmMemoryTotalFree = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(535).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
+		aabbRendering = debugCanvas.addText(Text.Builder.create("n/a").withX(10).withY(570).withAlign(Align.TOP_LEFT).withColor(RGBAColor.black()).build());
 	}
 
 	private void onUpdate() {
@@ -79,6 +79,6 @@ public class DebugUI {
 		jvmMemoryAllocated.setText("JVM mem allocated: " + NumberFormatter.formatBinaryUnit(runtime.totalMemory()));
 		jvmMemoryMax.setText("JVM mem max: " + NumberFormatter.formatBinaryUnit(runtime.maxMemory()));
 		jvmMemoryTotalFree.setText("JVM mem total free: " + NumberFormatter.formatBinaryUnit(runtime.freeMemory() + (runtime.maxMemory() - runtime.totalMemory())));
-		aabbRendering.setText("Showing AABB: " + Engine.preferences.renderAABB);
+		aabbRendering.setText("Showing AABB: " + RenderSystem.renderAABB);
 	}
 }

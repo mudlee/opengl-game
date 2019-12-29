@@ -1,7 +1,6 @@
 package spck.engine.render;
 
 import org.joml.AABBf;
-import spck.engine.render.shader.Shader;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,10 +21,6 @@ public class MeshMaterialCollection {
 
     public List<MeshMaterialPair> getCollection() {
         return collection;
-    }
-
-    public List<Shader> getShaders() {
-        return collection.stream().map(MeshMaterialPair::getMaterial).map(Material::getShader).collect(Collectors.toList());
     }
 
     public List<AABBf> getAABBs() {
