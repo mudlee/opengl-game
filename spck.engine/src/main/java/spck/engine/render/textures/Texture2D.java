@@ -1,7 +1,7 @@
 package spck.engine.render.textures;
 
 public class Texture2D implements Texture {
-    private final TextureRegistryID textureRegistryID;
+    private final String textureRegistryId;
     private final int id;
     private final int width;
     private final int height;
@@ -9,8 +9,8 @@ public class Texture2D implements Texture {
     private final int glTextureSlot;
     private final String shaderSamplerName;
 
-    public Texture2D(TextureRegistryID textureRegistryID, int id, int width, int height, int samplerIndex, int glTextureSlot, String shaderSamplerName) {
-        this.textureRegistryID = textureRegistryID;
+    public Texture2D(String textureRegistryId, int id, int width, int height, int samplerIndex, int glTextureSlot, String shaderSamplerName) {
+        this.textureRegistryId = textureRegistryId;
         this.id = id;
         this.width = width;
         this.height = height;
@@ -21,7 +21,7 @@ public class Texture2D implements Texture {
 
     @Override
     public Texture copy() {
-        return new Texture2D(textureRegistryID, id, width, height, samplerIndex, glTextureSlot, shaderSamplerName);
+        return new Texture2D(textureRegistryId, id, width, height, samplerIndex, glTextureSlot, shaderSamplerName);
     }
 
     @Override
@@ -54,8 +54,8 @@ public class Texture2D implements Texture {
     }
 
     @Override
-    public TextureRegistryID getTextureRegistryID() {
-        return textureRegistryID;
+    public String getTextureRegistryId() {
+        return textureRegistryId;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package spck.engine.render.textures;
 
-public class DynamicTextureRegistryID implements TextureRegistryID {
+public class DynamicTextureRegistryID {
     private final String texturePath;
 
     public DynamicTextureRegistryID(String textureID) {

@@ -1,12 +1,12 @@
 package spck.game.nations;
 
-import org.joml.Vector3f;
-
 public class EuropeanUnion implements Nation {
+    // https://en.wikipedia.org/wiki/List_of_cities_in_the_European_Union_by_population_within_city_limits
     private final CityArea[] areas = new CityArea[]{
-            new CityArea("Budapest", new Vector3f(5f, 15f, 0), 2.5f),
-            new CityArea("Paris", new Vector3f(0.5f, 15.3f, 0), 5f),
-            new CityArea("Berlin", new Vector3f(3.3f, 16.5f, 0), 6f),
+            new CityArea("Berlin", new Coordinates(52.52437f, 13.41053f), 6f),
+            new CityArea("Paris", new Coordinates(48.85341f, 2.3488f), 5f),
+            new CityArea("Budapest", new Coordinates(47.49801f, 19.03991f), 2.5f),
+
     };
 
     @Override

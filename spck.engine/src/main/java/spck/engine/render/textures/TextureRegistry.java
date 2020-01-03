@@ -10,16 +10,16 @@ import java.util.Optional;
 
 public class TextureRegistry {
     private final static Logger LOGGER = LoggerFactory.getLogger(TextureRegistry.class);
-    private static Map<TextureRegistryID, Texture> registry = new HashMap<>();
+    private static Map<String, Texture> registry = new HashMap<>();
 
     public static Texture register(Texture entry) {
-        LOGGER.debug("Registering {} ID:{} SAMPLER:{}-{}", entry.getClass().getSimpleName(), entry.getTextureRegistryID(), entry.getSamplerIndex(), entry.getShaderSamplerName());
-        registry.putIfAbsent(entry.getTextureRegistryID(), entry);
+        LOGGER.debug("Registering {} ID:{} SAMPLER:{}-{}", entry.getClass().getSimpleName(), entry.getTextureRegistryId(), entry.getSamplerIndex(), entry.getShaderSamplerName());
+        registry.putIfAbsent(entry.getTextureRegistryId(), entry);
         return entry;
     }
 
-    public static Optional<Texture> get(TextureRegistryID textureID, boolean newInstance) {
-        Texture texture = registry.getOrDefault(textureID, null);
+    public static Optional<Texture> get(String textureId, boolean newInstance) {
+        Texture texture = registry.getOrDefault(textureId, null);
 
         if (texture == null) {
             return Optional.empty();

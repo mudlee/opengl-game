@@ -1,7 +1,7 @@
 package spck.engine.render.textures;
 
 public interface Texture {
-    TextureRegistryID getTextureRegistryID();
+    String getTextureRegistryId();
 
     int getId();
 

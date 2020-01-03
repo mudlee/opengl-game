@@ -1,15 +1,13 @@
 package spck.game.nations;
 
-import org.joml.Vector3f;
-
 class CityArea {
     private final String name;
-    private final Vector3f position;
+    private final Coordinates coordinates;
     private final float populationMio;
 
-    CityArea(String name, Vector3f position, float populationMio) {
+    CityArea(String name, Coordinates coordinates, float populationMio) {
         this.name = name;
-        this.position = position;
+        this.coordinates = coordinates;
         this.populationMio = populationMio;
     }
 
@@ -17,8 +15,8 @@ class CityArea {
         return name;
     }
 
-    public Vector3f getPosition() {
-        return position;
+    public Coordinates getCoordinates() {
+        return coordinates;
     }
 
     public float getPopulationMio() {

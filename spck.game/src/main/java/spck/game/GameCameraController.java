@@ -12,7 +12,6 @@ import spck.engine.framework.assets.TextureStorage;
 import spck.engine.render.camera.OrthoCamera;
 import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureRegistry;
-import spck.engine.render.textures.TextureRegistryID;
 import spck.engine.ui.Canvas;
 import spck.engine.ui.Image;
 import spck.engine.window.GLFWWindow;
@@ -32,10 +31,6 @@ public class GameCameraController extends AbstractEntity {
     private static final float MAX_ZOOM = 30f;
     private static final Vector3f REUSABLE_3D_VECTOR = new Vector3f();
     private static final Vector2f REUSABLE_2D_VECTOR = new Vector2f();
-
-    private enum CursorTextureRegistryID implements TextureRegistryID {
-        CURSOR
-    }
 
     static {
         moveKeyMap.put(MoveDirection.LEFT, GLFW_KEY_A);
@@ -91,7 +86,7 @@ public class GameCameraController extends AbstractEntity {
     public void onEntityReady() {
         window.captureMouse();
 
-        Texture2D cursorTexture = TextureStorage.loadFromResource("/textures/pointer.png", CursorTextureRegistryID.CURSOR);
+        Texture2D cursorTexture = TextureStorage.loadFromResource("/textures/pointer.png", TextureId.CURSOR);
         TextureRegistry.register(cursorTexture);
 
         Vector2d mousePos = input.getMouseAbsolutePosition();

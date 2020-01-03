@@ -7,7 +7,6 @@ import spck.engine.framework.GL;
 import spck.engine.render.textures.Texture;
 import spck.engine.render.textures.Texture2D;
 import spck.engine.render.textures.TextureData;
-import spck.engine.render.textures.TextureRegistryID;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import static java.lang.Math.round;
 
 public class TextureStorage {
     private final static List<Texture> TEXTURES = new ArrayList<>();
-    private final static Map<TextureRegistryID, Texture> CACHE = new HashMap<>();
+    private final static Map<String, Texture> CACHE = new HashMap<>();
 
     static {
         MessageBus.register(LifeCycle.CLEANUP.eventID(), TextureStorage::cleanUp);
@@ -61,9 +60,9 @@ public class TextureStorage {
             // GL has a max of 31
     };
 
-    public static Texture2D loadFromTextureData(TextureData textureData, String shaderSampler, TextureRegistryID textureRegistryID) {
-        if (CACHE.containsKey(textureRegistryID)) {
-            return (Texture2D) CACHE.get(textureRegistryID);
+    public static Texture2D loadFromTextureData(TextureData textureData, String shaderSampler, String textureRegistryId) {
+        if (CACHE.containsKey(textureRegistryId)) {
+            return (Texture2D) CACHE.get(textureRegistryId);
         }
 
         int id = GL.genTextureContext(GL41.GL_TEXTURE_2D, textureId -> {
@@ -75,14 +74,14 @@ public class TextureStorage {
 
         int nextIndex = getNextIndex();
 
-        Texture2D texture = new Texture2D(textureRegistryID, id, textureData.getWidth(), textureData.getHeight(), nextIndex, GL_SLOTS[nextIndex], shaderSampler);
+        Texture2D texture = new Texture2D(textureRegistryId, id, textureData.getWidth(), textureData.getHeight(), nextIndex, GL_SLOTS[nextIndex], shaderSampler);
         TEXTURES.add(texture);
-        CACHE.put(textureRegistryID, texture);
+        CACHE.put(textureRegistryId, texture);
 
         return texture;
     }
 
-    public static Texture2D loadFromResource(String file, String shaderSampler, TextureRegistryID textureRegistryID) {
+    public static Texture2D loadFromResource(String file, String shaderSampler, String textureRegistryId) {
         TextureData textureData = TextureLoader.loadFromResources(file);
 
         int id = GL.genTextureContext(GL41.GL_TEXTURE_2D, textureId -> {
@@ -93,16 +92,16 @@ public class TextureStorage {
         });
 
         int nextIndex = getNextIndex();
-        Texture2D texture = new Texture2D(textureRegistryID, id, textureData.getWidth(), textureData.getHeight(), nextIndex, GL_SLOTS[nextIndex], shaderSampler);
+        Texture2D texture = new Texture2D(textureRegistryId, id, textureData.getWidth(), textureData.getHeight(), nextIndex, GL_SLOTS[nextIndex], shaderSampler);
         TEXTURES.add(texture);
         return texture;
     }
 
-    public static Texture2D loadFromResource(String file, TextureRegistryID textureRegistryID) {
+    public static Texture2D loadFromResource(String file, String textureRegistryID) {
         return loadFromResource(file, null, textureRegistryID);
     }
 
-    public static Texture2D store(TextureRegistryID registryID, String sourcePath, int textureID, int width, int height, String shaderSampler) {
+    public static Texture2D store(String registryID, String sourcePath, int textureID, int width, int height, String shaderSampler) {
         int nextIndex = getNextIndex();
 
         Texture2D texture = new Texture2D(registryID, textureID, width, height, nextIndex, GL_SLOTS[nextIndex], shaderSampler);

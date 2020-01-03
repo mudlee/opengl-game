@@ -62,9 +62,10 @@ public class Game extends AbstractGame {
 			});
 		});
 
-		ecs.createEntity(new WorldMap());
+        //ecs.createEntity(new WorldMap());
+        ecs.createEntity(new MapTest(window, canvas, (GameCamera) camera));
 		ecs.createEntity(new CrossHairCanvas(window, canvas));
-		ecs.createEntity(new NationsEntity((GameCamera) camera, canvas));
+        ecs.createEntity(new NationsEntity((GameCamera) camera, canvas, window));
 
 		new DebugUI(ecs, window, (OrthoCamera) camera);
 

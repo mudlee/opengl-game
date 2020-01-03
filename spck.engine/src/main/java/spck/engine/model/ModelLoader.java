@@ -221,7 +221,7 @@ public class ModelLoader {
             Texture2D texture = (Texture2D) TextureRegistry.register(TextureStorage.loadFromTextureData(
                     TextureLoader.loadFromByteBuffer(buffer),
                     ShaderUniform.Material.DIFFUSE_TEXTURE_SAMPLER.getUniformName(),
-                    new ModelTextureRegistryID(textPath)
+                    textPath
             ));
             LOGGER.debug("    Material {} texture is {}, - {}", textureType, textPath, texture);
             return texture;
